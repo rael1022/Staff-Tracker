@@ -1,0 +1,30 @@
+<h1>HR Dashboard</h1>
+<p>Welcome HR {{ user.username }}</p>
+
+<h2>Approve pending</h2>
+<table border="1">
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Approve</th>
+    </tr>
+    {% for profile in pending_users %}
+    <tr>
+        <td>{{ profile.user.username }}</td>
+        <td>{{ profile.user.email }}</td>
+        <td>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
+                <button type="submit">approve</button>
+            </form>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">not approve</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="../login/">Logout</a>

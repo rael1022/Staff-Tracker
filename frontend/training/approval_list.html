@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<h2>Pending Training Registrations</h2>
+
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Training</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reg in pending_regs %}
+        <tr>
+            <td>{{ reg.employee.username }}</td>
+            <td>{{ reg.training.title }}</td>
+            <td>{{ reg.training.date }}</td>
+            <td>{{ reg.training.time }}</td>
+            <td>{{ reg.training.location }}</td>
+            <td>
+                <a href="{% url 'approve_registration' reg.id %}">Approve</a> |
+                <a href="{% url 'reject_registration' reg.id %}">Reject</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No pending registrations.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+{% endblock %}
+
+</body>
+</html>

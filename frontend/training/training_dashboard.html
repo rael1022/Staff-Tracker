@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<h2>Trainer Dashboard</h2>
+<a href="{% url 'create_training' %}">Create New Training</a>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Location</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for training in trainings %}
+        <tr>
+            <td>{{ training.title }}</td>
+            <td>{{ training.date }}</td>
+            <td>{{ training.time }}</td>
+            <td>{{ training.location }}</td>
+            <td>
+                <a href="{% url 'edit_training' training.id %}">Edit</a> |
+                <a href="{% url 'delete_training' training.id %}">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No trainings yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+
+</body>
+</html>

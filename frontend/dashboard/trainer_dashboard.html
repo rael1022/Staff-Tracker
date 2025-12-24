@@ -6,6 +6,13 @@
     <title>Trainer</title>
 </head>
 <body>
-    
+{% extends 'base.html' %}
+{% block content %}
+<h2>Trainer Dashboard</h2>
+<p>Welcome, {{ request.user.username }}!</p>
+
+<a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
+{% endblock %}
+
 </body>
 </html>

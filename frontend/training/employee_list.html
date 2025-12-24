@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Trainings</title>
+</head>
+<body>
+{% extends 'base.html' %}
+{% block content %}
+<h2>Available Trainings</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Location</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% load training_tags %}
+        {% for training in trainings %}
+        <tr>
+            <td>{{ training.title }}</td>
+            <td>{{ training.date }}</td>
+            <td>{{ training.time }}</td>
+            <td>{{ training.location }}</td>
+            <td>
+                {% with reg=registrations|get_training_registration:training.id %}
+                    {% if reg %}
+                        {{ reg.status }}
+                    {% else %}
+                        <a href="{% url 'register_training' training.id %}">Register</a>
+                    {% endif %}
+                {% endwith %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No trainings available.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+{% endblock %}
+</body>
+</html>

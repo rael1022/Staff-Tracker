@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.contrib.auth import authenticate
 from django.utils import timezone
 from .models import Attendance
 from .serializers import (
-    QRAttendanceSerializer, 
     UserLoginSerializer, 
     GenerateQRSerializer,
     AttendanceSerializer
@@ -24,10 +24,17 @@ def generate_qr_code(request):
     training_id = serializer.validated_data['training_id']
     training_title = serializer.validated_data.get('training_title', 'Training Session')
     
+    attendance = Attendance.objects.create(
+        training_id=training_id,
+        status=Attendance.Status.ABSENT,
+        date=timezone.now().date(),
+    )
+    
     qr_data = {
         "type": "attendance_checkin",
         "training_id": training_id,
         "training_title": training_title,
+        "attendance_id": str(attendance.id), 
         "timestamp": int(time.time()),
         "expires": int(time.time()) + 3600,
         "generated_at": timezone.now().isoformat()
@@ -54,6 +61,7 @@ def generate_qr_code(request):
     return Response({
         'success': True,
         'message': 'QR code generated successfully',
+        'attendance_id': str(attendance.id),
         'training_id': training_id,
         'training_title': training_title,
         'qr_data': qr_json,
@@ -64,26 +72,20 @@ def generate_qr_code(request):
 
 @api_view(['POST'])
 def scan_qr_code(request):
-    serializer = QRAttendanceSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    qr_data = serializer.validated_data['qr_data']
-    training_id = serializer.validated_data['training_id']
-    
     try:
+        qr_data = request.data.get('qr_data')
+        if not qr_data:
+            return Response({
+                'success': False,
+                'message': 'QR code data is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
         qr_json = json.loads(qr_data)
         
         if qr_json.get('type') != 'attendance_checkin':
             return Response({
                 'success': False,
                 'message': 'This is not a check-in QR code'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        if qr_json.get('training_id') != training_id:
-            return Response({
-                'success': False,
-                'message': 'The QR code does not match the training.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         current_time = int(time.time())
@@ -93,21 +95,27 @@ def scan_qr_code(request):
                 'message': 'The QR code has expired. Please generate a new one.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        attendance = Attendance.objects.create(
-            training_id=training_id,
-            qr_code_data=qr_data,
-            qr_scan_time=timezone.now(),
-            status=Attendance.Status.ABSENT,
-            date=timezone.now().date(),
-        )
+        attendance_id = qr_json.get('attendance_id')
+        try:
+            attendance = Attendance.objects.get(id=attendance_id)
+        except Attendance.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'Attendance record not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        if attendance.user_id:
+            return Response({
+                'success': False,
+                'message': 'This QR code has already been used for check-in'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         return Response({
             'success': True,
-            'message': 'Please log in to verify your identity.',
-            'attendance_id': str(attendance.id),
-            'requires_login': True,
+            'message': 'Please enter your credentials to check in.',
+            'attendance_id': attendance_id,
             'training_title': qr_json.get('training_title', 'Unknown Training'),
-            'training_id': training_id
+            'training_id': qr_json.get('training_id')
         })
         
     except json.JSONDecodeError:
@@ -130,24 +138,63 @@ def verify_user_and_checkin(request):
     username = serializer.validated_data['username']
     password = serializer.validated_data['password']
     attendance_id = serializer.validated_data['attendance_id']
-    qr_data = serializer.validated_data['qr_data']
     
     try:
         attendance = Attendance.objects.get(id=attendance_id)
         
-        if attendance.qr_code_data != qr_data:
+        if attendance.user_id:
             return Response({
                 'success': False,
-                'message': 'QR code mismatch'
+                'message': 'This attendance record has already been used.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        user = verify_user_credentials(username, password)
-        
+        user = authenticate(username=username, password=password)
         if not user:
             return Response({
                 'success': False,
                 'message': 'Username or password incorrect.'
             }, status=status.HTTP_401_UNAUTHORIZED)
+        
+        try:
+            if not hasattr(user, 'role') or user.role != 'employee':
+                return Response({
+                    'success': False,
+                    'message': 'Only employees can check in for training.'
+                }, status=status.HTTP_403_FORBIDDEN)
+        except AttributeError:
+            return Response({
+                'success': False,
+                'message': 'User role information not found.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            from register.models import Register
+            
+            register_record = Register.objects.filter(
+                user_id=username,
+                training_id=attendance.training_id
+            ).first()
+            
+            if not register_record:
+                return Response({
+                    'success': False,
+                    'message': 'You are not registered for this training.'
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+            if register_record.approval_status != 'Approved':
+                return Response({
+                    'success': False,
+                    'message': 'Your registration for this training is not approved.'
+                }, status=status.HTTP_403_FORBIDDEN)
+                
+        except ImportError:
+            print("Warning: Register model not found, skipping approval check")
+        except Exception as e:
+            print(f"Error checking register approval: {e}")
+            return Response({
+                'success': False,
+                'message': 'Error checking training registration approval.'
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         existing = Attendance.objects.filter(
             user_id=username,
@@ -183,28 +230,13 @@ def verify_user_and_checkin(request):
     except Attendance.DoesNotExist:
         return Response({
             'success': False,
-            'message': 'Sign-in record does not exist'
+            'message': 'Attendance record does not exist'
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({
             'success': False,
             'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
-
-def verify_user_credentials(username, password):
-    try:
-        from django.contrib.auth import authenticate
-        
-        user = authenticate(username=username, password=password)
-        if user:
-            print(f"User verification successful.: {username}")
-            return user
-        else:
-            print(f"User verification failed.: {username}")
-            return None
-    except Exception as e:
-        print(f"Validation error: {e}")
-        return None
 
 @api_view(['GET'])
 def get_attendance_by_training(request, training_id):
@@ -217,8 +249,7 @@ def get_attendance_by_training(request, training_id):
             'username': att.user_id,
             'status': att.status,
             'check_in_time': att.check_in_time,
-            'date': att.date,
-            'is_qr_used': att.is_qr_used
+            'date': att.date
         })
     
     present_count = attendances.filter(status=Attendance.Status.PRESENT).count()

@@ -10,13 +10,9 @@ class Attendance(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ABSENT)
     check_in_time = models.DateTimeField(null=True, blank=True)
     date = models.DateField(auto_now_add=True)
-    
-    qr_code_data = models.TextField(null=True, blank=True, verbose_name="Scanned QR code data")
-    qr_scan_time = models.DateTimeField(null=True, blank=True, verbose_name="QR code scan time")
-    
+        
     user_id = models.CharField(max_length=255, null=True, blank=True)
     training_id = models.CharField(max_length=255)
-    recorded_by = models.CharField(max_length=255, null=True, blank=True)
     
     class Meta:
         db_table = 'attendance'

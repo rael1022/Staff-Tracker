@@ -141,12 +141,6 @@ def verify_user_and_checkin(request):
                 'message': 'QR code mismatch'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        if attendance.is_qr_used:
-            return Response({
-                'success': False,
-                'message': 'This QR code has already been used.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
         user = verify_user_credentials(username, password)
         
         if not user:
@@ -171,7 +165,6 @@ def verify_user_and_checkin(request):
         attendance.user_id = username
         attendance.status = Attendance.Status.PRESENT
         attendance.check_in_time = timezone.now()
-        attendance.is_qr_used = True
         attendance.save()
         
         return Response({

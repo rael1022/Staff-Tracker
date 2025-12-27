@@ -3,8 +3,8 @@ from .models import Attendance
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user_id', 'training_id', 'status', 'date', 'check_in_time', 'is_qr_used']
-    list_filter = ['status', 'date', 'is_qr_used']
+    list_display = ['id', 'user_id', 'training_id', 'status', 'date', 'check_in_time']
+    list_filter = ['status', 'date']
     search_fields = ['user_id', 'training_id']
     readonly_fields = ['id']  
     

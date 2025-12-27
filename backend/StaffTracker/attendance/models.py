@@ -13,7 +13,6 @@ class Attendance(models.Model):
     
     qr_code_data = models.TextField(null=True, blank=True, verbose_name="Scanned QR code data")
     qr_scan_time = models.DateTimeField(null=True, blank=True, verbose_name="QR code scan time")
-    is_qr_used = models.BooleanField(default=False, verbose_name="QR code already used")
     
     user_id = models.CharField(max_length=255, null=True, blank=True)
     training_id = models.CharField(max_length=255)

@@ -17,6 +17,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Location</th>
+            <th>CPD Points</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -27,6 +28,7 @@
             <td>{{ training.date }}</td>
             <td>{{ training.time }}</td>
             <td>{{ training.location }}</td>
+            <td>{{ training.cpd_points }}</td>
             <td>
                 <a href="{% url 'edit_training' training.id %}">Edit</a> |
                 <a href="{% url 'delete_training' training.id %}">Delete</a>

@@ -26,6 +26,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Location</th>
+            <th>CPD Points</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -37,6 +38,7 @@
             <td>{{ reg.training.date }}</td>
             <td>{{ reg.training.time }}</td>
             <td>{{ reg.training.location }}</td>
+            <td>{{ reg.training.cpd_points }}</td>
             <td>
                 <a href="{% url 'approve_registration' reg.id %}">Approve</a> |
                 <a href="{% url 'reject_registration' reg.id %}">Reject</a>

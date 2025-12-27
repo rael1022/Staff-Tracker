@@ -8,6 +8,7 @@ class Training(models.Model):
     time = models.TimeField()
     location = models.CharField(max_length=200)
     trainer = models.ForeignKey(User, on_delete=models.CASCADE)
+    cpd_points = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

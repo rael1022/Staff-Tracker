@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Issued Certificates</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(120deg, #eef1ff, #f4f6fb);
+            padding: 30px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #4c7df0;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #eef1ff;
+        }
+        .btn {
+            padding: 6px 14px;
+            background: #4c7df0;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #3a66d6;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Issued Certificates</h1>
+
+    <table>
+        <tr>
+            <th>Staff</th>
+            <th>Training</th>
+            <th>Issued Date</th>
+            <th>Expiry Date</th>
+            <th>Action</th>
+        </tr>
+
+        {% for cert in certs %}
+        <tr>
+            <td>{{ cert.user }}</td>
+            <td>{{ cert.training }}</td>
+            <td>{{ cert.issue_date }}</td>
+            <td>{{ cert.expiry_date }}</td>
+            <td>
+                <a class="btn" href="{% url 'certificate_preview' cert.id %}">
+                    Preview
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No certificates issued.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

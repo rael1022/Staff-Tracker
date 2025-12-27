@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certificate Preview</title>
+    <style>
+        body {
+            background: #f4f6fb;
+            padding: 40px;
+        }
+        .certificate {
+            width: 700px;
+            margin: auto;
+            background: white;
+            padding: 40px;
+            border: 6px solid #4c7df0;
+            text-align: center;
+            font-family: "Times New Roman";
+        }
+        h1 {
+            color: #4c7df0;
+            margin-bottom: 30px;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .training {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .date {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="certificate">
+    <h1>Certificate of Completion</h1>
+
+    <p>This certifies that</p>
+    <div class="name">{{ cert.user }}</div>
+
+    <p>has successfully completed</p>
+    <div class="training">{{ cert.training }}</div>
+
+    <div class="date">
+        Issued on {{ cert.issue_date }} <br>
+        Valid until {{ cert.expiry_date }}
+    </div>
+</div>
+</body>
+</html>

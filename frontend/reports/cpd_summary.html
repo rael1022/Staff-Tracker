@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPD Summary</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef1ff;
+            padding: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #dde2ff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>CPD Summary</h1>
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Activity</th>
+            <th>Points</th>
+        </tr>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.user }}</td>
+            <td>{{ r.activity }}</td>
+            <td>{{ r.points }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Summary</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6fb;
+            padding: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #eef1ff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Attendance Summary</h1>
+    <table>
+        <tr>
+            <th>Training</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+        {% for a in attendance %}
+        <tr>
+            <td>{{ a.training }}</td>
+            <td>{{ a.date }}</td>
+            <td>{{ a.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

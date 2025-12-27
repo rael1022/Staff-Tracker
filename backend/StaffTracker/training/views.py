@@ -12,16 +12,19 @@ def trainer_dashboard(request):
 @login_required
 def create_training(request):
     if request.method == 'POST':
+        cpd_points = request.POST.get('cpd_points', 0) 
         Training.objects.create(
             title=request.POST['title'],
             description=request.POST['description'],
             date=request.POST['date'],
             time=request.POST['time'],
             location=request.POST['location'],
-            trainer=request.user
+            trainer=request.user,
+            cpd_points=cpd_points
         )
         return redirect('trainer_dashboard')
     return render(request, 'training/create_training.html')
+
 
 @login_required
 def edit_training(request, training_id):
@@ -34,6 +37,13 @@ def edit_training(request, training_id):
         time_str = request.POST.get('time')
         training.location = request.POST.get('location')
 
+        cpd_points = request.POST.get('cpd_points')
+        if cpd_points is not None:
+            try:
+                training.cpd_points = int(cpd_points)
+            except ValueError:
+                training.cpd_points = 0
+
         from datetime import datetime
         if date_str:
             training.date = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -45,6 +55,7 @@ def edit_training(request, training_id):
         return redirect('trainer_dashboard')
 
     return render(request, 'training/edit_training.html', {'training': training})
+
 
 @login_required
 def delete_training(request, training_id):

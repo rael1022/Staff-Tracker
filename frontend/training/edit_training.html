@@ -11,22 +11,25 @@
 <h2>Edit Training</h2>
 <form method="POST">
     {% csrf_token %}
-    <label for="title">Title:</label>
-    <input type="text" name="title" value="{{ training.title }}">
+    <label>Title:</label>
+    <input type="text" name="title" value="{{ training.title }}" required><br>
 
-    <label for="description">Description:</label>
-    <textarea name="description">{{ training.description }}</textarea>
+    <label>Description:</label>
+    <textarea name="description" required>{{ training.description }}</textarea><br>
 
-    <label for="date">Date:</label>
-    <input type="date" name="date" value="{{ training.date|date:'Y-m-d' }}">
+    <label>Date:</label>
+    <input type="date" name="date" value="{{ training.date }}"><br>
 
-    <label for="time">Time:</label>
-    <input type="time" name="time" value="{{ training.time|time:'H:i' }}">
+    <label>Time:</label>
+    <input type="time" name="time" value="{{ training.time }}"><br>
 
-    <label for="location">Location:</label>
-    <input type="text" name="location" value="{{ training.location }}">
+    <label>Location:</label>
+    <input type="text" name="location" value="{{ training.location }}"><br>
 
-    <button type="submit">Save</button>
+    <label>CPD Points:</label>
+    <input type="number" name="cpd_points" min="0" value="{{ training.cpd_points }}"><br>
+
+    <button type="submit">Update Training</button>
 </form>
 
 {% endblock %}

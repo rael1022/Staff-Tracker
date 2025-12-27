@@ -17,6 +17,7 @@
             <th>Date</th>
             <th>Time</th>
             <th>Location</th>
+            <th>CPD Points</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -28,6 +29,7 @@
             <td>{{ training.date }}</td>
             <td>{{ training.time }}</td>
             <td>{{ training.location }}</td>
+            <td>{{ training.cpd_points }}</td>
             <td>
                 {% with reg=registrations|get_training_registration:training.id %}
                     {% if reg %}

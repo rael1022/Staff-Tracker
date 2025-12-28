@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New User</title>
+</head>
+<body>
+    {% extends 'dashboard/base.html' %}
+{% block content %}
+
+<h2>Create New User</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Username:</label>
+    <input type="text" name="username" required><br><br>
+
+    <label>Email:</label>
+    <input type="email" name="email"><br><br>
+
+    <label>Password:</label>
+    <input type="password" name="password" required><br><br>
+
+    <label>Role:</label>
+    <select name="role" required>
+        <option value="Employee">Employee</option>
+        <option value="Trainer">Trainer</option>
+        <option value="HOD">HOD</option>
+        <option value="HR">HR</option>
+    </select><br><br>
+
+    <label>Extra Info:</label>
+    <input type="text" name="extra_info"><br><br>
+
+    <button type="submit">Create</button>
+    <a href="{% url 'dashboard' %}">Cancel</a>
+</form>
+
+{% if error %}
+    <p style="color:red">{{ error }}</p>
+{% endif %}
+
+{% if message %}
+    <p style="color:green">{{ message }}</p>
+{% endif %}
+
+{% endblock %}
+
+</body>
+</html>

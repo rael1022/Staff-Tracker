@@ -1,4 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR</title>
+</head>
+<body>
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
 <h1>HR Dashboard</h1>
+
 <p>Welcome HR {{ user.username }}</p>
 
 <h2>Approve pending</h2>
@@ -16,15 +28,20 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
-                <button type="submit">approve</button>
+                <button type="submit">Approve</button>
             </form>
         </td>
     </tr>
     {% empty %}
     <tr>
-        <td colspan="3">not approve</td>
+        <td colspan="3">No pending approvals</td>
     </tr>
     {% endfor %}
 </table>
+{% endblock %}
+
 
 <a href="../login/">Logout</a>
+
+</body>
+</html>

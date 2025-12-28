@@ -7,3 +7,19 @@ http://127.0.0.1:8000/admin/
 http://127.0.0.1:8000/login/
 
 cd backend\StaffTracker
+
+Staff-Tracker/
+├─ backend/
+│  └─ StaffTracker/
+│     ├─ StaffTracker/        ← Django project
+│     ├─ accounts/            ← views / urls 在这里
+│     ├─ training/
+│     └─ ...
+├─ frontend/
+│  ├─ login/
+│  ├─ register/
+│  └─ dashboard/
+│     ├─ hr_dashboard.html    ← ✅ 你要改的文件
+│     ├─ hod_dashboard.html
+│     ├─ trainer_dashboard.html
+│     └─ employee_dashboard.html

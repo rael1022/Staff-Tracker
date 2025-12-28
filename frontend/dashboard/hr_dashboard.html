@@ -38,10 +38,46 @@
     </tr>
     {% endfor %}
 </table>
-{% endblock %}
+
+<h2>Manage User Accounts</h2>
+
+<a href="{% url 'hr_create_user' %}">➕ Create New Account</a>
+
+<table border="1">
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for u in all_users %}
+    <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.userprofile.role }}</td>
+        <td>
+            {% if u.is_active %}Active{% else %}Deactivated{% endif %}
+        </td>
+        <td>
+            <a href="{% url 'hr_update_user' u.id %}">Edit</a>
+
+            <form method="post" action="{% url 'hr_toggle_user' u.id %}" style="display:inline;">
+                {% csrf_token %}
+                {% if u.is_active %}
+                    <button type="submit">Deactivate</button>
+                {% else %}
+                    <button type="submit">Activate</button>
+                {% endif %}
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
 
 <a href="../login/">Logout</a>
-
+{% endblock %}
 </body>
 </html>

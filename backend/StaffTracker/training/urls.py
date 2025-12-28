@@ -11,4 +11,9 @@ urlpatterns = [
     path('hod/', views.hod_dashboard, name='hod_dashboard'),
     path('hod/approve/<int:reg_id>/', views.approve_registration, name='approve_registration'),
     path('hod/reject/<int:reg_id>/', views.reject_registration, name='reject_registration'),
+
+    path('hr/dashboard/', views.hr_dashboard, name='hr_dashboard'),
+    path('hr/create/', views.hr_create_training, name='hr_create_training'),
+    path('hr/edit/<int:training_id>/', views.hr_edit_training, name='hr_edit_training'),
+    path('hr/delete/<int:training_id>/', views.hr_delete_training, name='hr_delete_training'),
 ]

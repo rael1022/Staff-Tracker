@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   {% extends 'dashboard/base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Edit Training</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-2">
+        <label>Title:</label>
+        <input type="text" name="title" class="border px-2 py-1 w-full" value="{{ training.title }}" required>
+    </div>
+    <div class="mb-2">
+        <label>Description:</label>
+        <textarea name="description" class="border px-2 py-1 w-full">{{ training.description }}</textarea>
+    </div>
+    <div class="mb-2">
+        <label>Date:</label>
+        <input type="date" name="date" class="border px-2 py-1" value="{{ training.date }}">
+    </div>
+    <div class="mb-2">
+        <label>Time:</label>
+        <input type="time" name="time" class="border px-2 py-1" value="{{ training.time }}">
+    </div>
+    <div class="mb-2">
+        <label>Location:</label>
+        <input type="text" name="location" class="border px-2 py-1 w-full" value="{{ training.location }}">
+    </div>
+    <div class="mb-2">
+        <label>CPD Points:</label>
+        <input type="number" name="cpd_points" class="border px-2 py-1 w-20" value="{{ training.cpd_points }}">
+    </div>
+    <div class="mb-2">
+        <label>Trainer:</label>
+        <select name="trainer_id" class="border px-2 py-1 w-full">
+            <option value="">-- Select Trainer --</option>
+            {% for trainer in trainers %}
+            <option value="{{ trainer.id }}" {% if training.trainer and training.trainer.id == trainer.id %}selected{% endif %}>
+                {{ trainer.username }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Update</button>
+    <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary mt-2">Cancel</a>
+</form>
+{% endblock %}
+
+
+</body>
+</html>

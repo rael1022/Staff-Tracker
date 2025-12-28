@@ -1,8 +1,98 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Training, TrainingRegistration
 
+# ---------------- HR ----------------
+def is_hr(user):
+    return user.groups.filter(name='HR').exists() or user.is_superuser
+
+@login_required
+@user_passes_test(is_hr)
+def hr_dashboard(request):
+    trainings = Training.objects.all()  
+    return render(request, 'training/hr_training_dashboard.html', {'trainings': trainings})
+
+@login_required
+@user_passes_test(is_hr)
+def hr_create_training(request):
+    if request.method == 'POST':
+        cpd_points = request.POST.get('cpd_points', 0) 
+        trainer_id = request.POST.get('trainer_id')  
+        trainer_user = None
+        if trainer_id:
+            from django.contrib.auth.models import User
+            try:
+                trainer_user = User.objects.get(id=trainer_id)
+            except User.DoesNotExist:
+                trainer_user = None
+
+        Training.objects.create(
+            title=request.POST['title'],
+            description=request.POST['description'],
+            date=request.POST['date'],
+            time=request.POST['time'],
+            location=request.POST['location'],
+            trainer=trainer_user,
+            cpd_points=cpd_points
+        )
+        messages.success(request, "Training created successfully")
+        return redirect('hr_dashboard')
+
+    from django.contrib.auth.models import User
+    trainers = User.objects.filter(groups__name='Trainer')
+    return render(request, 'training/hr_create_training.html', {'trainers': trainers})
+
+@login_required
+@user_passes_test(is_hr)
+def hr_edit_training(request, training_id):
+    training = get_object_or_404(Training, id=training_id)
+
+    if request.method == 'POST':
+        training.title = request.POST.get('title')
+        training.description = request.POST.get('description')
+        date_str = request.POST.get('date')
+        time_str = request.POST.get('time')
+        training.location = request.POST.get('location')
+
+        cpd_points = request.POST.get('cpd_points')
+        if cpd_points is not None:
+            try:
+                training.cpd_points = int(cpd_points)
+            except ValueError:
+                training.cpd_points = 0
+
+        trainer_id = request.POST.get('trainer_id')
+        if trainer_id:
+            from django.contrib.auth.models import User
+            try:
+                training.trainer = User.objects.get(id=trainer_id)
+            except User.DoesNotExist:
+                training.trainer = None
+
+        from datetime import datetime
+        if date_str:
+            training.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        if time_str:
+            training.time = datetime.strptime(time_str, '%H:%M').time()
+
+        training.save()
+        messages.success(request, "Training updated successfully")
+        return redirect('hr_dashboard')
+
+    from django.contrib.auth.models import User
+    trainers = User.objects.filter(groups__name='Trainer')
+    return render(request, 'training/hr_edit_training.html', {'training': training, 'trainers': trainers})
+
+@login_required
+@user_passes_test(is_hr)
+def hr_delete_training(request, training_id):
+    training = get_object_or_404(Training, id=training_id)
+    if request.method == 'POST':
+        training.delete()
+        messages.success(request, "Training deleted successfully")
+        return redirect('hr_dashboard')
+    return render(request, 'training/hr_delete_training.html', {'training': training})
 # ---------------- Trainer ----------------
 @login_required
 def trainer_dashboard(request):

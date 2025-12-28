@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+</head>
+<body>
+    {% extends 'dashboard/base.html' %}
+{% block content %}
+
+<h2>Edit User</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>Username:</label>
+    <input type="text" name="username" value="{{ edit_user.username }}"><br><br>
+
+    <label>Email:</label>
+    <input type="email" name="email" value="{{ edit_user.email }}"><br><br>
+
+    <label>Role:</label>
+    <select name="role">
+        <option value="Employee" {% if edit_user.userprofile.role == "Employee" %}selected{% endif %}>Employee</option>
+        <option value="Trainer" {% if edit_user.userprofile.role == "Trainer" %}selected{% endif %}>Trainer</option>
+        <option value="HOD" {% if edit_user.userprofile.role == "HOD" %}selected{% endif %}>HOD</option>
+        <option value="HR" {% if edit_user.userprofile.role == "HR" %}selected{% endif %}>HR</option>
+    </select><br><br>
+
+    <button type="submit">Save</button>
+    <a href="{% url 'dashboard' %}">Cancel</a>
+</form>
+
+{% endblock %}
+
+
+</body>
+</html>

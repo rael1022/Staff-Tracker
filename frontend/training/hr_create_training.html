@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create training</title>
+</head>
+<body>
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Create Training</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-2">
+        <label>Title:</label>
+        <input type="text" name="title" class="border px-2 py-1 w-full" required>
+    </div>
+    <div class="mb-2">
+        <label>Description:</label>
+        <textarea name="description" class="border px-2 py-1 w-full"></textarea>
+    </div>
+    <div class="mb-2">
+        <label>Date:</label>
+        <input type="date" name="date" class="border px-2 py-1" required>
+    </div>
+    <div class="mb-2">
+        <label>Time:</label>
+        <input type="time" name="time" class="border px-2 py-1" required>
+    </div>
+    <div class="mb-2">
+        <label>Location:</label>
+        <input type="text" name="location" class="border px-2 py-1 w-full" required>
+    </div>
+    <div class="mb-2">
+        <label>CPD Points:</label>
+        <input type="number" name="cpd_points" class="border px-2 py-1 w-20" value="0">
+    </div>
+    <div class="mb-2">
+        <label>Trainer:</label>
+        <select name="trainer_id" class="border px-2 py-1 w-full">
+            <option value="">-- Select Trainer --</option>
+            {% for trainer in trainers %}
+            <option value="{{ trainer.id }}">{{ trainer.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Create</button>
+    <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary mt-2">Cancel</a>
+</form>
+{% endblock %}
+
+
+</body>
+</html>

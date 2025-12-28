@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -48,6 +48,78 @@ def register_view(request):
     return render(request, 'register/register.html')
 
 @login_required
+def hr_create_user(request):
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        role = request.POST['role']
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        UserProfile.objects.create(
+            user=user,
+            role=role,
+            is_approved=True
+        )
+
+        group, _ = Group.objects.get_or_create(name=role)
+        user.groups.add(group)
+
+        return redirect('/dashboard/')
+
+    return render(request, 'manage_account/create_user.html')
+
+@login_required
+def hr_update_user(request, user_id):
+    # 权限检查
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
+
+    user = get_object_or_404(User, id=user_id)
+    profile = user.userprofile
+
+    if request.method == 'POST':
+        user.username = request.POST['username']
+        user.email = request.POST['email']
+        role = request.POST['role']
+
+        # 更新 Group
+        user.groups.clear()
+        group, _ = Group.objects.get_or_create(name=role)
+        user.groups.add(group)
+
+        # 更新 UserProfile role
+        profile.role = role
+
+        user.save()
+        profile.save()
+
+        return redirect('/dashboard/')  # 保存后返回 HR Dashboard
+
+    # GET 请求显示编辑页面
+    return render(request, 'manage_account/update_user.html', {'edit_user': user})
+
+
+@login_required
+def hr_toggle_user(request, user_id):
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
+
+    user = User.objects.get(id=user_id)
+    user.is_active = not user.is_active
+    user.save()
+
+    return redirect('/dashboard/')
+
+@login_required
 def dashboard(request):
     user = request.user
 
@@ -74,11 +146,17 @@ def dashboard(request):
                 pass
 
         pending_users = UserProfile.objects.filter(is_approved=False)
+        all_users = User.objects.exclude(is_superuser=True)
+
         return render(
             request,
             'dashboard/hr_dashboard.html',
-            {'pending_users': pending_users}
+            {
+                'pending_users': pending_users,
+                'all_users': all_users
+            }
         )
+
 
     elif user.groups.filter(name='HOD').exists():
         return render(request, 'dashboard/hod_dashboard.html')
@@ -89,3 +167,13 @@ def dashboard(request):
     else:
         return render(request, 'dashboard/employee_dashboard.html')
    
+@login_required
+def toggle_user_status(request, user_id):
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
+
+    user = User.objects.get(id=user_id)
+    user.is_active = not user.is_active
+    user.save()
+
+    return redirect('/dashboard/')

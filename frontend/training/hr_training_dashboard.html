@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Dashboard</title>
+</head>
+<body>
+    {% extends 'dashboard/base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">HR Training Dashboard</h1>
+
+<p>Welcome HR {{ user.username }}</p>
+
+<a href="{% url 'hr_create_training' %}" class="btn btn-primary mb-4">➕ Create New Training</a>
+
+<table class="table-auto w-full border-collapse border border-gray-300">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border px-2 py-1">Title</th>
+            <th class="border px-2 py-1">Trainer</th>
+            <th class="border px-2 py-1">Date</th>
+            <th class="border px-2 py-1">Time</th>
+            <th class="border px-2 py-1">Location</th>
+            <th class="border px-2 py-1">CPD Points</th>
+            <th class="border px-2 py-1">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for training in trainings %}
+        <tr>
+            <td class="border px-2 py-1">{{ training.title }}</td>
+            <td class="border px-2 py-1">
+                {% if training.trainer %}
+                    {{ training.trainer.username }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="border px-2 py-1">{{ training.date }}</td>
+            <td class="border px-2 py-1">{{ training.time }}</td>
+            <td class="border px-2 py-1">{{ training.location }}</td>
+            <td class="border px-2 py-1">{{ training.cpd_points }}</td>
+            <td class="border px-2 py-1">
+                <a href="{% url 'hr_edit_training' training.id %}" class="text-blue-600 mr-2">Edit</a>
+                <a href="{% url 'hr_delete_training' training.id %}" class="text-red-600">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center py-2">No trainings available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+</body>
+</html>

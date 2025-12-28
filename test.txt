@@ -6,3 +6,54 @@ http://127.0.0.1:8000/admin/
 
 http://127.0.0.1:8000/login/
 
+cd backend\StaffTracker
+
+Staff-Tracker/
+├─ backend/
+│  ├─ .myvenv/                  # Python 虚拟环境
+│  │  └─ Stafftracker/          # Django 后端
+│  │     ├─ manage.py
+│  │     ├─ StaffTracker/
+│  │     │  ├─ __init__.py
+│  │     │  ├─ settings.py
+│  │     │  ├─ urls.py           # include accounts.urls
+│  │     │  └─ wsgi.py
+│  │
+│  ├─ accounts/
+│  │  ├─ __init__.py
+│  │  ├─ admin.py
+│  │  ├─ models.py               # UserProfile
+│  │  ├─ views.py                # login, register, dashboard, hr_create_user, hr_update_user, hr_toggle_user
+│  │  ├─ urls.py                 # login/, register/, dashboard/, hr/create-user/, hr/update-user/<int:user_id>/, hr/toggle-user/<int:user_id>/
+│  │  ├─ forms.py                # 可选
+│  │  └─ migrations/
+│  │
+│  ├─ training/
+│  │  ├─ __init__.py
+│  │  ├─ models.py
+│  │  ├─ views.py
+│  │  ├─ urls.py
+│  │  └─ templatetags/
+│  │      ├─ __init__.py
+│  │      └─ training_tags.py
+│  │
+│  └─ ...  # 其他 app（registration, attendance, assessment, etc.）
+│
+├─ frontend/
+│  ├─ manage_account/
+│  │  ├─ create_user.html
+│  │  └─ update_user.html
+│  │
+│  ├─ dashboard/
+│  │  ├─ hr_dashboard.html
+│  │  ├─ hod_dashboard.html
+│  │  ├─ trainer_dashboard.html
+│  │  └─ employee_dashboard.html
+│  │
+│  ├─ login/
+│  │  └─ login.html
+│  └─ register/
+│      └─ register.html
+│
+├─ .gitignore
+└─ README.md

@@ -4,16 +4,20 @@
     <title>CPD Summary</title>
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #eef1ff;
             padding: 30px;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: white;
             padding: 25px;
             border-radius: 16px;
+        }
+        h1 {
+            color: #4c7df0;
+            margin-bottom: 20px;
         }
         table {
             width: 100%;
@@ -29,22 +33,31 @@
     </style>
 </head>
 <body>
+
 <div class="container">
-    <h1>CPD Summary</h1>
+    <h1>CPD Summary Report</h1>
+
+    {% if records %}
     <table>
         <tr>
             <th>User</th>
-            <th>Activity</th>
+            <th>Training</th>
             <th>Points</th>
+            <th>Earned Date</th>
         </tr>
         {% for r in records %}
         <tr>
-            <td>{{ r.user }}</td>
-            <td>{{ r.activity }}</td>
+            <td>{{ r.user.username }}</td>
+            <td>{{ r.training.title }}</td>
             <td>{{ r.points }}</td>
+            <td>{{ r.earned_date }}</td>
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+        <p>No CPD records found.</p>
+    {% endif %}
 </div>
+
 </body>
 </html>

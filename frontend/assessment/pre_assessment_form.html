@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pre Assessment</title>
+</head>
+<body>
+
+<h2>Pre-Training Assessment</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Score:</label><br>
+    <input type="number" name="score" required><br><br>
+
+    <label>Stress Level:</label><br>
+    <select name="stress_level" required>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+    </select><br><br>
+
+    <button type="submit">Submit Pre-Assessment</button>
+</form>
+
+</body>
+</html>

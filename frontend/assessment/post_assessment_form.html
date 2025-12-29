@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Assessment</title>
+</head>
+<body>
+
+<h2>Post-Training Assessment</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label>Score:</label><br>
+    <input type="number" name="score" required><br><br>
+
+    <button type="submit">Submit Post-Assessment</button>
+</form>
+
+</body>
+</html>

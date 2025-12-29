@@ -142,7 +142,7 @@ def verify_user_and_checkin(request):
     try:
         attendance = Attendance.objects.get(id=attendance_id)
         
-        if attendance.user_id:
+        if attendance.user:
             return Response({
                 'success': False,
                 'message': 'This attendance record has already been used.'
@@ -171,7 +171,7 @@ def verify_user_and_checkin(request):
             from register.models import Register
             
             register_record = Register.objects.filter(
-                user_id=username,
+                user_id=user.id,
                 training_id=attendance.training_id
             ).first()
             
@@ -197,7 +197,7 @@ def verify_user_and_checkin(request):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         existing = Attendance.objects.filter(
-            user_id=username,
+            user=user,
             training_id=attendance.training_id,
             status=Attendance.Status.PRESENT
         ).exclude(id=attendance_id).first()
@@ -209,7 +209,7 @@ def verify_user_and_checkin(request):
                 'previous_checkin': existing.check_in_time
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        attendance.user_id = username
+        attendance.user = user
         attendance.status = Attendance.Status.PRESENT
         attendance.check_in_time = timezone.now()
         attendance.save()
@@ -219,7 +219,8 @@ def verify_user_and_checkin(request):
             'message': 'Check-in successful!',
             'attendance': {
                 'id': str(attendance.id),
-                'username': attendance.user_id,
+                'user_id': user.id,
+                'username': user.username,
                 'training_id': attendance.training_id,
                 'status': attendance.status,
                 'check_in_time': attendance.check_in_time,

@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from certificate.models import Certificate
 from cpd.models import CPDRecord
-#from attendance.models import Attendance
+from attendance.models import Attendance
 
 @login_required
 def reports_dashboard(request):
@@ -33,10 +33,17 @@ def cpd_summary_report(request):
     })
 
 
-#@login_required
-#def attendance_summary_report(request):
-#attendance_count = Attendance.objects.count()
+@login_required
+def attendance_summary_report(request):
+    records = Attendance.objects.all().order_by('-date', '-check_in_time')
 
-#return render(request, 'reports/attendance_summary.html', {
-#'attendance_count': attendance_count,
-#   })
+    total = records.count()
+    present = records.filter(status='Present').count()
+    absent = records.filter(status='Absent').count()
+
+    return render(request, 'reports/attendance_summary.html', {
+        'records': records,
+        'total': total,
+        'present': present,
+        'absent': absent,
+    })

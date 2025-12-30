@@ -28,4 +28,7 @@ urlpatterns = [
     path('certificate/', include('certificate.urls')),
     path('cpd/', include('cpd.urls')),
     path('reports/', include('reports.urls')),
+    path('assessment/', include('assessment.urls')),
+    path('attendance/', include('attendance.urls')),
+    path('evaluation/', include('evaluation.urls')),
 ]

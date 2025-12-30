@@ -214,7 +214,48 @@ def verify_user_and_checkin(request):
         attendance.check_in_time = timezone.now()
         attendance.save()
         
-        return Response({
+        try:
+            from trainings.models import Training
+            
+            training = Training.objects.filter(id=attendance.training_id).first()
+            cpd_points = 0
+            
+            if training:
+                if hasattr(training, 'cpd_points'):
+                    cpd_points = training.cpd_points
+                else:
+                    if hasattr(training, 'duration') and training.duration:
+                        if training.duration >= 2:
+                            cpd_points = 1
+                        if training.duration >= 4:
+                            cpd_points = 2
+                        if training.duration >= 6:
+                            cpd_points = 3
+            else:
+                cpd_points = 1
+            
+            from cpd.models import CPD_Record
+            
+            cpd_record = CPD_Record.objects.create(
+                id=uuid.uuid4(),
+                points=cpd_points,
+                earnedDate=timezone.now().date(),
+                userId=user.id,
+                training_id=attendance.training_id
+            )
+            
+            cpd_record_created = True
+            
+        except ImportError as e:
+            print(f"Warning: Could not import models for CPD calculation: {e}")
+            cpd_points = 0
+            cpd_record_created = False
+        except Exception as e:
+            print(f"Error creating CPD record: {e}")
+            cpd_points = 0
+            cpd_record_created = False
+        
+        response_data = {
             'success': True,
             'message': 'Check-in successful!',
             'attendance': {
@@ -226,7 +267,16 @@ def verify_user_and_checkin(request):
                 'check_in_time': attendance.check_in_time,
                 'date': attendance.date
             }
-        })
+        }
+        
+        if cpd_record_created:
+            response_data['cpd'] = {
+                'points_earned': cpd_points,
+                'record_created': True,
+                'cpd_record_id': str(cpd_record.id) if 'cpd_record' in locals() else None
+            }
+        
+        return Response(response_data)
         
     except Attendance.DoesNotExist:
         return Response({

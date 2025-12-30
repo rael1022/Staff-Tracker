@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Trainings - Trainer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .training-card {
+            transition: transform 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+        .training-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .status-open { background-color: #d4edda; color: #155724; }
+        .status-ongoing { background-color: #cce5ff; color: #004085; }
+        .status-completed { background-color: #f8f9fa; color: #383d41; }
+        .qr-btn {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            border: none;
+        }
+        .stat-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    {% extends 'base.html' %}
+    
+    {% block content %}
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h2><i class="fas fa-chalkboard-teacher me-2"></i>My Training Sessions</h2>
+                <p class="text-muted">Manage your training sessions and generate attendance QR codes</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h1 class="display-4">{{ total_trainings }}</h1>
+                        <p class="card-text">Total Trainings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h1 class="display-4">{{ open_trainings }}</h1>
+                        <p class="card-text">Open Trainings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h1 class="display-4">{{ ongoing_trainings }}</h1>
+                        <p class="card-text">Ongoing Trainings</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <h1 class="display-4">{{ completed_trainings }}</h1>
+                        <p class="card-text">Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Training Sessions</h5>
+                    <span class="badge bg-light text-dark">{{ trainings|length }} sessions</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if trainings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Training Title</th>
+                                    <th>Mode</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for training in trainings %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ training.training_title }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ training.training_description|truncatechars:80 }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if training.training_mode == 'Online' %}bg-info
+                                            {% elif training.training_mode == 'Physical' %}bg-warning
+                                            {% else %}bg-primary{% endif %}">
+                                            {{ training.training_mode }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if training.location %}
+                                            {{ training.location }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="status-badge 
+                                            {% if training.training_status == 'Open' %}status-open
+                                            {% elif training.training_status == 'Ongoing' %}status-ongoing
+                                            {% else %}status-completed{% endif %}">
+                                            {{ training.training_status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ training.created_at|date:"M d, Y" }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'generate_qr_page' training.id %}" 
+                                               class="btn btn-sm qr-btn text-white"
+                                               title="Generate QR Code for Attendance">
+                                                <i class="fas fa-qrcode"></i> QR Code
+                                            </a>
+                                            <a href="{% url 'training_attendance' training.id %}" 
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="View Attendance">
+                                                <i class="fas fa-list-check"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Training Sessions Found</h4>
+                        <p class="text-muted">You don't have any training sessions assigned yet.</p>
+                        <a href="#" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create New Training
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Quick Tips</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="d-flex">
+                                    <div class="me-3 text-info">
+                                        <i class="fas fa-1 fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Generate QR Code</h6>
+                                        <p class="text-muted mb-0">Click "QR Code" button to generate attendance QR code for each training</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex">
+                                    <div class="me-3 text-info">
+                                        <i class="fas fa-2 fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Display to Participants</h6>
+                                        <p class="text-muted mb-0">Show the QR code on screen for participants to scan</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex">
+                                    <div class="me-3 text-info">
+                                        <i class="fas fa-3 fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h6>Track Attendance</h6>
+                                        <p class="text-muted mb-0">View attendance records by clicking the list icon</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

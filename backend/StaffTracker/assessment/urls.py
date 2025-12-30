@@ -7,4 +7,6 @@ urlpatterns = [
     path('api/questions/<int:training_id>/<str:question_type>/', 
          views.get_assessment_questions, 
          name='get_assessment_questions'),
+    path('manage-questions/', views.manage_assessment_questions, name='manage_assessment_questions'),
+    path('manage-questions/<int:training_id>/', views.manage_assessment_questions, name='manage_assessment_questions'),
 ]

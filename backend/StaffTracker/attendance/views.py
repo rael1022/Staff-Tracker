@@ -9,12 +9,116 @@ from .serializers import (
     GenerateQRSerializer,
     AttendanceSerializer
 )
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+import uuid
+
 import json
 import qrcode
 import base64
 import io
 import time
 
+@login_required
+def trainer_training_list(request):
+    try:
+        from trainings.models import Training
+        
+        trainings = Training.objects.filter(trainer=request.user)
+        
+        trainings = trainings.order_by('-date', '-time')
+        
+        today = timezone.now().date()
+        
+        upcoming_trainings = trainings.filter(date__gt=today).count()
+        ongoing_trainings = trainings.filter(date=today).count()
+        completed_trainings = trainings.filter(date__lt=today).count()
+        
+        context = {
+            'trainings': trainings,
+            'open_trainings': upcoming_trainings,
+            'ongoing_trainings': ongoing_trainings,
+            'completed_trainings': completed_trainings,
+            'total_trainings': trainings.count(),
+            'now': today,
+        }
+        
+        return render(request, 'attendance/trainer_training_list.html', context)
+        
+    except ImportError:
+        from django.contrib import messages
+        messages.warning(request, "Training model not found. Using sample data.")
+        
+        trainings = [
+            {
+                'id': 1,
+                'title': 'Python Programming Basics',
+                'description': 'Learn Python fundamentals',
+                'date': '2024-03-20',
+                'time': '09:00:00',
+                'location': 'Main Campus',
+                'trainer': request.user,
+                'cpd_points': 2,
+                'created_at': '2024-01-15',
+            },
+            {
+                'id': 2,
+                'title': 'Django Web Development',
+                'description': 'Build web applications with Django',
+                'date': '2024-01-10',
+                'time': '14:00:00',
+                'location': 'Virtual',
+                'trainer': request.user,
+                'cpd_points': 3,
+                'created_at': '2024-01-20',
+            },
+        ]
+        
+        context = {
+            'trainings': trainings,
+            'open_trainings': 1,
+            'ongoing_trainings': 0,
+            'completed_trainings': 1,
+            'total_trainings': 2,
+            'now': timezone.now().date(),
+        }
+        
+        return render(request, 'attendance/trainer_training_list.html', context)
+
+@login_required
+def generate_qr_for_training(request, training_id):
+    try:
+        from trainings.models import Training
+        
+        training = Training.objects.get(id=training_id, trainer=request.user)
+        
+        context = {
+            'training': training,
+            'training_id': training_id,
+            'training_title': training.title,
+        }
+        
+        return render(request, 'attendance/generate_qr.html', context)
+        
+    except Training.DoesNotExist:
+        from django.contrib import messages
+        messages.error(request, "Training not found or you are not authorized.")
+        return render(request, 'attendance/generate_qr.html', {'error': 'Training not found'})
+    except ImportError:
+        context = {
+            'training': {
+                'title': f'Training {training_id}',
+                'description': 'Sample training description',
+                'date': timezone.now().date(),
+                'time': '10:00:00',
+                'location': 'Main Hall',
+                'cpd_points': 1,
+            },
+            'training_id': training_id,
+            'training_title': f'Training {training_id}',
+        }
+        return render(request, 'attendance/generate_qr.html', context)
+    
 @api_view(['POST'])
 def generate_qr_code(request):
     serializer = GenerateQRSerializer(data=request.data)
@@ -156,11 +260,23 @@ def verify_user_and_checkin(request):
             }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
-            if not hasattr(user, 'role') or user.role != 'employee':
+            from register.models import UserProfile
+            
+            try:
+                user_profile = user.userprofile
+                if user_profile.role != 'Employee':
+                    return Response({
+                        'success': False,
+                        'message': 'Only employees can check in for training.'
+                    }, status=status.HTTP_403_FORBIDDEN)
+            except UserProfile.DoesNotExist:
                 return Response({
                     'success': False,
-                    'message': 'Only employees can check in for training.'
-                }, status=status.HTTP_403_FORBIDDEN)
+                    'message': 'User profile not found.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except ImportError:
+            print("Warning: UserProfile model not found, skipping role check")
         except AttributeError:
             return Response({
                 'success': False,
@@ -168,10 +284,10 @@ def verify_user_and_checkin(request):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            from register.models import Register
+            from trainings.models import TrainingRegistration
             
-            register_record = Register.objects.filter(
-                user_id=user.id,
+            register_record = TrainingRegistration.objects.filter(
+                employee=user,
                 training_id=attendance.training_id
             ).first()
             
@@ -181,16 +297,16 @@ def verify_user_and_checkin(request):
                     'message': 'You are not registered for this training.'
                 }, status=status.HTTP_403_FORBIDDEN)
             
-            if register_record.approval_status != 'Approved':
+            if register_record.status != 'Approved':
                 return Response({
                     'success': False,
                     'message': 'Your registration for this training is not approved.'
                 }, status=status.HTTP_403_FORBIDDEN)
                 
         except ImportError:
-            print("Warning: Register model not found, skipping approval check")
+            print("Warning: TrainingRegistration model not found, skipping approval check")
         except Exception as e:
-            print(f"Error checking register approval: {e}")
+            print(f"Error checking registration approval: {e}")
             return Response({
                 'success': False,
                 'message': 'Error checking training registration approval.'
@@ -216,32 +332,21 @@ def verify_user_and_checkin(request):
         
         try:
             from trainings.models import Training
+            from cpd.models import CPDRecord
             
             training = Training.objects.filter(id=attendance.training_id).first()
             cpd_points = 0
             
             if training:
-                if hasattr(training, 'cpd_points'):
-                    cpd_points = training.cpd_points
-                else:
-                    if hasattr(training, 'duration') and training.duration:
-                        if training.duration >= 2:
-                            cpd_points = 1
-                        if training.duration >= 4:
-                            cpd_points = 2
-                        if training.duration >= 6:
-                            cpd_points = 3
+                cpd_points = training.cpd_points
             else:
                 cpd_points = 1
             
-            from cpd.models import CPD_Record
-            
-            cpd_record = CPD_Record.objects.create(
-                id=uuid.uuid4(),
+            cpd_record = CPDRecord.objects.create(
+                user=user,
+                training_id=attendance.training_id,
                 points=cpd_points,
-                earnedDate=timezone.now().date(),
-                userId=user.id,
-                training_id=attendance.training_id
+                earned_date=timezone.now().date()
             )
             
             cpd_record_created = True
@@ -297,7 +402,8 @@ def get_attendance_by_training(request, training_id):
     for att in attendances:
         data.append({
             'id': str(att.id),
-            'username': att.user_id,
+            'user_id': att.user.id if att.user else None,
+            'username': att.user.username if att.user else 'No user',
             'status': att.status,
             'check_in_time': att.check_in_time,
             'date': att.date

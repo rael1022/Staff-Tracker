@@ -15,8 +15,9 @@ class Evaluation(models.Model):
     ]
     
     evaluation_id = models.AutoField(primary_key=True)
+    
     training = models.ForeignKey(
-        'training.Training',
+        'Training',
         on_delete=models.CASCADE,
         related_name='evaluations',
         db_column='training_id'
@@ -73,7 +74,7 @@ class Evaluation(models.Model):
         ]
     
     def __str__(self):
-        return f"Evaluation #{self.evaluation_id} - {self.training.training_title}"
+        return f"Evaluation #{self.evaluation_id} - {self.training.title}"
     
     def get_average_question_rating(self):
         ratings = [
@@ -86,4 +87,7 @@ class Evaluation(models.Model):
         return round(sum(ratings) / len(ratings), 2) if ratings else 0
     
     def get_user_role(self):
-        return self.user.role if hasattr(self.user, 'role') else 'Employee'
+        if hasattr(self.user, 'userprofile'):
+            return self.user.userprofile.role
+        return 'Employee'
+[file content end]

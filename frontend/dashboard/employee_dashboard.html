@@ -7,5 +7,375 @@
 </head>
 <body>
     <a href="{% url 'employee_dashboard' %}">View Trainings</a>
+
+    <div id="training-evaluations">
+        <h2>Training Evaluations</h2>
+        
+        <div class="eval-tabs">
+            <button class="eval-tab active" onclick="showEvalTab('pending')">
+                <span class="tab-badge" id="pending-count">0</span>
+                Pending
+            </button>
+            <button class="eval-tab" onclick="showEvalTab('submitted')">
+                <span class="tab-badge" id="submitted-count">0</span>
+                Submitted
+            </button>
+        </div>
+        
+        <div id="pending-eval-content" class="eval-content active">
+            <div id="pending-list">
+                <p class="empty-state">Loading pending evaluations...</p>
+            </div>
+        </div>
+        
+        <div id="submitted-eval-content" class="eval-content">
+            <div id="submitted-list">
+                <p class="empty-state">Loading your evaluations...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="evalModal" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Evaluate Training</h3>
+                <button onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="evalForm">
+                    <input type="hidden" id="trainingId">
+                    
+                    <div class="question">
+                        <label>1. Overall training rating:</label>
+                        <div class="stars" data-question="rating">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                        <small>1=Very Poor, 5=Excellent</small>
+                    </div>
+                    
+                    <div class="question">
+                        <label>2. Overall training organization and structure:</label>
+                        <div class="stars" data-question="question1_rating">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <label>3. Trainer's knowledge and presentation skills:</label>
+                        <div class="stars" data-question="question2_rating">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <label>4. Relevance of content to your job:</label>
+                        <div class="stars" data-question="question3_rating">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <label>5. Quality of training materials and resources:</label>
+                        <div class="stars" data-question="question4_rating">
+                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <label class="checkbox">
+                            <input type="checkbox" id="recommend">
+                            6. Would you recommend this training to colleagues?
+                        </label>
+                    </div>
+                    
+                    <div class="question">
+                        <label>Additional feedback (optional):</label>
+                        <textarea id="feedback" rows="3" placeholder="Any additional comments..."></textarea>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn primary">Submit Evaluation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    class TrainingEvaluations {
+        constructor() {
+            this.currentRatings = {
+                rating: null,
+                question1_rating: null,
+                question2_rating: null,
+                question3_rating: null,
+                question4_rating: null
+            };
+            this.init();
+        }
+        
+        init() {
+            this.setupEventListeners();
+            this.loadData();
+        }
+        
+        setupEventListeners() {
+            document.querySelectorAll('.stars').forEach(stars => {
+                stars.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'SPAN') {
+                        this.handleStarClick(stars, e.target);
+                    }
+                });
+            });
+            
+            document.getElementById('evalForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.submitEvaluation();
+            });
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.loadData());
+            }
+        }
+        
+        async loadData() {
+            await Promise.all([
+                this.loadPendingEvaluations(),
+                this.loadSubmittedEvaluations()
+            ]);
+        }
+        
+        async loadPendingEvaluations() {
+            try {
+                const response = await fetch('/api/evaluations/pending/', {
+                    headers: this.getHeaders()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    this.displayPendingEvaluations(data);
+                }
+            } catch (error) {
+                console.error('Error loading pending evaluations:', error);
+                document.getElementById('pending-list').innerHTML = 
+                    '<p class="empty-state">Error loading data</p>';
+            }
+        }
+        
+        async loadSubmittedEvaluations() {
+            try {
+                const response = await fetch('/api/evaluations/my_evaluations/', {
+                    headers: this.getHeaders()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    this.displaySubmittedEvaluations(data);
+                }
+            } catch (error) {
+                console.error('Error loading submitted evaluations:', error);
+                document.getElementById('submitted-list').innerHTML = 
+                    '<p class="empty-state">Error loading data</p>';
+            }
+        }
+        
+        displayPendingEvaluations(trainings) {
+            const container = document.getElementById('pending-list');
+            
+            if (!trainings || trainings.length === 0) {
+                container.innerHTML = '<p class="empty-state">No trainings pending evaluation</p>';
+                document.getElementById('pending-count').textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            trainings.forEach(training => {
+                html += `
+                <div class="eval-item">
+                    <h4>${training.training_title || training.title}</h4>
+                    <p class="eval-meta">Trainer: ${training.trainer_name || 'N/A'}</p>
+                    <p class="eval-meta">Mode: ${training.training_mode || 'In-person'}</p>
+                    ${training.completed_date ? `<p class="eval-meta">Completed: ${training.completed_date}</p>` : ''}
+                    
+                    <div class="eval-actions">
+                        <button class="btn success" 
+                                onclick="evalSystem.openEvaluationForm(${training.training_id || training.id}, '${training.training_title || training.title}')">
+                            Evaluate Now
+                        </button>
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('pending-count').textContent = trainings.length;
+        }
+        
+        displaySubmittedEvaluations(evaluations) {
+            const container = document.getElementById('submitted-list');
+            
+            if (!evaluations || evaluations.length === 0) {
+                container.innerHTML = '<p class="empty-state">No evaluations submitted yet</p>';
+                document.getElementById('submitted-count').textContent = '0';
+                return;
+            }
+            
+            let html = '';
+            evaluations.forEach(evaluation => {
+                const date = new Date(evaluation.evaluation_date).toLocaleDateString();
+                const isEditable = evaluation.is_editable || false;
+                const avgRating = evaluation.average_question_rating || evaluation.rating;
+                
+                html += `
+                <div class="eval-item">
+                    <h4>${evaluation.training_title}</h4>
+                    <p class="eval-meta">
+                        Overall Rating: ${evaluation.rating}/5 | 
+                        Average: ${avgRating.toFixed(1)}/5 | 
+                        Would Recommend: ${evaluation.question5_would_recommend ? 'Yes' : 'No'}
+                    </p>
+                    <p class="eval-meta">Submitted: ${date} ${isEditable ? '(Editable)' : ''}</p>
+                    ${evaluation.feedback ? `<p>${evaluation.feedback.substring(0, 100)}${evaluation.feedback.length > 100 ? '...' : ''}</p>` : ''}
+                    
+                    <div class="eval-actions">
+                        <button class="btn primary" onclick="evalSystem.viewEvaluation(${evaluation.evaluation_id})">
+                            View
+                        </button>
+                        ${isEditable ? `
+                        <button class="btn warning" onclick="evalSystem.editEvaluation(${evaluation.evaluation_id})">
+                            Edit
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('submitted-count').textContent = evaluations.length;
+        }
+        
+        openEvaluationForm(trainingId, trainingTitle) {
+            this.currentRatings = {
+                rating: null,
+                question1_rating: null,
+                question2_rating: null,
+                question3_rating: null,
+                question4_rating: null
+            };
+            
+            document.querySelectorAll('.stars span').forEach(span => {
+                span.classList.remove('selected');
+            });
+            document.getElementById('recommend').checked = false;
+            document.getElementById('feedback').value = '';
+            
+            document.getElementById('modal-title').textContent = `Evaluate: ${trainingTitle}`;
+            document.getElementById('trainingId').value = trainingId;
+            
+            document.getElementById('evalModal').style.display = 'flex';
+        }
+        
+        handleStarClick(starsContainer, clickedStar) {
+            const questionName = starsContainer.dataset.question;
+            const stars = starsContainer.querySelectorAll('span');
+            const value = parseInt(clickedStar.textContent);
+            
+            stars.forEach(star => {
+                const starValue = parseInt(star.textContent);
+                star.classList.toggle('selected', starValue <= value);
+            });
+            
+            this.currentRatings[questionName] = value;
+        }
+        
+        async submitEvaluation() {
+            const missingRatings = Object.entries(this.currentRatings)
+                .filter(([key, value]) => value === null)
+                .map(([key]) => key);
+            
+            if (missingRatings.length > 0) {
+                alert(`Please complete all ratings: ${missingRatings.join(', ')}`);
+                return;
+            }
+            
+            const evaluationData = {
+                training: parseInt(document.getElementById('trainingId').value),
+                ...this.currentRatings,
+                question5_would_recommend: document.getElementById('recommend').checked,
+                feedback: document.getElementById('feedback').value.trim()
+            };
+            
+            try {
+                const response = await fetch('/api/evaluations/', {
+                    method: 'POST',
+                    headers: {
+                        ...this.getHeaders(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(evaluationData)
+                });
+                
+                if (response.ok) {
+                    alert('Evaluation submitted successfully!');
+                    this.closeModal();
+                    await this.loadData();
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${JSON.stringify(error)}`);
+                }
+            } catch (error) {
+                console.error('Error submitting evaluation:', error);
+                alert('Failed to submit evaluation. Please try again.');
+            }
+        }
+        
+        getHeaders() {
+            return {
+                'Authorization': `Token ${this.getAuthToken()}`,
+                'Accept': 'application/json'
+            };
+        }
+        
+        getAuthToken() {
+            return localStorage.getItem('auth_token') || '';
+        }
+        
+        closeModal() {
+            document.getElementById('evalModal').style.display = 'none';
+        }
+        
+        viewEvaluation(evaluationId) {
+            alert(`View evaluation #${evaluationId}`);
+        }
+        
+        editEvaluation(evaluationId) {
+            alert(`Edit evaluation #${evaluationId}`);
+        }
+    }
+
+    function showEvalTab(tabName) {
+        document.querySelectorAll('.eval-tab').forEach(tab => tab.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        
+        document.querySelectorAll('.eval-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}-eval-content`).classList.add('active');
+    }
+
+    function closeModal() {
+        if (window.evalSystem) {
+            window.evalSystem.closeModal();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('training-evaluations')) {
+            window.evalSystem = new TrainingEvaluations();
+        }
+    });
+    </script>
+    </div>
 </body>
 </html>

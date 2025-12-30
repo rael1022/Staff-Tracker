@@ -1,0 +1,171 @@
+<div id="attendance-modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Attendance Management</h3>
+            <button onclick="closeAttendanceModal()">×</button>
+        </div>
+        
+        <div class="modal-body">
+            <div id="attendance-stats"></div>
+            
+            <div class="section">
+                <h4>Manual Check-in</h4>
+                <div class="manual-checkin-form">
+                    <input type="text" id="search-user" placeholder="Search user by username..." 
+                           oninput="searchUsers(this.value)">
+                    <div id="user-results" class="user-results"></div>
+                    
+                    <div id="selected-user" style="display:none;">
+                        <p>Selected: <span id="selected-username"></span></p>
+                        <button onclick="performManualCheckin()">✅ Check In User</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h4>Attendance List</h4>
+                <div id="attendance-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentTrainingId = null;
+let selectedUserId = null;
+
+function openAttendanceModal(trainingId) {
+    currentTrainingId = trainingId;
+    document.getElementById('attendance-modal').style.display = 'block';
+    loadAttendanceData(trainingId);
+}
+
+function closeAttendanceModal() {
+    document.getElementById('attendance-modal').style.display = 'none';
+    currentTrainingId = null;
+    selectedUserId = null;
+}
+
+function loadAttendanceData(trainingId) {
+    fetch(`/attendance/api/trainer/attendance/${trainingId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                renderAttendanceData(data);
+            }
+        });
+}
+
+function renderAttendanceData(data) {
+    document.getElementById('modal-title').textContent = 
+        data.training_info ? `Attendance - ${data.training_info.title}` : 'Attendance';
+    
+    const statsDiv = document.getElementById('attendance-stats');
+    statsDiv.innerHTML = `
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-number">${data.total}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" style="color: green;">${data.present}</span>
+                <span class="stat-label">Present</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" style="color: red;">${data.absent}</span>
+                <span class="stat-label">Absent</span>
+            </div>
+        </div>
+    `;
+    
+    const listDiv = document.getElementById('attendance-list');
+    if (data.attendances.length === 0) {
+        listDiv.innerHTML = '<p>No attendance records yet.</p>';
+        return;
+    }
+    
+    let html = '<table class="attendance-table"><thead><tr>';
+    html += '<th>User</th><th>Status</th><th>Check-in Time</th><th>Method</th></tr></thead><tbody>';
+    
+    data.attendances.forEach(att => {
+        const user = att.user || {username: 'N/A', full_name: 'Unknown'};
+        const status = att.status === 'Present' ? '✅ Present' : '❌ Absent';
+        const time = att.check_in_time ? new Date(att.check_in_time).toLocaleString() : '-';
+        const method = att.is_qr_checkin ? 'QR Code' : 'Manual';
+        
+        html += `<tr>
+            <td>${user.full_name} (${user.username})</td>
+            <td>${status}</td>
+            <td>${time}</td>
+            <td>${method}</td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    listDiv.innerHTML = html;
+}
+
+function searchUsers(query) {
+    if (!query || query.length < 2) {
+        document.getElementById('user-results').innerHTML = '';
+        return;
+    }
+    
+    document.getElementById('user-results').innerHTML = `
+        <div class="alert alert-info">
+            <p>Search functionality requires user search API.</p>
+            <p>For testing, you can manually enter user ID:</p>
+            <input type="number" id="manual-user-id" placeholder="Enter User ID">
+            <button onclick="useManualUserId()">Use This ID</button>
+        </div>
+    `;
+}
+
+function useManualUserId() {
+    const userId = document.getElementById('manual-user-id').value;
+    if (userId) {
+        selectUser(userId, `User ${userId}`);
+    }
+}
+
+function selectUser(userId, username) {
+    selectedUserId = userId;
+    document.getElementById('selected-username').textContent = username;
+    document.getElementById('selected-user').style.display = 'block';
+    document.getElementById('user-results').innerHTML = '';
+}
+
+function performManualCheckin() {
+    if (!currentTrainingId || !selectedUserId) return;
+    
+    fetch('/attendance/api/trainer/manual-checkin/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+            training_id: currentTrainingId,
+            user_id: selectedUserId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Manual check-in successful!');
+            loadAttendanceData(currentTrainingId);
+            selectedUserId = null;
+            document.getElementById('selected-user').style.display = 'none';
+            document.getElementById('search-user').value = '';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+document.getElementById('attendance-modal').addEventListener('click', function(e) {
+    if (e.target.id === 'attendance-modal') {
+        closeAttendanceModal();
+    }
+});
+</script>

@@ -78,6 +78,10 @@
 
 <a href="{% url 'hr_dashboard' %}">Manage Trainings</a>
 
+<a href="{% url 'hr_training_registrations' %}">Training Registration</a>
+
+<a href="{% url 'attendance_summary' %}">View Attendence report</a>
+
 <!-- Certificate Management -->
 <h2 class="text-xl mt-6 mb-2">Manage Certificates</h2>
 <table class="table-auto w-full border-collapse border border-gray-300">
@@ -119,6 +123,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+
 
 
 {% endblock %}

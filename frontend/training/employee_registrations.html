@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Registrations</title>
+</head>
+<body>
+ {% extends 'dashboard/base.html' %}
+
+{% block content %}
+<h2>All Employee Training Registrations</h2>
+
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Email</th>
+            <th>Training</th>
+            <th>Trainer</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reg in registrations %}
+        <tr>
+            <td>{{ reg.employee.username }}</td>
+            <td>{{ reg.employee.email }}</td>
+            <td>{{ reg.training.title }}</td>
+            <td>{% if reg.training.trainer %}{{ reg.training.trainer.username }}{% else %}-{% endif %}</td>
+            <td>{{ reg.status }}</td>
+            <td>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_id" value="{{ reg.id }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No registrations yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+</body>
+</html>

@@ -156,6 +156,23 @@ def delete_training(request, training_id):
     return render(request, 'training/delete_training.html', {'training': training})
 
 
+@login_required
+@user_passes_test(is_hr)
+def hr_training_registrations(request):
+    registrations = TrainingRegistration.objects.select_related('employee', 'training').all()
+
+    if request.method == 'POST':
+        reg_id = request.POST.get('delete_id')
+        if reg_id:
+            reg = get_object_or_404(TrainingRegistration, id=reg_id)
+            reg.delete()
+            messages.success(request, "Registration deleted successfully.")
+            return redirect('hr_training_registrations')
+
+    return render(request, 'training/employee_registrations.html', {
+        'registrations': registrations
+    })
+
 # ---------------- Employee ----------------
 @login_required
 def employee_dashboard(request):

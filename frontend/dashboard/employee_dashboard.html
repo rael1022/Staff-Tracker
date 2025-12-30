@@ -6,6 +6,18 @@
     <title>HR</title>
 </head>
 <body>
+    {% extends 'dashboard/base.html' %}
+
+    {% block content %}
+    <h2>Employee Dashboard</h2>
+    <p>Welcome, {{ request.user.username }}!</p>
+
     <a href="{% url 'employee_dashboard' %}">View Trainings</a>
+    <br>
+    <a href="{% url 'my_certificates' %}">View certificate list</a>
+    <br>
+    <a href="{% url 'my_cpd' %}">View My CPD record</a>
+
+    {% endblock %}
 </body>
 </html>

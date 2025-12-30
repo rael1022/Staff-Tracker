@@ -12,6 +12,8 @@
 <p>Welcome, {{ request.user.username }}!</p>
 
 <a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
+<br>
+<a href="{% url 'issued_certificates' %}">Issue Certificate</a>
 {% endblock %}
 
 </body>

@@ -14,6 +14,7 @@ import io
 import time
 import qrcode
 
+# test
 @login_required
 def trainer_training_list(request):
     print("=== DEBUG: trainer_training_list called ===")

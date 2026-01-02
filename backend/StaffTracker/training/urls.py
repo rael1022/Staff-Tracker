@@ -16,4 +16,6 @@ urlpatterns = [
     path('hr/create/', views.hr_create_training, name='hr_create_training'),
     path('hr/edit/<int:training_id>/', views.hr_edit_training, name='hr_edit_training'),
     path('hr/delete/<int:training_id>/', views.hr_delete_training, name='hr_delete_training'),
+    path('hr/training/registrations/', views.hr_training_registrations, name='hr_training_registrations'),
+
 ]

@@ -1,5 +1,5 @@
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Certificate
 
 # Create your views here.
@@ -23,3 +23,14 @@ def certificate_preview(request, pk):
     return render(request, 'certificate/certificate_preview.html', {
         'cert': cert
     })
+
+def is_hr(user):
+    return user.groups.filter(name='HR').exists() or user.is_superuser
+
+@login_required
+@user_passes_test(is_hr)
+def hr_delete_certificate(request, cert_id):
+    cert = get_object_or_404(Certificate, id=cert_id)
+    if request.method == 'POST':
+        cert.delete()
+    return redirect('hr_dashboard')

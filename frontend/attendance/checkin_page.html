@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Check-in</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Training Check-in</h1>
+        
+        {% if training_info %}
+            <h3>{{ training_info.title }}</h3>
+            <p>Date: {{ training_info.date }} | Time: {{ training_info.time }}</p>
+            <p>Location: {{ training_info.location }}</p>
+            <p>Trainer: {{ training_info.trainer_name }}</p>
+        {% elif training_id %}
+            <p>Training ID: {{ training_id }}</p>
+        {% else %}
+            <p style="color: red;">No training ID provided</p>
+        {% endif %}
+        
+        <form id="checkinForm">
+            <input type="hidden" id="trainingId" value="{{ training_id }}">
+            
+            <div>
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            <div>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            
+            <button type="submit">Check In</button>
+        </form>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+    document.getElementById('checkinForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const trainingId = document.getElementById('trainingId').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        const submitBtn = document.querySelector('button');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking in...';
+        
+        try {
+            const response = await fetch('/attendance/api/employee/qr-checkin/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    training_id: trainingId
+                })
+            });
+            
+            const data = await response.json();
+            const messageDiv = document.getElementById('message');
+            
+            if (data.success) {
+                messageDiv.innerHTML = `<div class="success">✅ ${data.message}</div>`;
+                setTimeout(() => {
+                    try { window.close(); } catch(e) {}
+                }, 3000);
+            } else {
+                messageDiv.innerHTML = `<div class="error">❌ ${data.message}</div>`;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Check In';
+            }
+        } catch (error) {
+            document.getElementById('message').innerHTML = 
+                `<div class="error">Network error: ${error.message}</div>`;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Check In';
+        }
+    });
+    
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || '';
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer - My Trainings</title>
+</head>
+<body>
+    <h1>My Training Sessions</h1>
+    
+    <h2>My Trainings</h2>
+    
+    <table border="1" width="100%" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>CPD Points</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="trainings-table-body">
+            <tr>
+                <td colspan="7">Loading trainings...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', loadTrainings);
+
+    function loadTrainings() {
+        fetch('/attendance/api/trainer/trainings/')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    showError('Failed to load trainings.');
+                    return;
+                }
+                renderTrainingTable(data.trainings);
+            })
+            .catch(error => {
+                showError(error);
+            });
+    }
+
+    function showError(error) {
+        const tbody = document.getElementById('trainings-table-body');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7">Error: ${error}</td>
+            </tr>
+        `;
+    }
+
+    function renderTrainingTable(trainings) {
+        const tbody = document.getElementById('trainings-table-body');
+        tbody.innerHTML = '';
+
+        if (!trainings || trainings.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">No training sessions found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        trainings.forEach(training => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${training.title}</td>
+                <td>${training.status}</td>
+                <td>${training.description || '-'}</td>
+                <td>
+                    ${training.date || '-'}
+                    ${training.time ? training.time.substring(0, 5) : ''}
+                </td>
+                <td>${training.location || '-'}</td>
+                <td>${training.cpd_points ?? 0}</td>
+                <td>
+                    <button onclick="generateQR(${training.id}, '${escapeQuotes(training.title)}')">
+                        Generate QR
+                    </button>
+                    <br><br>
+                    <button onclick="viewAttendance(${training.id})">
+                        View Attendance
+                    </button>
+                    <div id="qr-result-${training.id}" style="margin-top:10px;"></div>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    function generateQR(trainingId, trainingTitle) {
+        fetch('/attendance/api/trainer/generate-qr/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                training_id: trainingId,
+                training_title: trainingTitle
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById(`qr-result-${trainingId}`);
+
+            if (!data.success) {
+                container.innerHTML = `<p>Error: ${data.message}</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <p><strong>Valid Until:</strong> ${data.expires_human}</p>
+                <img src="${data.qr_image}" width="120">
+                <p><strong>QR URL:</strong> <a href="${data.qr_url}" target="_blank">${data.qr_url}</a></p>
+                <button onclick="copyQRUrl('${data.qr_url}')">
+                    Copy QR URL
+                </button>
+            `;
+        });
+    }
+
+    function viewAttendance(trainingId) {
+        fetch(`/attendance/api/trainer/attendance/${trainingId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.message);
+                    return;
+                }
+
+                let message = `Attendance Report:\n\n`;
+                message += `Total: ${data.total}\n`;
+                message += `Present: ${data.present}\n`;
+                message += `Absent: ${data.absent}\n`;
+                
+                if (data.attendances && data.attendances.length > 0) {
+                    message += `\nAttendees:\n`;
+                    data.attendances.forEach(att => {
+                        const user = att.user || {username: 'N/A', full_name: 'Unknown'};
+                        const status = att.status === 'Present' ? '✅' : '❌';
+                        message += `${status} ${user.full_name} (${user.username})\n`;
+                    });
+                }
+
+                alert(message);
+            });
+    }
+
+    function copyQRUrl(qrUrl) {
+        navigator.clipboard.writeText(qrUrl)
+            .then(() => alert('QR URL copied!'));
+    }
+
+    function escapeQuotes(text) {
+        return text.replace(/'/g, "\\'");
+    }
+
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie) {
+            document.cookie.split(';').forEach(cookie => {
+                cookie = cookie.trim();
+                if (cookie.startsWith('csrftoken=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                }
+            });
+        }
+        return cookieValue;
+    }
+    </script>
+</body>
+</html>

@@ -2,12 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <title>
-        {% block title %}
-        STAFF TRAINING AND CERTIFICATION TRACKER
-        {% endblock %}
-    </title>
+    <title>Staff Training Tracker</title>
 
     <style>
         * {
@@ -18,14 +13,14 @@
         }
 
         body {
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
 
-        /* ===== Header ===== */
+        /* Header */
         .site-header {
             width: 100%;
-            background-color: #ffffff;
             border-bottom: 1px solid #e5e5e5;
+            background-color: #ffffff;
         }
 
         .header-container {
@@ -73,22 +68,20 @@
             color: #007bff;
         }
 
-        /* Auth */
+        /* Auth section */
         .auth {
             display: flex;
             align-items: center;
             gap: 20px;
         }
 
-        .auth button {
-            background: none;
-            border: none;
+        .auth .login {
+            text-decoration: none;
             font-size: 14px;
-            cursor: pointer;
             color: #333;
         }
 
-        .auth button:hover {
+        .auth .login:hover {
             color: #007bff;
         }
 
@@ -97,29 +90,13 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
-            background-color: transparent;
-            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
         }
 
         .auth .btn:hover {
             background-color: #f5f5f5;
-        }
-
-        /* ===== Main ===== */
-        main {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        /* ===== Footer ===== */
-        footer {
-            margin-top: 60px;
-            padding: 20px 0;
-            border-top: 1px solid #e5e5e5;
-            text-align: center;
-            font-size: 13px;
-            color: #666;
         }
 
         /* Responsive */
@@ -130,7 +107,6 @@
         }
     </style>
 </head>
-
 <body>
 
 <header class="site-header">
@@ -144,35 +120,19 @@
 
         <!-- Navigation -->
         <nav class="main-nav">
-            <a href="{% url 'dashboard' %}">Dashboard</a>
-            <a href="#">abc</a>
-            <a href="#">efg</a>
-            <a href="#">jjj</a>
+            <a href="#">Experts</a>
+            <a href="#">Community Groups</a>
+            <a href="#">Support</a>
         </nav>
 
         <!-- Auth -->
         <div class="auth">
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn">Login</a>
-            {% endif %}
+            <a href="#" class="login">Login</a>
+            <a href="#" class="btn">Create account</a>
         </div>
 
     </div>
 </header>
-
-<main>
-    {% block content %}
-    {% endblock %}
-</main>
-
-<footer>
-    <p>&copy; 2025 Staff Tracker</p>
-</footer>
 
 </body>
 </html>

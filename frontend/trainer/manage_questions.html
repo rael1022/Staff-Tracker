@@ -4,359 +4,475 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Assessment Questions</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .question-card {
-            border-left: 4px solid #007bff;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        
+        .inline-form {
+            display: inline;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        select, input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .training-selector {
             margin-bottom: 20px;
         }
-        .pre-question {
-            border-left-color: #28a745;
+        
+        .training-selector select {
+            width: 300px;
         }
-        .post-question {
-            border-left-color: #dc3545;
+        
+        .question-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
-        .type-badge {
-            font-size: 0.8em;
-            padding: 3px 8px;
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        .question-text {
-            font-weight: 500;
-        }
-        .option-label {
-            width: 30px;
+        
+        .question-type {
             display: inline-block;
-        }
-        .correct-answer {
-            background-color: #d4edda;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
             font-weight: bold;
+        }
+        
+        .pre-question {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .post-question {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .options-list {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .options-list li {
+            margin-bottom: 5px;
+        }
+        
+        .correct-option {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab.active {
+            border: 1px solid #ddd;
+            border-bottom: 1px solid white;
+            background: white;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        .format-info-box {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .format-info-box pre {
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <h2>Manage Assessment Questions</h2>
-                
-                <!-- Training Selection -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Select Training</h5>
+{% extends 'dashboard/base.html' %}
+{% block content %}
+    <div class="container">
+        <h1>Manage Assessment Questions</h1>
+        
+        <div class="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <form method="GET" action="{% url 'manage_assessment_questions' %}" class="row g-3">
-                                    <div class="col-md-8">
-                                        <select name="training_id" class="form-select" onchange="this.form.submit()">
-                                            <option value="">-- Select a Training --</option>
-                                            {% for training in trainings %}
-                                                <option value="{{ training.id }}" 
-                                                    {% if selected_training.id == training.id %}selected{% endif %}>
-                                                    {{ training.name }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <a href="{% url 'manage_assessment_questions' %}" class="btn btn-secondary w-100">
-                                            Clear Selection
-                                        </a>
-                                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="section training-selector">
+            <h2>Select Training</h2>
+            <form method="GET" action="{% url 'manage_assessment_questions' %}">
+                <label for="trainingSelect">Select Training</label>
+                <select id="trainingSelect" name="training_id" onchange="this.form.submit()">
+                    <option value="">-- Select a Training --</option>
+                    {% for training in trainings %}
+                        <option value="{{ training.id }}" 
+                                {% if selected_training and selected_training.id == training.id %}selected{% endif %}>
+                            {{ training.title }} ({{ training.date }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        
+        {% if selected_training %}
+            <h2>Questions for: {{ selected_training.title }}</h2>
+            
+            <div class="tab-navigation">
+                <div class="tab active" onclick="showTab('view')">View Questions</div>
+                <div class="tab" onclick="showTab('add')">Add Single Question</div>
+                <div class="tab" onclick="showTab('import')">Import Questions</div>
+                <div class="tab" onclick="showTab('results')">View Results</div>
+            </div>
+            
+            <div id="view-tab" class="tab-content active">
+                <h3>Existing Questions</h3>
+                
+                {% if questions %}
+                    {% for question in questions %}
+                        <div class="question-card">
+                            <div class="question-header">
+                                <div>
+                                    <span class="question-type {{ question.question_type }}-question">
+                                        {{ question.get_question_type_display }}
+                                    </span>
+                                    <strong>Marks: {{ question.marks }}</strong>
+                                </div>
+                                <form method="POST" class="inline-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                                    <button type="submit" name="delete_question" class="btn btn-danger btn-sm" 
+                                            onclick="return confirm('Are you sure you want to delete this question?')">
+                                        Delete
+                                    </button>
                                 </form>
                             </div>
+                            
+                            <p><strong>Question:</strong> {{ question.question_text }}</p>
+                            
+                            <ul class="options-list">
+                                <li {% if question.correct_answer == 'A' %}class="correct-option"{% endif %}>
+                                    A. {{ question.option_a }}
+                                </li>
+                                <li {% if question.correct_answer == 'B' %}class="correct-option"{% endif %}>
+                                    B. {{ question.option_b }}
+                                </li>
+                                <li {% if question.correct_answer == 'C' %}class="correct-option"{% endif %}>
+                                    C. {{ question.option_c }}
+                                </li>
+                                <li {% if question.correct_answer == 'D' %}class="correct-option"{% endif %}>
+                                    D. {{ question.option_d }}
+                                </li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
-
-                {% if selected_training %}
-                <!-- Add New Question Form -->
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Add New Question</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{% url 'manage_assessment_questions' training_id=selected_training.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="add_question" value="true">
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="question_type" class="form-label">Question Type *</label>
-                                    <select id="question_type" name="question_type" class="form-select" required>
-                                        <option value="">-- Select Type --</option>
-                                        {% for type_code, type_name in question_types %}
-                                            <option value="{{ type_code }}">{{ type_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="marks" class="form-label">Marks *</label>
-                                    <input type="number" id="marks" name="marks" class="form-control" value="1" min="1" required>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="question_text" class="form-label">Question Text *</label>
-                                <textarea id="question_text" name="question_text" class="form-control" rows="3" required></textarea>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <div class="input-group mb-2">
-                                        <span class="input-group-text option-label">A</span>
-                                        <input type="text" name="option_a" class="form-control" placeholder="Option A" required>
-                                    </div>
-                                    <div class="input-group mb-2">
-                                        <span class="input-group-text option-label">B</span>
-                                        <input type="text" name="option_b" class="form-control" placeholder="Option B" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-group mb-2">
-                                        <span class="input-group-text option-label">C</span>
-                                        <input type="text" name="option_c" class="form-control" placeholder="Option C" required>
-                                    </div>
-                                    <div class="input-group mb-2">
-                                        <span class="input-group-text option-label">D</span>
-                                        <input type="text" name="option_d" class="form-control" placeholder="Option D" required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="form-label">Correct Answer *</label>
-                                <div class="row">
-                                    <div class="col-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="correct_answer" id="correct_a" value="A" required>
-                                            <label class="form-check-label" for="correct_a">Option A</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="correct_answer" id="correct_b" value="B">
-                                            <label class="form-check-label" for="correct_b">Option B</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="correct_answer" id="correct_c" value="C">
-                                            <label class="form-check-label" for="correct_c">Option C</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="correct_answer" id="correct_d" value="D">
-                                            <label class="form-check-label" for="correct_d">Option D</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="text-end">
-                                <button type="submit" class="btn btn-primary">Add Question</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Existing Questions -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Existing Questions for {{ selected_training.name }}</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if questions %}
-                            <div class="row">
-                                {% for question in questions %}
-                                    <div class="col-md-12">
-                                        <div class="card question-card {% if question.question_type == 'pre' %}pre-question{% else %}post-question{% endif %}">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <div>
-                                                        <span class="badge 
-                                                            {% if question.question_type == 'pre' %}bg-success{% else %}bg-danger{% endif %} 
-                                                            type-badge me-2">
-                                                            {{ question.get_question_type_display }}
-                                                        </span>
-                                                        <span class="badge bg-secondary type-badge">
-                                                            {{ question.marks }} mark{{ question.marks|pluralize }}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button class="btn btn-sm btn-outline-primary" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#editModal{{ question.id }}">
-                                                            Edit
-                                                        </button>
-                                                        <form method="POST" action="{% url 'manage_assessment_questions' training_id=selected_training.id %}" 
-                                                              class="d-inline" onsubmit="return confirm('Are you sure you want to delete this question?');">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" name="delete_question" value="true">
-                                                            <input type="hidden" name="question_id" value="{{ question.id }}">
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                                
-                                                <h6 class="question-text mb-3">{{ question.question_text }}</h6>
-                                                
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="option {% if question.correct_answer == 'A' %}correct-answer{% endif %} p-2 mb-1">
-                                                            <strong>A:</strong> {{ question.option_a }}
-                                                        </div>
-                                                        <div class="option {% if question.correct_answer == 'B' %}correct-answer{% endif %} p-2 mb-1">
-                                                            <strong>B:</strong> {{ question.option_b }}
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="option {% if question.correct_answer == 'C' %}correct-answer{% endif %} p-2 mb-1">
-                                                            <strong>C:</strong> {{ question.option_c }}
-                                                        </div>
-                                                        <div class="option {% if question.correct_answer == 'D' %}correct-answer{% endif %} p-2 mb-1">
-                                                            <strong>D:</strong> {{ question.option_d }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Edit Modal -->
-                                    <div class="modal fade" id="editModal{{ question.id }}" tabindex="-1">
-                                        <div class="modal-dialog modal-lg">
-                                            <div class="modal-content">
-                                                <form method="POST" action="{% url 'manage_assessment_questions' training_id=selected_training.id %}">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="update_question" value="true">
-                                                    <input type="hidden" name="question_id" value="{{ question.id }}">
-                                                    
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Edit Question</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <!-- Same form structure as Add Question, pre-filled -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Question Type</label>
-                                                            <div>
-                                                                <span class="badge 
-                                                                    {% if question.question_type == 'pre' %}bg-success{% else %}bg-danger{% endif %}">
-                                                                    {{ question.get_question_type_display }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label for="edit_marks{{ question.id }}" class="form-label">Marks</label>
-                                                            <input type="number" id="edit_marks{{ question.id }}" name="marks" 
-                                                                   class="form-control" value="{{ question.marks }}" min="1">
-                                                        </div>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label for="edit_question_text{{ question.id }}" class="form-label">Question Text</label>
-                                                            <textarea id="edit_question_text{{ question.id }}" name="question_text" 
-                                                                      class="form-control" rows="3">{{ question.question_text }}</textarea>
-                                                        </div>
-                                                        
-                                                        <div class="row mb-3">
-                                                            <div class="col-md-6">
-                                                                <div class="input-group mb-2">
-                                                                    <span class="input-group-text option-label">A</span>
-                                                                    <input type="text" name="option_a" class="form-control" 
-                                                                           value="{{ question.option_a }}">
-                                                                </div>
-                                                                <div class="input-group mb-2">
-                                                                    <span class="input-group-text option-label">B</span>
-                                                                    <input type="text" name="option_b" class="form-control" 
-                                                                           value="{{ question.option_b }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="input-group mb-2">
-                                                                    <span class="input-group-text option-label">C</span>
-                                                                    <input type="text" name="option_c" class="form-control" 
-                                                                           value="{{ question.option_c }}">
-                                                                </div>
-                                                                <div class="input-group mb-2">
-                                                                    <span class="input-group-text option-label">D</span>
-                                                                    <input type="text" name="option_d" class="form-control" 
-                                                                           value="{{ question.option_d }}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Correct Answer</label>
-                                                            <div class="row">
-                                                                {% for option in 'ABCD' %}
-                                                                    <div class="col-3">
-                                                                        <div class="form-check">
-                                                                            <input class="form-check-input" type="radio" 
-                                                                                   name="correct_answer" 
-                                                                                   id="edit_correct_{{ option }}_{{ question.id }}" 
-                                                                                   value="{{ option }}"
-                                                                                   {% if question.correct_answer == option %}checked{% endif %}>
-                                                                            <label class="form-check-label" 
-                                                                                   for="edit_correct_{{ option }}_{{ question.id }}">
-                                                                                Option {{ option }}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                {% endfor %}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="alert alert-info">
-                                No questions found for this training. Add some questions using the form above.
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+                    {% endfor %}
                 {% else %}
-                <div class="alert alert-info">
-                    Please select a training to manage its assessment questions.
-                </div>
+                    <p>No questions found for this training. Add questions using the tabs above.</p>
                 {% endif %}
             </div>
-        </div>
-    </div>
+            
+            <div id="add-tab" class="tab-content">
+                <h3>Add Single Question</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="add_question" value="true">
+                    
+                    <div class="form-group">
+                        <label for="question_type">Question Type:</label>
+                        <select name="question_type" id="question_type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="pre">Pre-Assessment</option>
+                            <option value="post">Post-Assessment</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="question_text">Question Text:</label>
+                        <textarea name="question_text" id="question_text" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_a">Option A:</label>
+                        <input type="text" name="option_a" id="option_a" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_b">Option B:</label>
+                        <input type="text" name="option_b" id="option_b" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_c">Option C:</label>
+                        <input type="text" name="option_c" id="option_c" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_d">Option D:</label>
+                        <input type="text" name="option_d" id="option_d" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="correct_answer">Correct Answer:</label>
+                        <select name="correct_answer" id="correct_answer" required>
+                            <option value="">-- Select Correct Option --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marks">Marks:</label>
+                        <input type="number" name="marks" id="marks" value="1" min="1" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Add Question</button>
+                </form>
+            </div>
+            
+            <div id="import-tab" class="tab-content">
+                <h3>Import Questions from File</h3>
+                
+                <div class="format-info-box">
+                    <h4>Supported Formats:</h4>
+                    <p><strong>CSV Format:</strong></p>
+                    <pre>type,question,option_a,option_b,option_c,option_d,correct_answer,marks
+                    pre,What is Django?,Web framework,Database,OS,Language,A,1
+                    post,What is Python?,Snake,Programming language,Bird,Car,B,2</pre>
+                                        
+                                        <p><strong>JSON Format:</strong></p>
+                                        <pre>[
+                    {
+                        "type": "pre",
+                        "question": "What is Django?",
+                        "option_a": "Web framework",
+                        "option_b": "Database",
+                        "option_c": "OS",
+                        "option_d": "Language",
+                        "correct_answer": "A",
+                        "marks": 1
+                    }
+                    ]</pre>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="import_questions" value="true">
+                    
+                    <div class="form-group">
+                        <label for="question_file">Select File:</label>
+                        <input type="file" name="question_file" id="question_file" accept=".csv,.json" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Import Questions</button>
+                </form>
+            </div>
+            
+            <div id="results-tab" class="tab-content">
+                <h3>Assessment Results</h3>
+                
+                <div class="d-flex gap-3 mb-4">
+                    <a href="{% url 'view_results_training' training_id=selected_training.id %}" 
+                    class="btn btn-primary" target="_blank">
+                        View Detailed Results
+                    </a>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                    <a href="{% url 'pre_assessment' training_id=selected_training.id %}" 
+                    class="btn btn-secondary" target="_blank">
+                        Take Pre-Assessment (Test)
+                    </a>
+
+                    <a href="{% url 'post_assessment' training_id=selected_training.id %}" 
+                    class="btn btn-secondary" target="_blank">
+                        Take Post-Assessment (Test)
+                    </a>
+                </div>
+                
+                <div class="stats">
+                    {% if pre_results or post_results %}
+                        <h4>Quick Stats:</h4>
+                        <p>Pre-Assessments Completed: {{ pre_results|length }}</p>
+                        <p>Post-Assessments Completed: {{ post_results|length }}</p>
+                    {% else %}
+                        <p>No assessment results yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>Please select a training to manage questions.</p>
+        {% endif %}
+    </div>
     
     <script>
-        // Auto-resize textarea
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            event.target.classList.add('active');
         }
         
-        // Initialize all textareas
         document.addEventListener('DOMContentLoaded', function() {
-            const textareas = document.querySelectorAll('textarea');
-            textareas.forEach(textarea => {
-                autoResize(textarea);
-                textarea.addEventListener('input', function() {
-                    autoResize(this);
-                });
-            });
+            const messages = document.querySelector('.messages');
+            if (messages && messages.innerHTML.trim() !== '') {
+                messages.scrollIntoView({ behavior: 'smooth' });
+            }
         });
     </script>
+{% endblock %}
 </body>
 </html>

@@ -10,8 +10,10 @@ urlpatterns = [
     path('api/trainer/manual-checkin/', views.manual_checkin, name='manual_checkin'),
     
     path('api/employee/qr-checkin/', views.qr_checkin, name='qr_checkin'),
-    
     path('checkin/', views.checkin_page_view, name='checkin_page'),
+    
+    path('trainer/view/', views.trainer_attendance_view, name='trainer_attendance_view'),
+    path('trainer/attendance/<str:training_id>/', views.get_training_attendance, name='get_training_attendance'),
     
     path('trainer/trainings/', TemplateView.as_view(template_name='trainer/trainer_trainings.html'), name='trainer_trainings_page'),
     path('test-attendance/', TemplateView.as_view(template_name='attendance/test_attendance.html'), name='test_attendance'),

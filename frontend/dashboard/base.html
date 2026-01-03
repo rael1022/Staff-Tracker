@@ -181,12 +181,15 @@
             {% if user.is_authenticated and user.userprofile.role == "Trainer" %}
                 <a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
                 <a href="{% url 'trainer_trainings_page' %}">Attendance QR Generate</a>
+                <a href="{% url 'manage_assessment_questions' %}">Manage Assessment Questions</a>
+                <a href="{% url 'view_results' %}">View Assessment Results</a>
+                <a href="{% url 'trainer_evaluations' %}">View Evaluations</a>
             {% endif %}
 
             {% if user.is_authenticated and user.userprofile.role == "Employee" %}
                 <a href="{% url 'employee_dashboard' %}">View Trainings</a>
-                <a href="{% url 'evaluation_dashboard' %}">Evaluation dashboard</a>
                 <a href="{% url 'my_certificates' %}">View certificate list</a>
+                <a href="{% url 'employee_results' %}">View My Assessment Results</a>
                 <a href="{% url 'my_cpd' %}">View My CPD record</a>
             {% endif %}
 

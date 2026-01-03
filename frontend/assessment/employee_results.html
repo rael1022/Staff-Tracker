@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Assessment Results</title>
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            font-weight: 600;
+        }
+
+        h4 {
+            font-weight: 600;
+            margin-top: 30px;
+        }
+
+        .performance-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 32px;
+            margin: 0;
+        }
+
+        .stat-item p {
+            margin-top: 6px;
+            opacity: 0.85;
+        }
+
+        .card,
+        .assessment-card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.25s ease;
+        }
+
+        .card:hover,
+        .assessment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .training-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .status-badge,
+        .status-completed,
+        .status-pending,
+        .status-muted {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-muted {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+
+        .assessment-link,
+        a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .assessment-link:hover,
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .list-group-item {
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4">My Assessment Results</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center p-3">
+                <h5>Average Score</h5>
+                {% if average_score %}
+                    <h3>{{ average_score }}%</h3>
+                {% else %}
+                    <h3>--</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Training Assessments</h4>
+
+    {% if registration_status %}
+        {% for item in registration_status %}
+            {% with registration=item.registration %}
+            <div class="card mb-3 p-3">
+
+                <h5>{{ registration.training.title }}</h5>
+
+                <p>
+                    Training Status:
+                    {% if registration.training.training_status == "Completed" %}
+                        <span class="badge bg-success">Completed</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Upcoming</span>
+                    {% endif %}
+                </p>
+
+                <hr>
+
+                <p>
+                    <strong>Pre-Assessment:</strong>
+                    {% if item.pre_done %}
+                        <span class="status-completed">✓ Completed</span>
+                    {% else %}
+                        <a href="{% url 'pre_assessment' training_id=registration.training.id %}">
+                            Take Pre-Assessment
+                        </a>
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Post-Assessment:</strong>
+                    {% if item.post_done %}
+                        <span class="status-completed">✓ Completed</span>
+                    {% elif registration.training.training_status == "Completed" %}
+                        <a href="{% url 'post_assessment' training_id=registration.training.id %}">
+                            Take Post-Assessment
+                        </a>
+                    {% else %}
+                        <span class="status-muted">
+                            Available after training completion
+                        </span>
+                    {% endif %}
+                </p>
+
+            </div>
+            {% endwith %}
+        {% endfor %}
+    {% else %}
+        <p>No approved trainings found.</p>
+    {% endif %}
+
+    <h4 class="mt-5 mb-3">Assessment History</h4>
+
+    <h5>Pre-Assessments</h5>
+    {% if pre_assessments %}
+        <ul class="list-group mb-4">{% for assessment in pre_assessments %}
+            <li class="list-group-item">
+                <strong>{{ assessment.training.title }}</strong><br>
+                Score: {{ assessment.score }}% <br>
+                Date: {{ assessment.assessment_date }}
+            </li>{% endfor %}
+        </ul>
+    {% else %}
+        <p>No pre-assessments completed.</p>
+    {% endif %}
+
+    <h5>Post-Assessments</h5>
+    {% if post_assessments %}
+        <ul class="list-group">{% for assessment in post_assessments %}
+            <li class="list-group-item">
+                <strong>{{ assessment.training.title }}</strong><br>
+                Score: {{ assessment.score }}% <br>
+                Date: {{ assessment.assessment_date }}
+            </li>{% endfor %}
+        </ul>
+    {% else %}
+        <p>No post-assessments completed.</p>
+    {% endif %}
+
+</div>
+{% endblock %}
+</body>
+</html>

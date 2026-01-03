@@ -24,13 +24,6 @@ def can_user_evaluate_training(user, training):
     if Evaluation.objects.filter(user=user, training=training).exists():
         return False, "Already evaluated"
     
-    try:
-        status_value = training.status
-        if status_value != 'Complete':
-            return False, f"Training not completed (Status: {status_value})"
-    except AttributeError:
-        return False, "Training status field not available"
-    
     Registration = get_registration_model()
     if Registration:
         try:
@@ -40,6 +33,10 @@ def can_user_evaluate_training(user, training):
             )
             if registration.status != 'Approved':
                 return False, f"Registration not approved (Status: {registration.status})"
+            
+            if registration.complete_status != 'Completed':
+                return False, f"Training not completed (Status: {registration.complete_status})"
+            
         except Registration.DoesNotExist:
             return False, "Not registered for this training"
     else:
@@ -99,6 +96,11 @@ def submit_evaluation(request, training_id):
             if registration.status != 'Approved':
                 messages.warning(request, 'Your registration is not approved.')
                 return redirect('employee_dashboard')
+            
+            if registration.complete_status != 'Completed':
+                messages.warning(request, 'This training is not completed yet.')
+                return redirect('employee_dashboard')
+            
         except Registration.DoesNotExist:
             messages.warning(request, 'You are not registered for this training.')
             return redirect('employee_dashboard')

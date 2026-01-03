@@ -170,6 +170,12 @@
                 <a href="{% url 'hod_dashboard' %}">
                     Manage Training Approvals
                 </a>
+                <a href="{% url 'hod_department_report' %}">
+                    Hod Department Report
+                </a>
+                <a href="{% url 'hod_department_training_progress' %}">
+                    Hod department training progress
+                </a>
             {% endif %}
 
             {% if user.is_authenticated and user.userprofile.role == "Trainer" %}

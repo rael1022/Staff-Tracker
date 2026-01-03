@@ -55,10 +55,9 @@ def hod_department_training_progress(request):
     department = Department.objects.filter(hod=request.user).first()
 
     employees = UserProfile.objects.filter(department=department)
+    user_ids = [e.user.id for e in employees]  
+    attendances = Attendance.objects.filter(user_id__in=user_ids)
 
-    attendances = Attendance.objects.filter(
-        user_id__in=[e.user.username for e in employees]
-    )
 
     return render(request, 'reports/department_training_progress.html', {
         'department': department,

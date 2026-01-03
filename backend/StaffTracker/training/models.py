@@ -20,10 +20,26 @@ class TrainingRegistration(models.Model):
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected')
     ]
+    
+    COMPLETE_CHOICES = [
+        ('Not Completed', 'Not Completed'),
+        ('Completed', 'Completed'),
+    ]
+    
     training = models.ForeignKey(Training, on_delete=models.CASCADE)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'groups__name': 'Employee'})
+    employee = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'groups__name': 'Employee'}
+    )
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    complete_status = models.CharField(
+        max_length=15,
+        choices=COMPLETE_CHOICES,
+        default='Not Completed'
+    )
     requested_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.employee.username} -> {self.training.title} ({self.status})"
+        return f"{self.employee.username} -> {self.training.title} ({self.status}, {self.complete_status})"
+

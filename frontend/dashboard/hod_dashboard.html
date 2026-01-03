@@ -1,11 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR</title>
-</head>
-<body>
-    <a href="{% url 'hod_dashboard' %}">Manage Training Approvals</a>
-</body>
-</html>
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+
+<style>
+    .card {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        max-width: 600px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    .card h1 {
+        font-size: 22px;
+        margin-bottom: 16px;
+    }
+
+    .card a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .card a:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="card">
+    <h1>HOD Dashboard</h1>
+    <p>Welcome, <strong>{{ user.username }}</strong></p>
+</div>
+
+{% endblock %}

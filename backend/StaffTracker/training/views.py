@@ -93,6 +93,23 @@ def hr_delete_training(request, training_id):
         messages.success(request, "Training deleted successfully")
         return redirect('hr_dashboard')
     return render(request, 'training/hr_delete_training.html', {'training': training})
+
+@login_required
+def hr_approve_registration(request, reg_id):
+    reg = get_object_or_404(TrainingRegistration, id=reg_id)
+    reg.status = 'Approved'
+    reg.save()
+    messages.success(request, f"{reg.employee.username}'s registration approved.")
+    return redirect('hr_dashboard')
+
+@login_required
+def hr_reject_registration(request, reg_id):
+    reg = get_object_or_404(TrainingRegistration, id=reg_id)
+    reg.status = 'Rejected'
+    reg.save()
+    messages.warning(request, f"{reg.employee.username}'s registration rejected.")
+    return redirect('hr_dashboard')
+
 # ---------------- Trainer ----------------
 @login_required
 def trainer_dashboard(request):

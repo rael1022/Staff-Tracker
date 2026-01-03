@@ -1,22 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainer</title>
-</head>
-<body>
 {% extends 'dashboard/base.html' %}
+
 {% block content %}
-<h2>Trainer Dashboard</h2>
-<p>Welcome, {{ request.user.username }}!</p>
 
-<a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
-<br>
-<a href="{% url 'trainer_trainings_page' %}">Attendence QR Generate</a>
-<br>
-<a href="{% url 'evaluation_dashboard' %}">Evaluation dashboard</a>
+<style>
+    .card {
+        background: #ffffff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        max-width: 700px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    .card h2 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .card p {
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .card a {
+        display: block;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #007bff;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .card a:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<div class="card">
+    <h2>Trainer Dashboard</h2>
+    <p>Welcome, <strong>{{ request.user.username }}</strong></p>
+</div>
+
 {% endblock %}
-
-</body>
-</html>

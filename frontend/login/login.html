@@ -1,21 +1,155 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Login | Staff Training Tracker</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+        }
+
+        /* ===== Header (Simple) ===== */
+        .site-header {
+            width: 100%;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 18px 20px;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-main {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 0.8px;
+        }
+
+        /* ===== Login Box ===== */
+        .login-container {
+            max-width: 420px;
+            margin: 80px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .login-container h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-container label {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-container .register {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+
+        .login-container .register a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-container .error {
+            margin-top: 12px;
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
+
+<!-- Simple Header -->
+<header class="site-header">
+    <div class="header-container">
+        <div class="logo">
+            <span class="logo-main">STAFF TRAINING</span>
+            <span class="logo-sub">AND CERTIFICATION TRACKER</span>
+        </div>
+    </div>
+</header>
+
+<!-- Login Form -->
+<div class="login-container">
     <h1>Login</h1>
+
     <form method="post">
         {% csrf_token %}
-        <label>Username:</label>
-        <input type="text" name="username"><br><br>
-        <label>Password:</label>
-        <input type="password" name="password"><br><br>
+
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
         <button type="submit">Login</button>
     </form>
-    <p><a href="/register/">Register</a></p>
+
+    <div class="register">
+        <a href="{% url 'register' %}">Create an account</a>
+    </div>
+
     {% if error %}
-        <p style="color:red">{{ error }}</p>
+        <div class="error">{{ error }}</div>
     {% endif %}
+</div>
+
 </body>
 </html>

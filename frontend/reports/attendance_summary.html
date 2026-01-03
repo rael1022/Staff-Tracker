@@ -1,13 +1,12 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Attendance Summary Report</title>
     <style>
-        body {
-            font-family: Arial;
-            background: #f4f6fb;
-            padding: 30px;
-        }
+
         .container {
             max-width: 1000px;
             margin: auto;
@@ -99,6 +98,6 @@
         {% endfor %}
     </table>
 </div>
-
+{% endblock %}
 </body>
 </html>

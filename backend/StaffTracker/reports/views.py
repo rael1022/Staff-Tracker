@@ -5,6 +5,8 @@ from datetime import date, timedelta
 from certificate.models import Certificate
 from cpd.models import CPDRecord
 from attendance.models import Attendance
+from accounts.models import UserProfile
+from department.models import Department
 
 @login_required
 def reports_dashboard(request):
@@ -46,4 +48,37 @@ def attendance_summary_report(request):
         'total': total,
         'present': present,
         'absent': absent,
+    })
+
+@login_required
+def hod_department_training_progress(request):
+    department = Department.objects.filter(hod=request.user).first()
+
+    employees = UserProfile.objects.filter(department=department)
+
+    attendances = Attendance.objects.filter(
+        user_id__in=[e.user.username for e in employees]
+    )
+
+    return render(request, 'reports/department_training_progress.html', {
+        'department': department,
+        'attendances': attendances
+    })
+
+@login_required
+def hod_department_report(request):
+    department = Department.objects.filter(hod=request.user).first()
+
+    employees = UserProfile.objects.filter(department=department)
+
+    cpd_records = CPDRecord.objects.filter(
+        user__in=[e.user for e in employees]
+    )
+
+    total_cpd = sum(r.points for r in cpd_records)
+
+    return render(request, 'reports/department_report.html', {
+        'department': department,
+        'records': cpd_records,
+        'total_cpd': total_cpd
     })

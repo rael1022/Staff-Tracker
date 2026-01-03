@@ -15,5 +15,8 @@ Reports:
 - `/reports/certificate-expiry/` – Certificate expiry report
 - `/reports/cpd-summary/` – CPD summary report
 - `/reports/attendance-summary/` – Attendance summary report
+<<<<<<< Updated upstream
 - `/reports/hod-department-report/` – Attendance summary report
 - `/reports/hod-department-training-progress/` – Attendance summary report
+- `/reports/hod-department-training-progress/` – Attendance summary report
+- `/reports/hod-department-report/` – Attendance summary report

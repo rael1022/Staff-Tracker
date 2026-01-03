@@ -1,52 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Trainings</title>
-</head>
-<body>
 {% extends 'dashboard/base.html' %}
+
 {% block content %}
+
+<style>
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f4f7;
+        font-weight: 600;
+    }
+
+    .status {
+        font-weight: 500;
+    }
+
+    .status-pending {
+        color: #ff9800;
+    }
+
+    .status-approved {
+        color: green;
+    }
+
+    .status-rejected {
+        color: red;
+    }
+
+    .btn-link {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .btn-register {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.btn-register:hover {
+    background-color: #0056b3;
+}
+
+</style>
+
 <h2>Available Trainings</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Location</th>
-            <th>CPD Points</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% load training_tags %}
-        {% for training in trainings %}
-        <tr>
-            <td>{{ training.title }}</td>
-            <td>{{ training.date }}</td>
-            <td>{{ training.time }}</td>
-            <td>{{ training.location }}</td>
-            <td>{{ training.cpd_points }}</td>
-            <td>
-                {% with reg=registrations|get_training_registration:training.id %}
-                    {% if reg %}
-                        {{ reg.status }}
-                    {% else %}
-                        <a href="{% url 'register_training' training.id %}">Register</a>
-                    {% endif %}
-                {% endwith %}
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">No trainings available.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>CPD Points</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% load training_tags %}
+            {% for training in trainings %}
+            <tr>
+                <td>{{ training.title }}</td>
+                <td>{{ training.date }}</td>
+                <td>{{ training.time }}</td>
+                <td>{{ training.location }}</td>
+                <td>{{ training.cpd_points }}</td>
+                <td>
+                    {% with reg=registrations|get_training_registration:training.id %}
+                        {% if reg %}
+                            <span class="status
+                                {% if reg.status == 'Pending' %}status-pending
+                                {% elif reg.status == 'Approved' %}status-approved
+                                {% elif reg.status == 'Rejected' %}status-rejected
+                                {% endif %}
+                            ">
+                                {{ reg.status }}
+                            </span>
+                        {% else %}
+                        <a href="{% url 'register_training' training.id %}" class="btn-register">
+                            Register
+                        </a>
 
-<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No trainings available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+
 {% endblock %}
-</body>
-</html>

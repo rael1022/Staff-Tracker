@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Department Report</title>
+    <style>
+        body { font-family: Arial; background: #eef1ff; padding: 30px; }
+        .container { background: white; padding: 25px; border-radius: 16px; max-width: 900px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background: #dde2ff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>{{ department.name }} - Department Report</h1>
+    <p><strong>Total CPD Points:</strong> {{ total_cpd }}</p>
+
+    <table>
+        <tr>
+            <th>Employee</th>
+            <th>Training</th>
+            <th>Points</th>
+        </tr>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.user.username }}</td>
+            <td>{{ r.training.title }}</td>
+            <td>{{ r.points }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

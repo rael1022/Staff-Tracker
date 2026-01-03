@@ -1,129 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR</title>
-</head>
-<body>
 {% extends 'dashboard/base.html' %}
 
 {% block content %}
+
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        margin-top: 5px;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: 30px 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #f2f4f7;
+        font-weight: 600;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+    }
+
+    .inline-form {
+        display: inline;
+    }
+
+    .links a {
+        margin-right: 15px;
+        font-size: 14px;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .status-active {
+        color: green;
+        font-weight: 500;
+    }
+
+    .status-inactive {
+        color: red;
+        font-weight: 500;
+    }
+</style>
+
 <h1>HR Dashboard</h1>
+<p>Welcome, <strong>{{ user.username }}</strong></p>
 
-<p>Welcome HR {{ user.username }}</p>
+<!-- Pending Approvals -->
+<div class="card">
+    <h2>Approve Pending Users</h2>
 
-<h2>Approve pending</h2>
-<table border="1">
-    <tr>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Approve</th>
-    </tr>
-    {% for profile in pending_users %}
-    <tr>
-        <td>{{ profile.user.username }}</td>
-        <td>{{ profile.user.email }}</td>
-        <td>
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
-                <button type="submit">Approve</button>
-            </form>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="3">No pending approvals</td>
-    </tr>
-    {% endfor %}
-</table>
-
-<h2>Manage User Accounts</h2>
-
-<a href="{% url 'hr_create_user' %}">➕ Create New Account</a>
-
-<table border="1">
-    <tr>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
-
-    {% for u in all_users %}
-    <tr>
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.userprofile.role }}</td>
-        <td>
-            {% if u.is_active %}Active{% else %}Deactivated{% endif %}
-        </td>
-        <td>
-            <a href="{% url 'hr_update_user' u.id %}">Edit</a>
-
-            <form method="post" action="{% url 'hr_toggle_user' u.id %}" style="display:inline;">
-                {% csrf_token %}
-                {% if u.is_active %}
-                    <button type="submit">Deactivate</button>
-                {% else %}
-                    <button type="submit">Activate</button>
-                {% endif %}
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-
-<a href="{% url 'hr_dashboard' %}">Manage Trainings</a>
-
-<a href="{% url 'hr_training_registrations' %}">Training Registration</a>
-
-<a href="{% url 'attendance_summary' %}">View Attendence report</a>
-
-<!-- Certificate Management -->
-<h2 class="text-xl mt-6 mb-2">Manage Certificates</h2>
-<table class="table-auto w-full border-collapse border border-gray-300">
-    <thead>
-        <tr class="bg-gray-200">
-            <th class="border px-2 py-1">User</th>
-            <th class="border px-2 py-1">Training</th>
-            <th class="border px-2 py-1">Issue Date</th>
-            <th class="border px-2 py-1">Expiry Date</th>
-            <th class="border px-2 py-1">Status</th>
-            <th class="border px-2 py-1">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cert in certificates %}
+    <table>
         <tr>
-            <td class="border px-2 py-1">{{ cert.user.username }}</td>
-            <td class="border px-2 py-1">{{ cert.training.title }}</td>
-            <td class="border px-2 py-1">{{ cert.issue_date }}</td>
-            <td class="border px-2 py-1">{{ cert.expiry_date }}</td>
-            <td class="border px-2 py-1">
-                {% if cert.is_expired %}
-                    <span class="text-red-600">Expired</span>
-                {% else %}
-                    <span class="text-green-600">Valid</span>
-                {% endif %}
-            </td>
-            <td class="border px-2 py-1">
-                <form method="post" action="{% url 'hr_delete_certificate' cert.id %}">
+            <th>Username</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+
+        {% for profile in pending_users %}
+        <tr>
+            <td>{{ profile.user.username }}</td>
+            <td>{{ profile.user.email }}</td>
+            <td>
+                <form method="post" class="inline-form">
                     {% csrf_token %}
-                    <button type="submit" class="text-red-600">Delete</button>
+                    <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
+                    <button type="submit" class="btn btn-primary">Approve</button>
                 </form>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center py-1">No certificates found.</td>
+            <td colspan="3">No pending approvals</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+    </table>
+</div>
+
+<!-- Manage Users -->
+<div class="card">
+    <h2>Manage User Accounts</h2>
+
+    <div class="links">
+        <a href="{% url 'hr_create_user' %}">➕ Create New Account</a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for u in all_users %}
+        <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.userprofile.role }}</td>
+            <td>
+                {% if u.is_active %}
+                    <span class="status-active">Active</span>
+                {% else %}
+                    <span class="status-inactive">Deactivated</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'hr_update_user' u.id %}">Edit</a>
+
+                <form method="post" action="{% url 'hr_toggle_user' u.id %}" class="inline-form">
+                    {% csrf_token %}
+                    {% if u.is_active %}
+                        <button type="submit" class="btn">Deactivate</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary">Activate</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<!-- Certificates -->
+<div class="card">
+    <h2>Manage Certificates</h2>
+
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Training</th>
+            <th>Issue Date</th>
+            <th>Expiry Date</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for cert in certificates %}
+        <tr>
+            <td>{{ cert.user.username }}</td>
+            <td>{{ cert.training.title }}</td>
+            <td>{{ cert.issue_date }}</td>
+            <td>{{ cert.expiry_date }}</td>
+            <td>
+                {% if cert.is_expired %}
+                    <span class="status-inactive">Expired</span>
+                {% else %}
+                    <span class="status-active">Valid</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="post" action="{% url 'hr_delete_certificate' cert.id %}" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No certificates found.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
 {% endblock %}
-</body>
-</html>

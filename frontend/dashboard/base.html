@@ -80,6 +80,17 @@
             gap: 20px;
         }
 
+        .user-greeting {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            padding: 6px 27px;
+            border-radius: 10px;
+            background-color: black;
+            white-space: nowrap;
+        }
+
+
         .auth button {
             background: none;
             border: none;
@@ -144,15 +155,47 @@
 
         <!-- Navigation -->
         <nav class="main-nav">
+
             <a href="{% url 'dashboard' %}">Dashboard</a>
-            <a href="#">abc</a>
-            <a href="#">efg</a>
-            <a href="#">jjj</a>
+
+            {% if user.is_authenticated and user.userprofile.role == "HR" %}
+                <a href="{% url 'hr_dashboard' %}">Manage Trainings</a>
+
+                <a href="{% url 'hr_training_registrations' %}">Training Registration</a>
+
+                <a href="{% url 'attendance_summary' %}">View Attendence report</a>
+            {% endif %}
+
+            {% if user.is_authenticated and user.userprofile.role == "HOD" %}
+                <a href="{% url 'hod_dashboard' %}">
+                    Manage Training Approvals
+                </a>
+            {% endif %}
+
+            {% if user.is_authenticated and user.userprofile.role == "Trainer" %}
+                <a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
+                <a href="{% url 'trainer_trainings_page' %}">Attendance QR Generate</a>
+                <a href="{% url 'evaluation_dashboard' %}">Evaluation Dashboard</a>
+            {% endif %}
+
+            {% if user.is_authenticated and user.userprofile.role == "Employee" %}
+                <a href="{% url 'employee_dashboard' %}">View Trainings</a>
+                <a href="{% url 'evaluation_dashboard' %}">Evaluation dashboard</a>
+                <a href="{% url 'my_certificates' %}">View certificate list</a>
+                <a href="{% url 'my_cpd' %}">View My CPD record</a>
+            {% endif %}
+
         </nav>
+
 
         <!-- Auth -->
         <div class="auth">
             {% if user.is_authenticated %}
+            <span class="user-greeting">
+                {{ request.user.username }}
+            </span>
+
+
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
@@ -161,6 +204,7 @@
                 <a href="{% url 'login' %}" class="btn">Login</a>
             {% endif %}
         </div>
+
 
     </div>
 </header>

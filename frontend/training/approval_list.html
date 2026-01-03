@@ -1,57 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOD</title>
-</head>
-<body>
 {% extends 'dashboard/base.html' %}
+
 {% block content %}
-<h2>Pending Training Registrations</h2>
+
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    p {
+        font-size: 14px;
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: 0 auto 30px auto;
+        max-width: 900px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #f2f4f7;
+        font-weight: 600;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        margin-right: 5px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #a71d2a;
+    }
+
+    .status-message {
+        margin-bottom: 15px;
+        list-style: none;
+        padding: 0;
+    }
+
+    .status-message li {
+        background-color: #e7f3ff;
+        color: #055160;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 15px;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<h1>Pending Training Registrations</h1>
+<p>Review and approve or reject employee training requests.</p>
 
 {% if messages %}
-<ul>
+<ul class="status-message">
     {% for message in messages %}
     <li>{{ message }}</li>
     {% endfor %}
 </ul>
 {% endif %}
 
-<table>
-    <thead>
-        <tr>
-            <th>Employee</th>
-            <th>Training</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Location</th>
-            <th>CPD Points</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for reg in pending_regs %}
-        <tr>
-            <td>{{ reg.employee.username }}</td>
-            <td>{{ reg.training.title }}</td>
-            <td>{{ reg.training.date }}</td>
-            <td>{{ reg.training.time }}</td>
-            <td>{{ reg.training.location }}</td>
-            <td>{{ training.cpd_points }}</td>
-            <td>
-                <a href="{% url 'approve_registration' reg.id %}">Approve</a> |
-                <a href="{% url 'reject_registration' reg.id %}">Reject</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6">No pending registrations.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Training</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reg in pending_regs %}
+            <tr>
+                <td>{{ reg.employee.username }}</td>
+                <td>{{ reg.training.title }}</td>
+                <td>{{ reg.training.date }}</td>
+                <td>{{ reg.training.time }}</td>
+                <td>
+                    <a href="{% url 'approve_registration' reg.id %}" class="btn btn-primary">Approve</a>
+                    <a href="{% url 'reject_registration' reg.id %}" class="btn btn-danger">Reject</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No pending registrations.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    <div style="text-align: center; margin-top: 15px;">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
 {% endblock %}
-
-</body>
-</html>

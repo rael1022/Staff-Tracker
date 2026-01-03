@@ -4,180 +4,865 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainer - My Trainings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1400px;
+        }
+        .header {
+            background: linear-gradient(135deg, #6f42c1, #6610f2);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .stat-card {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        .badge-upcoming {
+            background-color: #0dcaf0;
+            color: white;
+        }
+        .badge-ongoing {
+            background-color: #198754;
+            color: white;
+        }
+        .badge-completed {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-action {
+            font-size: 0.875rem;
+            padding: 5px 10px;
+        }
+        .attendance-modal .modal-dialog {
+            max-width: 900px !important;
+        }
+        .attendance-badge {
+            font-size: 0.7rem;
+        }
+        .search-filter {
+            max-width: 300px;
+        }
+        .export-btn {
+            font-size: 0.875rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>My Training Sessions</h1>
-    
-    <h2>My Trainings</h2>
-    
-    <table border="1" width="100%" cellpadding="8" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Description</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>CPD Points</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="trainings-table-body">
-            <tr>
-                <td colspan="7">Loading trainings...</td>
-            </tr>
-        </tbody>
-    </table>
+{% extends 'dashboard/base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="bi bi-clipboard-data me-2"></i>My Training Sessions</h1>
+                    <p class="mb-0">Manage and track attendance for your training sessions</p>
+                </div>
+                <div>
+                    <button class="btn btn-light ms-2" onclick="refreshData()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
 
+        <div class="row mb-4" id="statsContainer">
+            <div class="col-md-3">
+                <div class="stat-card bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Total Trainings</h6>
+                            <h2 class="mb-0" id="totalTrainings">0</h2>
+                        </div>
+                        <i class="bi bi-calendar-week fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Total Present</h6>
+                            <h2 class="mb-0" id="totalPresent">0</h2>
+                        </div>
+                        <i class="bi bi-check-circle fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-warning text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Total Absent</h6>
+                            <h2 class="mb-0" id="totalAbsent">0</h2>
+                        </div>
+                        <i class="bi bi-x-circle fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-2">Current Date</h6>
+                            <h5 class="mb-0" id="currentDate"></h5>
+                        </div>
+                        <i class="bi bi-clock fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="input-group search-filter">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search trainings...">
+                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()" aria-label="Clear search">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="statusFilter" class="form-label">Training Status</label>
+                <select class="form-select" id="statusFilter" onchange="filterTrainings()">
+                    <option value="all">All Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Training Sessions</h5>
+                <div class="spinner-border spinner-border-sm" id="loadingSpinner" role="status"></div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover" id="trainingsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Date & Time</th>
+                            <th>Location</th>
+                            <th>CPD Points</th>
+                            <th>Attendance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trainings-table-body">
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading trainings...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3" id="noResults">
+                <i class="bi bi-info-circle"></i> No training sessions match your search criteria.
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade attendance-modal" id="attendanceModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">
+                        <i class="bi bi-clipboard-data me-2"></i>Attendance Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4" id="trainingInfo">
+                        <div class="col-md-8">
+                            <h5 id="trainingTitle" class="mb-2"></h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        <span id="trainingDate"></span>
+                                    </small>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span id="trainingTime"></span>
+                                    </small>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        <span id="trainingLocation"></span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary" onclick="exportAttendance()">
+                                <i class="bi bi-download me-1"></i>Export CSV
+                            </button>
+                            <button class="btn btn-success" onclick="refreshAttendance()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center py-3">
+                                    <h6 class="text-muted mb-1">Total</h6>
+                                    <h3 id="totalCount" class="mb-0">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center py-3">
+                                    <h6 class="mb-1">Present</h6>
+                                    <h3 id="presentCount" class="mb-0">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center py-3">
+                                    <h6 class="mb-1">Absent</h6>
+                                    <h3 id="absentCount" class="mb-0">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-dark">
+                                <div class="card-body text-center py-3">
+                                    <h6 class="mb-1">Not Checked In</h6>
+                                    <h3 id="missingCount" class="mb-0">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4" id="manualCheckinSection">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Manual Check-in</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <label for="userSelect" class="visually-hidden">Select employee</label>
+                                    <select class="form-select" id="userSelect">
+                                        <option value="">Select employee to check in...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-success w-100" onclick="performManualCheckin()">
+                                        <i class="bi bi-check-lg me-1"></i>Mark as Present
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Check-in Time</th>
+                                    <th>Method</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceList">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center py-5" id="modalLoading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading attendance data...</p>
+                    </div>
+
+                    <div class="alert alert-danger mt-3" id="modalError"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-    document.addEventListener('DOMContentLoaded', loadTrainings);
+        let allTrainings = [];
+        let currentTrainingId = null;
+        let attendanceModal = null;
 
-    function loadTrainings() {
-        fetch('/attendance/api/trainer/trainings/')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    showError('Failed to load trainings.');
-                    return;
-                }
-                renderTrainingTable(data.trainings);
-            })
-            .catch(error => {
-                showError(error);
-            });
-    }
+        document.addEventListener('DOMContentLoaded', function() {
+            attendanceModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            
+            const now = new Date();
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            
+            loadTrainings();
+        });
 
-    function showError(error) {
-        const tbody = document.getElementById('trainings-table-body');
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7">Error: ${error}</td>
-            </tr>
-        `;
-    }
-
-    function renderTrainingTable(trainings) {
-        const tbody = document.getElementById('trainings-table-body');
-        tbody.innerHTML = '';
-
-        if (!trainings || trainings.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7">No training sessions found.</td>
-                </tr>
-            `;
-            return;
+        function loadTrainings() {
+            showLoading(true);
+            fetch('/attendance/api/trainer/trainings/')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to load trainings');
+                    }
+                    
+                    allTrainings = data.trainings;
+                    renderTrainingTable(allTrainings);
+                    updateStatistics(allTrainings);
+                    showLoading(false);
+                })
+                .catch(error => {
+                    showError(error);
+                    showLoading(false);
+                });
         }
 
-        trainings.forEach(training => {
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
-                <td>${training.title}</td>
-                <td>${training.status}</td>
-                <td>${training.description || '-'}</td>
-                <td>
-                    ${training.date || '-'}
-                    ${training.time ? training.time.substring(0, 5) : ''}
-                </td>
-                <td>${training.location || '-'}</td>
-                <td>${training.cpd_points ?? 0}</td>
-                <td>
-                    <button onclick="generateQR(${training.id}, '${escapeQuotes(training.title)}')">
-                        Generate QR
-                    </button>
-                    <br><br>
-                    <button onclick="viewAttendance(${training.id})">
-                        View Attendance
-                    </button>
-                    <div id="qr-result-${training.id}" style="margin-top:10px;"></div>
-                </td>
-            `;
-
-            tbody.appendChild(row);
-        });
-    }
-
-    function generateQR(trainingId, trainingTitle) {
-        fetch('/attendance/api/trainer/generate-qr/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: JSON.stringify({
-                training_id: trainingId,
-                training_title: trainingTitle
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById(`qr-result-${trainingId}`);
-
-            if (!data.success) {
-                container.innerHTML = `<p>Error: ${data.message}</p>`;
+        function renderTrainingTable(trainings) {
+            const tbody = document.getElementById('trainings-table-body');
+            
+            if (!trainings || trainings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="bi bi-inbox fs-1 text-muted mb-2 d-block"></i>
+                            <p class="text-muted">No training sessions found.</p>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('noResults').style.display = 'block';
                 return;
             }
+            
+            document.getElementById('noResults').style.display = 'none';
+            
+            tbody.innerHTML = '';
+            
+            trainings.forEach(training => {
+                const row = document.createElement('tr');
+                const statusClass = getStatusClass(training.status);
+                
+                const presentCount = training.attendance?.present || 0;
+                const totalCount = training.attendance?.total || 0;
+                const attendancePercent = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
+                
+                row.innerHTML = `
+                    <td>
+                        <strong>${escapeHtml(training.title)}</strong>
+                    </td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${training.status}
+                        </span>
+                    </td>
+                    <td>
+                        <small class="text-muted">
+                            ${training.description ? escapeHtml(training.description.substring(0, 60)) + '...' : '-'}
+                        </small>
+                    </td>
+                    <td>
+                        <div>${training.date || '-'}</div>
+                        ${training.time ? 
+                            `<small class="text-muted">${training.time.substring(0, 5)}</small>` : 
+                            ''}
+                    </td>
+                    <td>${training.location || '-'}</td>
+                    <td>
+                        <span class="badge bg-info">${training.cpd_points ?? 0}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <div class="progress" style="width: 80px; height: 6px;">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         style="width: ${attendancePercent}%">
+                                    </div>
+                                </div>
+                                <small class="d-block text-muted">
+                                    ${presentCount}/${totalCount}
+                                </small>
+                            </div>
+                            ${presentCount < totalCount ? 
+                                `<span class="badge bg-warning text-dark attendance-badge">
+                                    ${totalCount - presentCount} missing
+                                </span>` : 
+                                ''}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary btn-action" 
+                                    onclick="viewAttendance(${training.id})"
+                                    title="View Attendance">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            ${training.status === 'ongoing' || training.status === 'upcoming' ? 
+                                `<button class="btn btn-outline-success btn-action" 
+                                        onclick="generateQR(${training.id}, '${escapeQuotes(training.title)}')"
+                                        title="Generate QR Code">
+                                    <i class="bi bi-qr-code"></i>
+                                </button>` : 
+                                ''}
+                        </div>
+                        <div id="qr-result-${training.id}" class="mt-2"></div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
 
+        function updateStatistics(trainings) {
+            const totalTrainings = trainings.length;
+            const totalPresent = trainings.reduce((sum, t) => sum + (t.attendance?.present || 0), 0);
+            const totalAbsent = trainings.reduce((sum, t) => sum + (t.attendance?.absent || 0), 0);
+            
+            document.getElementById('totalTrainings').textContent = totalTrainings;
+            document.getElementById('totalPresent').textContent = totalPresent;
+            document.getElementById('totalAbsent').textContent = totalAbsent;
+        }
+
+        function viewAttendance(trainingId) {
+            currentTrainingId = trainingId;
+            
+            document.getElementById('modalLoading').style.display = 'block';
+            document.getElementById('trainingInfo').style.display = 'none';
+            document.getElementById('modalError').style.display = 'none';
+            document.getElementById('manualCheckinSection').style.display = 'none';
+            document.getElementById('attendanceList').innerHTML = '';
+            
+            const attendanceModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            attendanceModal.show();
+            
+            fetchAttendanceDetails(trainingId);
+        }
+
+        async function fetchAttendanceDetails(trainingId) {
+            try {
+                const response = await fetch(`/attendance/api/trainer/attendance/${trainingId}/`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to load attendance data');
+                }
+                
+                const training = allTrainings.find(t => t.id == trainingId);
+                if (training) {
+                    document.getElementById('modalTitle').innerHTML = `
+                        <i class="bi bi-clipboard-data me-2"></i>Attendance: ${escapeHtml(training.title)}
+                    `;
+                    document.getElementById('trainingTitle').textContent = training.title;
+                    document.getElementById('trainingDate').textContent = training.date || 'N/A';
+                    document.getElementById('trainingTime').textContent = training.time ? training.time.substring(0, 5) : 'N/A';
+                    document.getElementById('trainingLocation').textContent = training.location || 'N/A';
+                    document.getElementById('trainingInfo').style.display = 'block';
+                }
+                
+                document.getElementById('totalCount').textContent = data.total;
+                document.getElementById('presentCount').textContent = data.present;
+                document.getElementById('absentCount').textContent = data.absent;
+                
+                const totalRegistered = await getTotalRegistered(trainingId);
+                const missing = Math.max(0, totalRegistered - data.present);
+                document.getElementById('missingCount').textContent = missing;
+                
+                populateAttendanceList(data.attendances);
+                
+                if (training && (training.status === 'ongoing' || training.status === 'upcoming')) {
+                    await populateUserSelect(trainingId);
+                    document.getElementById('manualCheckinSection').style.display = 'block';
+                }
+                
+                document.getElementById('modalLoading').style.display = 'none';
+                
+            } catch (error) {
+                document.getElementById('modalLoading').style.display = 'none';
+                document.getElementById('modalError').textContent = `Error: ${error.message}`;
+                document.getElementById('modalError').style.display = 'block';
+            }
+        }
+
+        function populateAttendanceList(attendances) {
+            const tbody = document.getElementById('attendanceList');
+            tbody.innerHTML = '';
+            
+            if (!attendances || attendances.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                            No attendance records found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            attendances.forEach(att => {
+                const row = document.createElement('tr');
+                const user = att.user || { username: 'N/A', full_name: 'Unknown', role: 'Unknown' };
+                const isPresent = att.status === 'Present';
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="fw-medium">${escapeHtml(user.full_name)}</div>
+                        <small class="text-muted">@${escapeHtml(user.username)}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">${escapeHtml(user.role)}</span>
+                    </td>
+                    <td>
+                        ${isPresent ? 
+                            `<span class="badge bg-success">Present</span>` : 
+                            `<span class="badge bg-danger">Absent</span>`}
+                    </td>
+                    <td>
+                        ${att.check_in_time ? 
+                            new Date(att.check_in_time).toLocaleTimeString([], { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                            }) : 
+                            '<span class="text-muted">Not checked in</span>'}
+                    </td>
+                    <td>
+                        ${att.is_qr_checkin ? 
+                            `<span class="badge bg-info">QR Code</span>` : 
+                            `<span class="badge bg-secondary">Manual</span>`}
+                    </td>
+                    <td>
+                        ${!isPresent ? 
+                            `<button class="btn btn-sm btn-outline-success" 
+                                    onclick="manualCheckin(${currentTrainingId}, ${user.id})">
+                                <i class="bi bi-check-lg"></i> Check In
+                            </button>` : 
+                            `<span class="text-muted">Checked In</span>`}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        async function getTotalRegistered(trainingId) {
+            try {
+                const response = await fetch(`/training/api/registrations/${trainingId}/count/`);
+                const data = await response.json();
+                return data.count || 0;
+            } catch (error) {
+                return 0;
+            }
+        }
+
+        async function populateUserSelect(trainingId) {
+            try {
+                const response = await fetch(`/training/api/registrations/${trainingId}/`);
+                const data = await response.json();
+                
+                const select = document.getElementById('userSelect');
+                select.innerHTML = '<option value="">Select employee to check in...</option>';
+                
+                if (data.success && data.registrations) {
+                    data.registrations.forEach(reg => {
+                        const user = reg.employee;
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = `${user.full_name} (@${user.username})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error populating user select:', error);
+            }
+        }
+
+        function manualCheckin(trainingId, userId) {
+            if (!confirm('Mark this employee as present?')) return;
+            
+            performCheckin(trainingId, userId);
+        }
+
+        function performManualCheckin() {
+            const select = document.getElementById('userSelect');
+            const userId = select.value;
+            
+            if (!userId) {
+                alert('Please select an employee first');
+                return;
+            }
+            
+            if (!confirm('Mark selected employee as present?')) return;
+            
+            performCheckin(currentTrainingId, userId);
+        }
+
+        async function performCheckin(trainingId, userId) {
+            try {
+                const response = await fetch('/attendance/api/trainer/manual-checkin/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        training_id: trainingId,
+                        user_id: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✓ Check-in successful!');
+                    fetchAttendanceDetails(trainingId);
+                    loadTrainings();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function generateQR(trainingId, trainingTitle) {
+            const container = document.getElementById(`qr-result-${trainingId}`);
             container.innerHTML = `
-                <p><strong>Valid Until:</strong> ${data.expires_human}</p>
-                <img src="${data.qr_image}" width="120">
-                <p><strong>QR URL:</strong> <a href="${data.qr_url}" target="_blank">${data.qr_url}</a></p>
-                <button onclick="copyQRUrl('${data.qr_url}')">
-                    Copy QR URL
-                </button>
+                <div class="text-center">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <small class="d-block mt-1">Generating QR...</small>
+                </div>
             `;
-        });
-    }
-
-    function viewAttendance(trainingId) {
-        fetch(`/attendance/api/trainer/attendance/${trainingId}/`)
+            
+            fetch('/attendance/api/trainer/generate-qr/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    training_id: trainingId,
+                    training_title: unescapeQuotes(trainingTitle)
+                })
+            })
             .then(response => response.json())
             .then(data => {
                 if (!data.success) {
-                    alert(data.message);
+                    container.innerHTML = `<div class="alert alert-danger p-2">${data.message}</div>`;
                     return;
                 }
-
-                let message = `Attendance Report:\n\n`;
-                message += `Total: ${data.total}\n`;
-                message += `Present: ${data.present}\n`;
-                message += `Absent: ${data.absent}\n`;
                 
-                if (data.attendances && data.attendances.length > 0) {
-                    message += `\nAttendees:\n`;
-                    data.attendances.forEach(att => {
-                        const user = att.user || {username: 'N/A', full_name: 'Unknown'};
-                        const status = att.status === 'Present' ? '✅' : '❌';
-                        message += `${status} ${user.full_name} (${user.username})\n`;
-                    });
-                }
-
-                alert(message);
-            });
-    }
-
-    function copyQRUrl(qrUrl) {
-        navigator.clipboard.writeText(qrUrl)
-            .then(() => alert('QR URL copied!'));
-    }
-
-    function escapeQuotes(text) {
-        return text.replace(/'/g, "\\'");
-    }
-
-    function getCSRFToken() {
-        let cookieValue = null;
-        if (document.cookie) {
-            document.cookie.split(';').forEach(cookie => {
-                cookie = cookie.trim();
-                if (cookie.startsWith('csrftoken=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(10));
-                }
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-center">
+                                    <img src="${data.qr_image}" class="img-fluid" style="max-width: 150px;">
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="mb-2">QR Code Generated</h6>
+                                    <p class="mb-1"><small><strong>Valid Until:</strong> ${data.expires_human}</small></p>
+                                    <p class="mb-1"><small><strong>URL:</strong> 
+                                        <a href="${data.qr_url}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">
+                                            ${data.qr_url}
+                                        </a>
+                                    </small></p>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="copyQRUrl('${data.qr_url}')">
+                                            <i class="bi bi-clipboard me-1"></i>Copy URL
+                                        </button>
+                                        <a href="${data.qr_url_local}" target="_blank" class="btn btn-sm btn-outline-info ms-1">
+                                            <i class="bi bi-link me-1"></i>Local
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                container.innerHTML = `<div class="alert alert-danger p-2">Error: ${error.message}</div>`;
             });
         }
-        return cookieValue;
-    }
+
+        function exportAttendance() {
+            if (!currentTrainingId) return;
+            
+            window.location.href = `/attendance/export/${currentTrainingId}/`;
+        }
+
+        function refreshAttendance() {
+            if (!currentTrainingId) return;
+            fetchAttendanceDetails(currentTrainingId);
+        }
+
+        function refreshData() {
+            loadTrainings();
+        }
+
+        function filterTrainings() {
+            const status = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = allTrainings;
+            
+            if (status !== 'all') {
+                filtered = filtered.filter(t => t.status.toLowerCase() === status);
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(t => 
+                    t.title.toLowerCase().includes(searchTerm) ||
+                    (t.description && t.description.toLowerCase().includes(searchTerm)) ||
+                    (t.location && t.location.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderTrainingTable(filtered);
+            document.getElementById('noResults').style.display = filtered.length === 0 ? 'block' : 'none';
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterTrainings();
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'inline-block' : 'none';
+        }
+
+        function showError(error) {
+            const tbody = document.getElementById('trainings-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-danger">
+                        <i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i>
+                        Error loading data: ${error}
+                    </td>
+                </tr>
+            `;
+            document.getElementById('noResults').style.display = 'block';
+        }
+
+        function getStatusClass(status) {
+            switch(status.toLowerCase()) {
+                case 'upcoming': return 'badge-upcoming';
+                case 'ongoing': return 'badge-ongoing';
+                case 'completed': return 'badge-completed';
+                default: return 'badge-secondary';
+            }
+        }
+
+        function copyQRUrl(qrUrl) {
+            navigator.clipboard.writeText(qrUrl)
+                .then(() => {
+                    const button = event.target;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="bi bi-check2 me-1"></i>Copied!';
+                    button.classList.remove('btn-outline-primary');
+                    button.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-outline-primary');
+                    }, 2000);
+                })
+                .catch(err => {
+                    alert('Failed to copy URL');
+                });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeQuotes(text) {
+            return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        function unescapeQuotes(text) {
+            return text.replace(/\\'/g, "'").replace(/\\"/g, '"');
+        }
+
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie) {
+                document.cookie.split(';').forEach(cookie => {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith('csrftoken=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                    }
+                });
+            }
+            return cookieValue;
+        }
     </script>
+{% endblock %}
 </body>
 </html>

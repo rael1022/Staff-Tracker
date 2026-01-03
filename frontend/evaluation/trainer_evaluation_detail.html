@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ training.title }} - Evaluations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .rating-badge {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .stat-card {
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        .feedback-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+{% extends 'dashboard/base.html' %}
+{% block content %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="bi bi-clipboard-data"></i> {{ training.title }}</h2>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-calendar"></i> {{ training.date }} | 
+                    <i class="bi bi-clock"></i> {{ training.time }} | 
+                    <i class="bi bi-geo-alt"></i> {{ training.location }}
+                </p>
+            </div>
+            <div>
+                <a href="{% url 'trainer_evaluations' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Total Evaluations</h5>
+                        <h2 class="text-primary">{{ total_evaluations }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Overall Rating</h5>
+                        <h2 class="text-success">{{ avg_ratings.overall|floatformat:1 }}/5.0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Would Recommend</h5>
+                        <h2 class="text-info">{{ avg_ratings.recommend_percentage|floatformat:1 }}%</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-muted">Avg. Question Score</h5>
+                        <h2 class="text-warning">
+                            {% with avg=(avg_ratings.q1|add:avg_ratings.q2|add:avg_ratings.q3|add:avg_ratings.q4) %}
+                            {% widthratio avg 4 1 as q_avg %}
+                            {{ q_avg|floatformat:1 }}/5.0
+                            {% endwith %}
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Question-wise Average Ratings</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Overall Rating</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {% widthratio avg_ratings.overall 5 100 %}%"
+                                 aria-valuenow="{{ avg_ratings.overall }}" aria-valuemin="0" aria-valuemax="5">
+                                {{ avg_ratings.overall|floatformat:1 }}/5.0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Organization & Structure</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 style="width: {% widthratio avg_ratings.q1 5 100 %}%"
+                                 aria-valuenow="{{ avg_ratings.q1 }}" aria-valuemin="0" aria-valuemax="5">
+                                {{ avg_ratings.q1|floatformat:1 }}/5.0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Trainer's Knowledge</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {% widthratio avg_ratings.q2 5 100 %}%"
+                                 aria-valuenow="{{ avg_ratings.q2 }}" aria-valuemin="0" aria-valuemax="5">
+                                {{ avg_ratings.q2|floatformat:1 }}/5.0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Content Relevance</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {% widthratio avg_ratings.q3 5 100 %}%"
+                                 aria-valuenow="{{ avg_ratings.q3 }}" aria-valuemin="0" aria-valuemax="5">
+                                {{ avg_ratings.q3|floatformat:1 }}/5.0
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Materials Quality</label>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: {% widthratio avg_ratings.q4 5 100 %}%"
+                                 aria-valuenow="{{ avg_ratings.q4 }}" aria-valuemin="0" aria-valuemax="5">
+                                {{ avg_ratings.q4|floatformat:1 }}/5.0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Individual Evaluations ({{ total_evaluations }})</h5>
+            </div>
+            <div class="card-body">
+                {% if evaluations %}
+                    {% for evaluation in evaluations %}
+                    <div class="card mb-3 feedback-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">{{ evaluation.user.username }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ evaluation.evaluation_date|date:"M d, Y H:i" }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-primary rating-badge">Overall: {{ evaluation.rating }}/5</span>
+                                    {% if evaluation.question5_would_recommend %}
+                                        <span class="badge bg-success rating-badge">Would Recommend</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rating-badge">Not Recommended</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <small class="text-muted">Organization:</small>
+                                    <span class="badge bg-info">{{ evaluation.question1_rating }}/5</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Knowledge:</small>
+                                    <span class="badge bg-warning">{{ evaluation.question2_rating }}/5</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Relevance:</small>
+                                    <span class="badge bg-primary">{{ evaluation.question3_rating }}/5</span>
+                                </div>
+                                <div class="col-md-3">
+                                    <small class="text-muted">Materials:</small>
+                                    <span class="badge bg-danger">{{ evaluation.question4_rating }}/5</span>
+                                </div>
+                            </div>
+                            
+                            {% if evaluation.feedback %}
+                            <div class="mt-2">
+                                <small class="text-muted">Feedback:</small>
+                                <p class="mb-0 p-2 bg-white rounded border">{{ evaluation.feedback }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if evaluations.paginator.num_pages > 1 %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if evaluations.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ evaluations.previous_page_number }}">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in evaluations.paginator.page_range %}
+                            <li class="page-item {% if evaluations.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+                            
+                            {% if evaluations.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ evaluations.next_page_number }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">No individual evaluations found for this training.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+</body>
+</html>

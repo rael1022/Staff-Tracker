@@ -8,13 +8,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.http import HttpResponse
 from .models import Attendance
+from accounts.models import UserProfile
 import json
 import base64
 import io
 import time
 import qrcode
 
-# test
 @login_required
 def trainer_training_list(request):
     print("=== DEBUG: trainer_training_list called ===")
@@ -421,7 +421,6 @@ def qr_checkin(request):
             }, status=401)
         
         try:
-            from registration.models import UserProfile
             user_profile = UserProfile.objects.get(user=user)
             
             if user_profile.role != 'Employee':
@@ -435,12 +434,7 @@ def qr_checkin(request):
                     'success': False,
                     'message': 'Your account is not approved'
                 }, status=403)
-                
-        except UserProfile.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'User profile not found'
-            }, status=400)
+            
         except ImportError:
             print("Warning: UserProfile check skipped")
             
@@ -623,3 +617,68 @@ def checkin_page_view(request):
         'training_info': training_info,
     })        
         
+@login_required
+def trainer_attendance_view(request):
+    try:
+        from training.models import Training
+        
+        trainings = Training.objects.filter(trainer=request.user).order_by('-date', '-time')
+        
+        training_data = []
+        for training in trainings:
+            attendances = Attendance.objects.filter(training_id=str(training.id))
+            
+            present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
+            absent_count = attendances.filter(status=Attendance.Status.ABSENT).count()
+            total_count = attendances.count()
+            
+            try:
+                from training.models import TrainingRegistration
+                registered_users = TrainingRegistration.objects.filter(
+                    training_id=training.id,
+                    status='Approved'
+                ).count()
+                
+                not_checked_in = max(0, registered_users - present_count)
+            except ImportError:
+                not_checked_in = 0
+            
+            training_data.append({
+                'id': training.id,
+                'title': training.title,
+                'date': training.date,
+                'time': training.time,
+                'location': training.location,
+                'total_attendance': total_count,
+                'present_count': present_count,
+                'absent_count': absent_count,
+                'not_checked_in': not_checked_in,
+                'status': 'upcoming' if training.date > timezone.now().date() else 
+                         'ongoing' if training.date == timezone.now().date() else 
+                         'completed',
+            })
+        
+        total_trainings = len(training_data)
+        total_present = sum(t['present_count'] for t in training_data)
+        total_absent = sum(t['absent_count'] for t in training_data)
+        
+        return render(request, 'attendance/trainer_attendance.html', {
+            'trainings': training_data,
+            'total_trainings': total_trainings,
+            'total_present': total_present,
+            'total_absent': total_absent,
+            'current_date': timezone.now().date(),
+            'user_role': 'trainer',
+        })
+        
+    except Exception as e:
+        print(f"Error in trainer_attendance_view: {str(e)}")
+        return render(request, 'attendance/trainer_attendance.html', {
+            'error': str(e),
+            'trainings': [],
+            'total_trainings': 0,
+            'total_present': 0,
+            'total_absent': 0,
+            'current_date': timezone.now().date(),
+            'user_role': 'trainer',
+        })

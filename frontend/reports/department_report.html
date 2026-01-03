@@ -3,7 +3,7 @@
 <head>
     <title>Department Report</title>
     <style>
-        body { font-family: Arial; background: #eef1ff; padding: 30px; }
+        body { font-family: Arial; background: #eef1ff;}
         .container { background: white; padding: 25px; border-radius: 16px; max-width: 900px; margin: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; }
@@ -11,7 +11,9 @@
     </style>
 </head>
 <body>
+{% extends 'dashboard/base.html' %}
 
+{% block content %}
 <div class="container">
     <h1>{{ department.name }} - Department Report</h1>
     <p><strong>Total CPD Points:</strong> {{ total_cpd }}</p>
@@ -31,6 +33,7 @@
         {% endfor %}
     </table>
 </div>
+{% endblock %}
 
 </body>
 </html>

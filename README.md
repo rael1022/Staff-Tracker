@@ -18,3 +18,4 @@ Reports:
 - `/reports/hod-department-report/` – Attendance summary report
 - `/reports/hod-department-training-progress/` – Attendance summary report
 
+extend pakage pip install qrcode

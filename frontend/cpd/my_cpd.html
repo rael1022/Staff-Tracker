@@ -1,86 +1,90 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My CPD Points</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(120deg, #eef1ff, #f4f6fb);
-            padding: 40px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-        }
-        h1 {
-            color: #4c7df0;
-            margin-bottom: 10px;
-        }
-        .total {
-            font-size: 18px;
-            background: #eef1ff;
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-weight: bold;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background: #dde2ff;
-        }
-        tr:hover {
-            background: #f6f7ff;
-        }
-        .empty {
-            text-align: center;
-            color: #777;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        font-size: 24px;
+        color: #4c7df0;
+        margin-bottom: 12px;
+    }
+
+    .total {
+        font-size: 18px;
+        background: #eef1ff;
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background: #dde2ff;
+        font-weight: 600;
+    }
+
+    tr:hover td {
+        background-color: #f6f7ff;
+    }
+
+    .empty {
+        text-align: center;
+        color: #777;
+        margin-top: 20px;
+    }
+</style>
 
 <div class="container">
     <h1>My CPD Records</h1>
 
-    <!-- Total CPD Points -->
     <div class="total">
         Total CPD Points: {{ total_points }}
     </div>
 
-    <!-- CPD Records Table -->
     {% if records %}
     <table>
-        <tr>
-            <th>Training</th>
-            <th>Points</th>
-            <th>Earned Date</th>
-        </tr>
-
-        {% for record in records %}
-        <tr>
-            <td>{{ record.training }}</td>
-            <td>{{ record.points }}</td>
-            <td>{{ record.earned_date }}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Training</th>
+                <th>Points</th>
+                <th>Earned Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.training }}</td>
+                <td>{{ record.points }}</td>
+                <td>{{ record.earned_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
     {% else %}
-        <div class="empty">No CPD records available.</div>
+    <div class="empty">No CPD records available.</div>
     {% endif %}
 </div>
 
-</body>
-</html>
+{% endblock %}

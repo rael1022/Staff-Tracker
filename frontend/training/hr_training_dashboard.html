@@ -1,60 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training Dashboard</title>
-</head>
-<body>
-    {% extends 'dashboard/base.html' %}
+{% extends 'dashboard/base.html' %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">HR Training Dashboard</h1>
 
-<p>Welcome HR {{ user.username }}</p>
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
 
-<a href="{% url 'hr_create_training' %}" class="btn btn-primary mb-4">➕ Create New Training</a>
+    h2 {
+        font-size: 18px;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
 
-<table class="table-auto w-full border-collapse border border-gray-300">
-    <thead>
-        <tr class="bg-gray-200">
-            <th class="border px-2 py-1">Title</th>
-            <th class="border px-2 py-1">Trainer</th>
-            <th class="border px-2 py-1">Date</th>
-            <th class="border px-2 py-1">Time</th>
-            <th class="border px-2 py-1">Location</th>
-            <th class="border px-2 py-1">CPD Points</th>
-            <th class="border px-2 py-1">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for training in trainings %}
-        <tr>
-            <td class="border px-2 py-1">{{ training.title }}</td>
-            <td class="border px-2 py-1">
-                {% if training.trainer %}
-                    {{ training.trainer.username }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td class="border px-2 py-1">{{ training.date }}</td>
-            <td class="border px-2 py-1">{{ training.time }}</td>
-            <td class="border px-2 py-1">{{ training.location }}</td>
-            <td class="border px-2 py-1">{{ training.cpd_points }}</td>
-            <td class="border px-2 py-1">
-                <a href="{% url 'hr_edit_training' training.id %}" class="text-blue-600 mr-2">Edit</a>
-                <a href="{% url 'hr_delete_training' training.id %}" class="text-red-600">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7" class="text-center py-2">No trainings available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: 30px 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table th,
+    table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    table th {
+        background-color: #f2f4f7;
+        font-weight: 600;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        color: #007bff;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background-color: #a71d2a;
+    }
+</style>
+
+<h1>HR Training Dashboard</h1>
+<p>Welcome HR <strong>{{ user.username }}</strong></p>
+
+<!-- Training List -->
+<div class="card">
+    <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ Create New Training</a>
+    <h2>Training List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Trainer</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Location</th>
+                <th>CPD Points</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for training in trainings %}
+            <tr>
+                <td>{{ training.title }}</td>
+                <td>
+                    {% if training.trainer %}
+                        {{ training.trainer.username }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ training.date }}</td>
+                <td>{{ training.time }}</td>
+                <td>{{ training.location }}</td>
+                <td>{{ training.cpd_points }}</td>
+                <td>
+                    <a href="{% url 'hr_edit_training' training.id %}" class="btn btn-primary">Edit</a>
+                    <form method="post" action="{% url 'hr_delete_training' training.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No trainings available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
-
-</body>
-</html>

@@ -1,51 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New User</title>
-</head>
-<body>
-    {% extends 'dashboard/base.html' %}
+{% extends 'dashboard/base.html' %}
+
 {% block content %}
 
-<h2>Create New User</h2>
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
 
-<form method="post">
-    {% csrf_token %}
-    <label>Username:</label>
-    <input type="text" name="username" required><br><br>
+    p.subtitle {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
 
-    <label>Email:</label>
-    <input type="email" name="email"><br><br>
+    .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: 0 auto 30px auto;
+        max-width: 500px;
+    }
 
-    <label>Password:</label>
-    <input type="password" name="password" required><br><br>
+    form label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
 
-    <label>Role:</label>
-    <select name="role" required>
-        <option value="Employee">Employee</option>
-        <option value="Trainer">Trainer</option>
-        <option value="HOD">HOD</option>
-        <option value="HR">HR</option>
-    </select><br><br>
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="password"],
+    form select {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
 
-    <label>Extra Info:</label>
-    <input type="text" name="extra_info"><br><br>
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        margin-top: 15px;
+        margin-right: 10px;
+        text-decoration: none;
+    }
 
-    <button type="submit">Create</button>
-    <a href="{% url 'dashboard' %}">Cancel</a>
-</form>
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
 
-{% if error %}
-    <p style="color:red">{{ error }}</p>
-{% endif %}
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
 
-{% if message %}
-    <p style="color:green">{{ message }}</p>
-{% endif %}
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #565e64;
+    }
+
+    .status-message {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .status-message.success {
+        color: green;
+    }
+
+    .status-message.error {
+        color: red;
+    }
+
+    form .button-group {
+        text-align: center;
+    }
+</style>
+
+<h1>Create New User</h1>
+<p class="subtitle">Fill in the details below to create a new user account.</p>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email">
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+
+        <label for="role">Role:</label>
+        <select name="role" id="role" required>
+            <option value="Employee">Employee</option>
+            <option value="Trainer">Trainer</option>
+            <option value="HOD">HOD</option>
+            <option value="HR">HR</option>
+        </select>
+
+        <label for="extra_info">Extra Info:</label>
+        <input type="text" name="extra_info" id="extra_info">
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+
+        {% if error %}
+            <p class="status-message error">{{ error }}</p>
+        {% endif %}
+
+        {% if message %}
+            <p class="status-message success">{{ message }}</p>
+        {% endif %}
+    </form>
+</div>
 
 {% endblock %}
-
-</body>
-</html>

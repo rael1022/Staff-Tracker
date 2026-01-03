@@ -77,9 +77,10 @@ def hr_create_user(request):
 
     return render(request, 'manage_account/create_user.html')
 
+from django.contrib import messages
+
 @login_required
 def hr_update_user(request, user_id):
-    # 权限检查
     if not request.user.groups.filter(name='HR').exists():
         return redirect('/dashboard/')
 
@@ -87,9 +88,18 @@ def hr_update_user(request, user_id):
     profile = user.userprofile
 
     if request.method == 'POST':
-        user.username = request.POST['username']
-        user.email = request.POST['email']
+        new_username = request.POST['username']
+        new_email = request.POST['email']
         role = request.POST['role']
+
+        # 检查用户名是否重复
+        if User.objects.filter(username=new_username).exclude(id=user.id).exists():
+            messages.error(request, "Username already exists. Please choose a different one.")
+            return render(request, 'manage_account/update_user.html', {'edit_user': user})
+
+        # 更新 User
+        user.username = new_username
+        user.email = new_email
 
         # 更新 Group
         user.groups.clear()
@@ -102,10 +112,11 @@ def hr_update_user(request, user_id):
         user.save()
         profile.save()
 
-        return redirect('/dashboard/')  # 保存后返回 HR Dashboard
+        messages.success(request, "User updated successfully.")
+        return redirect('/dashboard/')
 
-    # GET 请求显示编辑页面
     return render(request, 'manage_account/update_user.html', {'edit_user': user})
+
 
 
 @login_required

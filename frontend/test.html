@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Training Tracker</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+        }
+
+        /* Header */
+        .site-header {
+            width: 100%;
+            border-bottom: 1px solid #e5e5e5;
+            background-color: #ffffff;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-main {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 0.8px;
+        }
+
+        /* Navigation */
+        .main-nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .main-nav a:hover {
+            color: #007bff;
+        }
+
+        /* Auth section */
+        .auth {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth .login {
+            text-decoration: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .auth .login:hover {
+            color: #007bff;
+        }
+
+        .auth .btn {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+        }
+
+        .auth .btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-container">
+
+        <!-- Logo -->
+        <div class="logo">
+            <span class="logo-main">STAFF TRAINING</span>
+            <span class="logo-sub">AND CERTIFICATION TRACKER</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <a href="#">Experts</a>
+            <a href="#">Community Groups</a>
+            <a href="#">Support</a>
+        </nav>
+
+        <!-- Auth -->
+        <div class="auth">
+            <a href="#" class="login">Login</a>
+            <a href="#" class="btn">Create account</a>
+        </div>
+
+    </div>
+</header>
+
+</body>
+</html>

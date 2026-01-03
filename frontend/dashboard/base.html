@@ -184,6 +184,7 @@
                 <a href="{% url 'manage_assessment_questions' %}">Manage Assessment Questions</a>
                 <a href="{% url 'view_results' %}">View Assessment Results</a>
                 <a href="{% url 'trainer_evaluations' %}">View Evaluations</a>
+                <a href="{% url 'issued_certificates' %}">Issued Certificates</a>
             {% endif %}
 
             {% if user.is_authenticated and user.userprofile.role == "Employee" %}

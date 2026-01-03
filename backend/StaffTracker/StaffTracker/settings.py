@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'certificate',
     'cpd',
     'reports',
+    'department',
 ]
 
 MIDDLEWARE = [

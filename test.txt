@@ -1,5 +1,7 @@
 python manage.py createsuperuser
 
+cd backend\StaffTracker
+
 python manage.py runserver
 
 py manage.py makemigrations
@@ -10,23 +12,21 @@ http://127.0.0.1:8000/admin/
 
 http://127.0.0.1:8000/login/
 
-cd backend\StaffTracker
-
 Staff-Tracker/
 ├─ backend/
 │  ├─ .myvenv/                  # Python 虚拟环境
-│  │  └─ Stafftracker/          # Django 后端
+│  │  └─ StaffTracker/          # Django 后端
 │  │     ├─ manage.py
 │  │     ├─ StaffTracker/
 │  │     │  ├─ __init__.py
 │  │     │  ├─ settings.py
-│  │     │  ├─ urls.py           # include accounts.urls
+│  │     │  ├─ urls.py           # include 各 app urls
 │  │     │  └─ wsgi.py
 │  │
 │  ├─ accounts/
 │  │  ├─ __init__.py
 │  │  ├─ admin.py
-│  │  ├─ models.py               # UserProfile
+│  │  ├─ models.py               # UserProfile 模型
 │  │  ├─ views.py                # login, register, dashboard, hr_create_user, hr_update_user, hr_toggle_user
 │  │  ├─ urls.py                 # login/, register/, dashboard/, hr/create-user/, hr/update-user/<int:user_id>/, hr/toggle-user/<int:user_id>/
 │  │  ├─ forms.py                # 可选
@@ -41,12 +41,17 @@ Staff-Tracker/
 │  │      ├─ __init__.py
 │  │      └─ training_tags.py
 │  │
+│  ├─ department/
+│  │  ├─ __init__.py
+│  │  ├─ models.py               # Department 模型
+│  │  └─ admin.py
+│  │
 │  └─ ...  # 其他 app（registration, attendance, assessment, etc.）
 │
 ├─ frontend/
 │  ├─ manage_account/
-│  │  ├─ create_user.html
-│  │  └─ update_user.html
+│  │  ├─ create_user.html        # HR 创建用户模板
+│  │  └─ update_user.html        # HR 编辑用户模板
 │  │
 │  ├─ dashboard/
 │  │  ├─ hr_dashboard.html
@@ -59,5 +64,4 @@ Staff-Tracker/
 │  └─ register/
 │      └─ register.html
 │
-├─ .gitignore
-└─ README.md
+

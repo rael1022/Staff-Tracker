@@ -10,6 +10,15 @@
         margin-bottom: 10px;
     }
 
+    .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        margin: 30px 0;
+    }
+
+
     p.subtitle {
         text-align: center;
         color: #555;
@@ -17,9 +26,60 @@
         font-size: 14px;
     }
 
-    .action-bar {
+    .filter-card {
+        background: #f9fafc;
+        padding: 20px 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        max-width: 900px;
+        margin: 0 auto 20px auto;
+    }
+
+    .filter-card h3 {
+        font-size: 18px;
+        font-weight: 600;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1 1 200px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-group label {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .filter-group select,
+    .filter-group input[type="date"] {
+        padding: 7px 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        flex: 1 1 100%;
+        justify-content: center;
+        margin-top: 10px;
     }
 
     .btn {
@@ -39,6 +99,15 @@
 
     .btn-primary:hover {
         background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #565e64;
     }
 
     table {
@@ -90,45 +159,96 @@
         padding: 20px;
         color: #777;
     }
+
+    .btncreate{
+        margin: 0 0 30px 0;
+    }
+
+    @media (max-width: 700px) {
+        .filter-form {
+            flex-direction: column;
+        }
+        .filter-actions {
+            justify-content: center;
+        }
+    }
 </style>
 
 <h2>Trainer Dashboard</h2>
 <p class="subtitle">Manage your trainings below</p>
 
-<div class="action-bar">
-    <a href="{% url 'create_training' %}" class="btn btn-primary">➕ Create New Training</a>
+<div class="filter-card">
+    <h3>Filter Trainings</h3>
+    <form method="get" class="filter-form">
+        <div class="filter-group">
+            <label for="department">Department</label>
+            <select name="department" id="department">
+                <option value="">-- All Departments --</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if selected_department and selected_department|add:"" == dept.id|add:"" %}selected{% endif %}>
+                    {{ dept.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="start_date">Start Date</label>
+            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+        </div>
+
+        <div class="filter-group">
+            <label for="end_date">End Date</label>
+            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'trainer_dashboard' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+</div>
+<div class="card">
+    <div class="action-bar">
+        <a href="{% url 'create_training' %}" class="btn btn-primary btncreate">➕ Create New Training</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Duration (hours)</th>
+                <th>Location</th>
+                <th>CPD Points</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for training in trainings %}
+            <tr>
+                <td>{{ training.title }}</td>
+                <td>{{ training.date }}</td>
+                <td>{{ training.time }}</td>
+                <td>{{ training.duration_hours }}</td>
+                <td>{{ training.location }}</td>
+                <td>{{ training.cpd_points }}</td>
+                <td>{% if training.department %}{{ training.department.name }}{% else %}-{% endif %}</td>
+                <td>
+                    <a href="{% url 'edit_training' training.id %}" class="action-link">Edit</a> |
+                    <a href="{% url 'delete_training' training.id %}" class="action-link delete">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="8">No trainings yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Location</th>
-            <th>CPD Points</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for training in trainings %}
-        <tr>
-            <td>{{ training.title }}</td>
-            <td>{{ training.date }}</td>
-            <td>{{ training.time }}</td>
-            <td>{{ training.location }}</td>
-            <td>{{ training.cpd_points }}</td>
-            <td>
-                <a href="{% url 'edit_training' training.id %}" class="action-link">Edit</a> |
-                <a href="{% url 'delete_training' training.id %}" class="action-link delete">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr class="empty-row">
-            <td colspan="6">No trainings yet.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
 {% endblock %}

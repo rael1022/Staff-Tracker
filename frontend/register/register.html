@@ -3,133 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Register | Staff Training Tracker</title>
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f9f9f9;
-        }
-
-        /* ===== Header (Simple) ===== */
-        .site-header {
-            width: 100%;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 18px 20px;
-        }
-
-        .logo {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .logo-main {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .logo-sub {
-            font-size: 11px;
-            color: #666;
-            letter-spacing: 0.8px;
-        }
-
-        /* ===== Register Box ===== */
-        .register-container {
-            max-width: 480px;
-            margin: 70px auto;
-            background-color: #ffffff;
-            padding: 32px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .register-container h1 {
-            font-size: 22px;
-            margin-bottom: 22px;
-            text-align: center;
-        }
-
-        .register-container label {
-            font-size: 14px;
-            display: block;
-            margin-bottom: 6px;
-            color: #333;
-        }
-
-        .register-container input,
-        .register-container select,
-        .register-container textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .register-container textarea {
-            resize: vertical;
-        }
-
-        .register-container button {
-            width: 100%;
-            padding: 11px;
-            border: none;
-            border-radius: 6px;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .register-container button:hover {
-            background-color: #0056b3;
-        }
-
-        .register-container .login-link {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 14px;
-        }
-
-        .register-container .login-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .message {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 14px;
-        }
-
-        .message.error {
-            color: red;
-        }
-
-        .message.success {
-            color: green;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+        body { background-color: #f9f9f9; }
+        .site-header { width: 100%; background-color: #fff; border-bottom: 1px solid #e5e5e5; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 18px 20px; }
+        .logo { display: flex; flex-direction: column; line-height: 1.1; }
+        .logo-main { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+        .logo-sub { font-size: 11px; color: #666; letter-spacing: 0.8px; }
+        .register-container { max-width: 480px; margin: 70px auto; background-color: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .register-container h1 { font-size: 22px; margin-bottom: 22px; text-align: center; }
+        .register-container label { font-size: 14px; display: block; margin-bottom: 6px; color: #333; }
+        .register-container input, .register-container select, .register-container textarea { width: 100%; padding: 10px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .register-container textarea { resize: vertical; }
+        .register-container button { width: 100%; padding: 11px; border: none; border-radius: 6px; background-color: #007bff; color: #fff; font-size: 15px; cursor: pointer; }
+        .register-container button:hover { background-color: #0056b3; }
+        .register-container .login-link { text-align: center; margin-top: 16px; font-size: 14px; }
+        .register-container .login-link a { color: #007bff; text-decoration: none; }
+        .message { text-align: center; margin-top: 14px; font-size: 14px; }
+        .message.error { color: red; }
+        .message.success { color: green; }
     </style>
 </head>
-
 <body>
 
-<!-- Simple Header -->
 <header class="site-header">
     <div class="header-container">
         <div class="logo">
@@ -139,35 +36,48 @@
     </div>
 </header>
 
-<!-- Register Form -->
 <div class="register-container">
     <h1>Register</h1>
+<form method="post">
+    {% csrf_token %}
+    <label>Who are you</label>
+    <select name="role" onchange="this.form.submit()">
+        <option value="">-- Select Role --</option>
+        <option value="Employee" {% if selected_role|default:'' == 'Employee' %}selected{% endif %}>Employee</option>
+        <option value="Trainer" {% if selected_role|default:'' == 'Trainer' %}selected{% endif %}>Trainer</option>
+        <option value="HOD" {% if selected_role|default:'' == 'HOD' %}selected{% endif %}>Head of Department</option>
+        <option value="HR" {% if selected_role|default:'' == 'HR' %}selected{% endif %}>HR</option>
+    </select>
+</form>
 
-    <form method="post">
-        {% csrf_token %}
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="role" value="{{ selected_role|default:'' }}">
 
-        <label>Username</label>
-        <input type="text" name="username" required>
+    <label>Department</label>
+    <select name="department" {% if selected_role|default:'' == 'HR' %}disabled{% endif %}>
+        <option value="">-- Select Department --</option>
+        {% for dept in departments %}
+            <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == department_value|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+        {% endfor %}
+    </select>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+    <label>Username</label>
+    <input type="text" name="username" value="{{ request.POST.username|default:'' }}" required>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+    <label>Email</label>
+    <input type="email" name="email" value="{{ request.POST.email|default:'' }}" required>
 
-        <label>Who are you</label>
-        <select name="role" required>
-            <option value="">-- Select Role --</option>
-            <option value="Employee">Employee</option>
-            <option value="Trainer">Trainer</option>
-            <option value="HOD">Head of Department</option>
-        </select>
+    <label>Password</label>
+    <input type="password" name="password" required>
 
-        <label>Personal Info / Bio</label>
-        <textarea name="extra_info" rows="4"></textarea>
+    <label>Personal Info / Bio</label>
+    <textarea name="extra_info">{{ request.POST.extra_info|default:'' }}</textarea>
 
-        <button type="submit">Create Account</button>
-    </form>
+    <button type="submit">Create Account</button>
+</form>
+
+
 
     <div class="login-link">
         <a href="{% url 'login' %}">Back to Login</a>

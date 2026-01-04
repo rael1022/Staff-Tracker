@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from department.models import Department
+from django.core.exceptions import ValidationError
 
 ROLE_CHOICES = (
     ('Employee', 'Employee'),
@@ -19,6 +20,13 @@ class UserProfile(models.Model):
         null=True,
         blank=True
     )
+
+    def clean(self):
+        if self.role == 'HR' and self.department is not None:
+            raise ValidationError("HR should not belong to any department.")
+
+        if self.role in ['Employee', 'Trainer', 'HOD'] and self.department is None:
+            raise ValidationError(f"{self.role} must belong to a department.")
     
     def __str__(self):
         return self.user.username

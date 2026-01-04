@@ -101,6 +101,8 @@
                 <th>Location</th>
                 <th>CPD Points</th>
                 <th>Status</th>
+                <th>Assessment</th>
+                <th>Evaluation</th>
             </tr>
         </thead>
         <tbody>
@@ -131,6 +133,38 @@
                         {% endif %}
                     {% endwith %}
                 </td>
+                <td>
+                    {% with reg=registrations|get_training_registration:training.id %}
+                        {% if reg and reg.status == 'Approved' %}
+                            <a href="{% url 'pre_assessment' training_id=training.id %}">Pre-Assessment</a>
+                            
+                            {% if training.is_completed %}
+                                <br>
+                                <a href="{% url 'post_assessment' training_id=training.id %}">Post-Assessment</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
+                    {% with reg=registrations|get_training_registration:training.id %}
+                        {% if reg and reg.status == 'Approved' %}
+                            {% if not training.has_evaluated %}
+                                {% if training.status == 'Complete' %}
+                                    <a href="{% url 'submit_evaluation' training.id %}" 
+                                    class="btn btn-primary btn-sm">
+                                        Evaluate
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Training Not Completed</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-success">✓ Evaluated</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not Eligible</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
             </tr>
             {% empty %}
             <tr>
@@ -140,7 +174,5 @@
         </tbody>
     </table>
 </div>
-
-<a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
 
 {% endblock %}

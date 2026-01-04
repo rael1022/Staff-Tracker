@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        
+        .assessment-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .training-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .question-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-top: 10px;
+        }
+        
+        .options-container {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            background: #f8f9fa;
+            border-color: #dee2e6;
+        }
+        
+        .option.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .option label {
+            cursor: pointer;
+            display: block;
+        }
+        
+        .stress-level-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .stress-level-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stress-option {
+            padding: 10px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .stress-option:hover {
+            border-color: #007bff;
+        }
+        
+        .stress-option.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .stress-option input {
+            display: none;
+        }
+        
+        .submit-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #218838;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .btn-back {
+            background: #6c757d;
+            margin-right: 10px;
+        }
+        
+        .btn-back:hover {
+            background: #545b62;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: right;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .assessment-container {
+                padding: 15px;
+            }
+            
+            .stress-level-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if disabled %}
+        <div class="assessment-container">
+            <div class="warning-message">
+                <h2>Assessment Not Available</h2>
+                <p>{{ reason }}</p>
+                <a href="{% url 'employee_dashboard' %}" class="btn btn-back">Back to Dashboard</a>
+            </div>
+        </div>
+    {% else %}
+        <div id="total-questions" style="display: none;">{{ questions|length }}</div>
+        
+        <form method="POST" class="assessment-container" id="assessmentForm">
+            {% csrf_token %}
+            
+            <div class="header">
+                <h1>Pre-Assessment</h1>
+                <h2>{{ training.title }}</h2>
+                <p>Complete this assessment before the training begins</p>
+            </div>
+            
+            <div class="training-info">
+                <p><strong>Training Date:</strong> {{ training.date }} at {{ training.time }}</p>
+                <p><strong>Location:</strong> {{ training.location }}</p>
+                <p><strong>Trainer:</strong> {{ training.trainer.get_full_name }}</p>
+            </div>
+            
+            <div class="progress-text" id="progress-text">Question 0 of {{ questions|length }}</div>
+            <div class="progress-bar">
+                <div class="progress" id="progress" style="width: 0%"></div>
+            </div>
+            
+            {% for question in questions %}
+                <div class="question-card" id="question-{{ forloop.counter }}" 
+                     {% if not forloop.first %}style="display: none;"{% endif %}>
+                    <div class="question-number">{{ forloop.counter }}</div>
+                    <div class="question-text">{{ question.question_text }}</div>
+                    
+                    <div class="options-container">
+                        <div class="option" onclick="selectOption(this, '{{ question.id }}', 'A')">
+                            <input type="radio"
+                                name="question_{{ question.id }}"
+                                id="q{{ question.id }}_a"
+                                value="A">
+                            <label for="q{{ question.id }}_a">
+                                <strong>A.</strong> {{ question.option_a }}
+                            </label>
+                        </div>
+
+                        <div class="option" onclick="selectOption(this, '{{ question.id }}', 'B')">
+                            <input type="radio"
+                                name="question_{{ question.id }}"
+                                id="q{{ question.id }}_b"
+                                value="B">
+                            <label for="q{{ question.id }}_b">
+                                <strong>B.</strong> {{ question.option_b }}
+                            </label>
+                        </div>
+
+                        <div class="option" onclick="selectOption(this, '{{ question.id }}', 'C')">
+                            <input type="radio"
+                                name="question_{{ question.id }}"
+                                id="q{{ question.id }}_c"
+                                value="C">
+                            <label for="q{{ question.id }}_c">
+                                <strong>C.</strong> {{ question.option_c }}
+                            </label>
+                        </div>
+
+                        <div class="option" onclick="selectOption(this, '{{ question.id }}', 'D')">
+                            <input type="radio"
+                                name="question_{{ question.id }}"
+                                id="q{{ question.id }}_d"
+                                value="D">
+                            <label for="q{{ question.id }}_d">
+                                <strong>D.</strong> {{ question.option_d }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="stress-level-section" id="stress-section" style="display: none;">
+                <h3>Stress Level Assessment</h3>
+                <p>Please indicate your current stress level before the training:</p>
+                
+                <div class="stress-level-options">
+                    <label class="stress-option" onclick="selectStressLevel(this, 'Low')">
+                        <input type="radio" name="stress_level" value="Low">
+                        <div>😊 Low Stress</div>
+                    </label>
+                    
+                    <label class="stress-option" onclick="selectStressLevel(this, 'Medium')">
+                        <input type="radio" name="stress_level" value="Medium">
+                        <div>😐 Medium Stress</div>
+                    </label>
+                    
+                    <label class="stress-option" onclick="selectStressLevel(this, 'High')">
+                        <input type="radio" name="stress_level" value="High">
+                        <div>😰 High Stress</div>
+                    </label>
+                    
+                    <label class="stress-option" onclick="selectStressLevel(this, 'Very High')">
+                        <input type="radio" name="stress_level" value="Very High">
+                        <div>😫 Very High Stress</div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="submit-section">
+                <button type="button" class="btn btn-back" id="prev-btn" style="display: none;">
+                    ← Previous
+                </button>
+                
+                <button type="button" class="btn" id="next-btn">
+                    Next →
+                </button>
+                
+                <button type="submit" class="btn" id="submit-btn" style="display: none;" disabled>
+                    Submit Assessment
+                </button>
+            </div>
+        </form>
+    {% endif %}
+    
+    <script>
+        let currentQuestion = 1;
+        let totalQuestions = parseInt(document.getElementById('total-questions').textContent);
+        let questionsAnswered = new Set();
+        
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            if (prevBtn) prevBtn.onclick = prevQuestion;
+            if (nextBtn) nextBtn.onclick = nextQuestion;
+            
+            updateNavigationButtons();
+            updateProgress();
+        });
+        
+        function updateProgress() {
+            const progressPercent = (questionsAnswered.size / totalQuestions) * 100;
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+            document.getElementById('progress-text').textContent = 
+                `Question ${questionsAnswered.size} of ${totalQuestions}`;
+        }
+        
+        function selectOption(element, questionId, value) {
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                opt.querySelector('input').checked = false;
+            });
+            
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+            
+            questionsAnswered.add(questionId);
+            
+            updateProgress();
+            
+            checkAllAnswered();
+        }
+        
+        function selectStressLevel(element, value) {
+            const options = element.parentElement.querySelectorAll('.stress-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+            
+            checkAllAnswered();
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                
+                currentQuestion++;
+                document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                
+                updateNavigationButtons();
+            } else if (currentQuestion === totalQuestions) {
+                document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                document.getElementById('stress-section').style.display = 'block';
+                currentQuestion++;
+                updateNavigationButtons();
+            }
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 1) {
+                if (currentQuestion === totalQuestions + 1) {
+                    document.getElementById('stress-section').style.display = 'none';
+                    document.getElementById(`question-${totalQuestions}`).style.display = 'block';
+                } else {
+                    document.getElementById(`question-${currentQuestion}`).style.display = 'none';
+                    document.getElementById(`question-${currentQuestion - 1}`).style.display = 'block';
+                }
+                currentQuestion--;
+                updateNavigationButtons();
+            }
+        }
+        
+        function updateNavigationButtons() {
+            if (currentQuestion === 1) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'inline-block';
+            }
+            
+            if (currentQuestion <= totalQuestions) {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+            }
+        }
+        
+        function checkAllAnswered() {
+            const allQuestionsAnswered = questionsAnswered.size === totalQuestions;
+            
+            const stressOptions = document.querySelectorAll('input[name="stress_level"]');
+            let stressSelected = false;
+            stressOptions.forEach(option => {
+                if (option.checked) stressSelected = true;
+            });
+            
+            if (allQuestionsAnswered && stressSelected) {
+                submitBtn.disabled = false;
+                submitBtn.title = '';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.title = 'Please answer all questions and select stress level';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Results</title>
+    <style>
+        /* ========== 全局 ========== */
+        body {
+            background: #f4f6f9;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #2c2f33;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* ========== 标题 ========== */
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin: 30px 0 15px;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        /* ========== Training Selector ========== */
+        .training-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+
+        .training-selector select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            font-size: 14px;
+        }
+
+        /* ========== Filters 工具栏 ========== */
+        .filters {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .filters label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .filters input {
+            min-width: 220px;
+        }
+
+        /* ========== 结果布局 ========== */
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== 左右结果区块 ========== */
+        .result-section {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+        }
+
+        /* ========== Result Card ========== */
+        .result-card {
+            background: linear-gradient(135deg, #f9fafb, #ffffff);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border-left: 5px solid #ccc;
+            transition: all 0.25s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        /* Pre / Post 区分 */
+        .result-card[data-type="pre"] {
+            border-left-color: #ff9800;
+        }
+
+        .result-card[data-type="post"] {
+            border-left-color: #4caf50;
+        }
+
+        /* ========== Header ========== */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 员工名字 */
+        .result-header strong {
+            font-size: 15px;
+        }
+
+        /* ========== Score 强调 ========== */
+        .score {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2196f3;
+        }
+
+        /* ========== Stress Level Tag ========== */
+        .stress-level {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 999px;
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* ========== 日期 ========== */
+        .result-card small {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* ========== 空状态 ========== */
+        .result-section p {
+            font-size: 14px;
+            color: #777;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+{% extends 'dashboard/base.html' %}
+{% block content %}
+    <div class="container">
+        <h1>Assessment Results</h1>
+        
+        <div class="section training-selector">
+            <h2>Select Training</h2>
+            <form method="GET" action="{% url 'view_results' %}">
+                <label for="trainingSelect">Select Training</label>
+                <select id="trainingSelect" name="training_id" onchange="this.form.submit()">
+                    <option value="">-- Select a Training --</option>
+                    {% for training in trainings %}
+                        <option value="{{ training.id }}" 
+                                {% if selected_training and selected_training.id == training.id %}selected{% endif %}>
+                            {{ training.title }} ({{ training.date }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        
+        {% if selected_training %}
+            <h2>Results for: {{ selected_training.title }}</h2>
+            
+            <div class="filters">
+                <label for="filter-type">Filter Result Type</label>
+                <select id="filter-type">
+                    <option value="all">All Results</option>
+                    <option value="pre">Pre-Assessment Only</option>
+                    <option value="post">Post-Assessment Only</option>
+                </select>
+                
+                <label for="sort-by">Sort Results By</label>
+                <select id="sort-by">
+                    <option value="score-desc">Score (High to Low)</option>
+                    <option value="score-asc">Score (Low to High)</option>
+                    <option value="name">Employee Name</option>
+                    <option value="date">Date</option>
+                </select>
+                
+                <input type="text" id="search-name" placeholder="Search by employee name...">
+            </div>
+            
+            <div class="results-container">
+                <div class="result-section">
+                    <h3>Pre-Assessment Results ({{ pre_results|length }})</h3>
+                    
+                    {% if pre_results %}
+                        {% for result in pre_results %}
+                            <div class="result-card" data-type="pre" data-name="{{ result.user.username }}">
+                                <div class="result-header">
+                                    <div>
+                                        <strong>{{ result.user.get_full_name|default:result.user.username }}</strong>
+                                        <span class="stress-level">Stress: {{ result.stress_level|default:"Not specified" }}</span>
+                                    </div>
+                                    <span class="score">{{ result.score }}%</span>
+                                </div>
+                                <div>
+                                    <small>Date: {{ result.assessment_date|date:"Y-m-d H:i" }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No pre-assessment results available.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="result-section">
+                    <h3>Post-Assessment Results ({{ post_results|length }})</h3>
+                    
+                    {% if post_results %}
+                        {% for result in post_results %}
+                            <div class="result-card" data-type="post" data-name="{{ result.user.username }}">
+                                <div class="result-header">
+                                    <div>
+                                        <strong>{{ result.user.get_full_name|default:result.user.username }}</strong>
+                                    </div>
+                                    <span class="score">{{ result.score }}%</span>
+                                </div>
+                                <div>
+                                    <small>Date: {{ result.assessment_date|date:"Y-m-d H:i" }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No post-assessment results available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p>Please select a training to view results.</p>
+        {% endif %}
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterType = document.getElementById('filter-type');
+            const sortBy = document.getElementById('sort-by');
+            const searchName = document.getElementById('search-name');
+            
+            function filterAndSortResults() {
+                const typeFilter = filterType.value;
+                const sortValue = sortBy.value;
+                const searchText = searchName.value.toLowerCase();
+                
+                const resultCards = document.querySelectorAll('.result-card');
+                const visibleCards = [];
+                
+                resultCards.forEach(card => {
+                    const cardType = card.getAttribute('data-type');
+                    const cardName = card.getAttribute('data-name').toLowerCase();
+                    
+                    let typeMatch = typeFilter === 'all' || typeFilter === cardType;
+                    
+                    let nameMatch = !searchText || cardName.includes(searchText);
+                    
+                    if (typeMatch && nameMatch) {
+                        card.style.display = 'block';
+                        visibleCards.push(card);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                visibleCards.sort((a, b) => {
+                    if (sortValue === 'name') {
+                        const nameA = a.getAttribute('data-name').toLowerCase();
+                        const nameB = b.getAttribute('data-name').toLowerCase();
+                        return nameA.localeCompare(nameB);
+                    } else if (sortValue === 'date') {
+                        return 0;
+                    } else {
+                        const scoreA = parseFloat(a.querySelector('.score').textContent);
+                        const scoreB = parseFloat(b.querySelector('.score').textContent);
+                        return sortValue === 'score-asc' ? scoreA - scoreB : scoreB - scoreA;
+                    }
+                });
+                
+                visibleCards.forEach(card => {
+                    card.parentNode.appendChild(card);
+                });
+            }
+            
+            filterType.addEventListener('change', filterAndSortResults);
+            sortBy.addEventListener('change', filterAndSortResults);
+            searchName.addEventListener('input', filterAndSortResults);
+        });
+    </script>
+{% endblock %}
+</body>
+</html>

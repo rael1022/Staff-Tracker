@@ -6,7 +6,6 @@
         body {
             font-family: Arial;
             background: linear-gradient(120deg, #eef1ff, #f4f6fb);
-            padding: 30px;
         }
         .container {
             max-width: 1000px;
@@ -47,6 +46,9 @@
     </style>
 </head>
 <body>
+    {% extends 'dashboard/base.html' %}
+
+    {% block content %}
 <div class="container">
     <h1>Issued Certificates</h1>
 
@@ -78,5 +80,6 @@
         {% endfor %}
     </table>
 </div>
+    {% endblock %}
 </body>
 </html>

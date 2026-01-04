@@ -32,12 +32,9 @@
         font-weight: 500;
     }
 
-    form input[type="text"],
-    form input[type="date"],
-    form input[type="time"],
-    form input[type="number"],
-    form textarea,
-    form select {
+    form input,
+    form select,
+    form textarea {
         width: 100%;
         padding: 8px 10px;
         font-size: 14px;
@@ -51,20 +48,15 @@
         min-height: 80px;
     }
 
-    .w-20 {
-        width: 80px;
-    }
-
     .btn {
         padding: 10px 20px;
         font-size: 14px;
         border-radius: 6px;
         border: none;
         cursor: pointer;
-        display: inline-block;
         margin-top: 15px;
         margin-right: 10px;
-        text-decoration: none;
+        display: inline-block;
     }
 
     .btn-primary {
@@ -84,15 +76,6 @@
     .btn-secondary:hover {
         background-color: #565e64;
     }
-
-    .btn-success {
-        background-color: #28a745;
-        color: #fff;
-    }
-
-    .btn-success:hover {
-        background-color: #1e7e34;
-    }
 </style>
 
 <h1>Create Training</h1>
@@ -101,6 +84,7 @@
 <div class="card">
     <form method="POST">
         {% csrf_token %}
+
         <label for="title">Title:</label>
         <input type="text" name="title" id="title" required>
 
@@ -117,9 +101,23 @@
         <input type="text" name="location" id="location" required>
 
         <label for="cpd_points">CPD Points:</label>
-        <input type="text" name="cpd_points" id="cpd_points" required>
+        <input type="number" name="cpd_points" id="cpd_points" min="1" value="1" required>
 
-        <button type="submit" class="btn btn-primary">Create</button>
+        <label for="duration_hours">Duration (hours):</label>
+        <input type="number" name="duration_hours" id="duration_hours" min="1" value="1" required>
+
+        <label for="department_id">Department:</label>
+        <select name="department_id" id="department_id">
+            <option value="">-- Select Department --</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+        </select>
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a href="{% url 'trainer_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </div>
     </form>
 </div>
 

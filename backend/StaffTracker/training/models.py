@@ -10,6 +10,13 @@ class Training(models.Model):
     trainer = models.ForeignKey(User, on_delete=models.CASCADE)
     cpd_points = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    department = models.ForeignKey(
+        'department.Department',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    duration_hours = models.PositiveIntegerField(default=1)  
 
     def __str__(self):
         return f"{self.title} by {self.trainer.username}"

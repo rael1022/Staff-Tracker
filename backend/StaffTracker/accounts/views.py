@@ -7,6 +7,15 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from .models import UserProfile
+from django.contrib import messages
+from department.models import Department
+
+ROLE_DEPARTMENTS = {
+    'Employee': ['IT', 'Finance', 'Marketing'],
+    'Trainer': ['Training', 'IT', 'Ops'],
+    'HOD': ['IT', 'HR Ops', 'Finance'],
+    'HR': [],  
+}
 
 def login_view(request):
     if request.method == 'POST':
@@ -30,54 +39,130 @@ def login_view(request):
     return render(request, 'login/login.html')
 
 def register_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        role = request.POST.get('role') 
-        extra_info = request.POST['extra_info']
+    selected_role = None
+    departments = Department.objects.none()
+    department_value = None
+
+    if request.method == "POST" and 'role' in request.POST and 'username' not in request.POST:
+        selected_role = request.POST.get("role")
+        if selected_role and selected_role != "HR":
+            allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+            departments = Department.objects.filter(name__in=allowed_dept_names)
+        else:
+            departments = Department.objects.all()
+
+    if request.method == "POST" and 'username' in request.POST:
+        selected_role = request.POST.get("role")
+        department_value = request.POST.get("department")
+        if selected_role and selected_role != "HR":
+            allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+            departments = Department.objects.filter(name__in=allowed_dept_names)
+        else:
+            departments = Department.objects.all()
+
+        username = request.POST['username'].strip()
+        email = request.POST['email'].strip()
+        password = request.POST['password'].strip()
+        extra_info = request.POST.get('extra_info', '')
 
         if User.objects.filter(username=username).exists():
-            return render(request, 'register/register.html', {'error': 'username exists'})
-        
-        user = User.objects.create_user(username=username, email=email, password=password)
-        UserProfile.objects.create(user=user, role=role, extra_info=extra_info)
+            return render(request, "register/register.html", {
+                "error": "Username already exists",
+                "selected_role": selected_role,
+                "departments": departments,
+                "department_value": department_value
+            })
 
-        return render(request, 'register/register.html', {'message': 'Register Successful'})
-    
-    return render(request, 'register/register.html')
+        department = None
+        if department_value:
+            department = get_object_or_404(Department, id=department_value)
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_active=False
+        )
+
+        UserProfile.objects.create(
+            user=user,
+            role=selected_role,
+            extra_info=extra_info,
+            department=department,
+            is_approved=False
+        )
+
+        return render(request, "register/register.html", {
+            "message": "Register Successful. Awaiting HR approval.",
+            "selected_role": selected_role,
+            "departments": departments,
+            "department_value": department_value
+        })
+
+    return render(request, "register/register.html", {
+        "selected_role": selected_role,
+        "departments": departments,
+        "department_value": department_value
+    })
 
 @login_required
 def hr_create_user(request):
     if not request.user.groups.filter(name='HR').exists():
         return redirect('/dashboard/')
 
-    if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        role = request.POST['role']
+    roles = list(ROLE_DEPARTMENTS.keys())
+    selected_role = request.POST.get('role', None)
+    departments = Department.objects.filter(name__in=ROLE_DEPARTMENTS.get(selected_role, [])) if selected_role else Department.objects.none()
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
+    context = {
+        'roles': roles,
+        'departments': departments,
+        'selected_role': selected_role,
+        'message': '',
+        'error': '',
+    }
+
+    action = request.POST.get('action', None)
+
+    if request.method == 'POST' and action == 'submit':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        role = request.POST.get('role')
+        department_id = request.POST.get('department')
+
+        if not username or not email or not password or not role:
+            context['error'] = "Username, email, password, and role are required."
+            return render(request, 'manage_account/create_user.html', context)
+
+        if User.objects.filter(username=username).exists():
+            context['error'] = "Username already exists."
+            return render(request, 'manage_account/create_user.html', context)
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+
+        department = None
+        if department_id:
+            department = get_object_or_404(Department, id=department_id)
 
         UserProfile.objects.create(
             user=user,
             role=role,
+            department=department,
             is_approved=True
         )
 
         group, _ = Group.objects.get_or_create(name=role)
         user.groups.add(group)
 
-        return redirect('/dashboard/')
+        context['message'] = "User created successfully."
+        context['departments'] = Department.objects.filter(name__in=ROLE_DEPARTMENTS.get(role, []))
+        context['selected_role'] = role
 
-    return render(request, 'manage_account/create_user.html')
+    elif request.method == 'POST' and action == 'refresh':
+        pass
 
-from django.contrib import messages
+    return render(request, 'manage_account/create_user.html', context)
 
 @login_required
 def hr_update_user(request, user_id):
@@ -87,27 +172,49 @@ def hr_update_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     profile = user.userprofile
 
-    if request.method == 'POST':
-        new_username = request.POST['username']
-        new_email = request.POST['email']
-        role = request.POST['role']
+    roles = list(ROLE_DEPARTMENTS.keys())
+    selected_role = request.POST.get('role', profile.role)
 
-        # 检查用户名是否重复
+    allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+    departments = Department.objects.filter(name__in=allowed_dept_names)
+
+    context = {
+        'edit_user': user,
+        'roles': roles,
+        'departments': departments,
+        'selected_role': selected_role,
+        'role_departments': ROLE_DEPARTMENTS,
+        'message': '',
+        'error': '',
+    }
+
+    action = request.POST.get('action', 'submit')
+
+    if request.method == 'POST' and action == 'submit':
+        new_username = request.POST.get('username', '').strip()
+        new_email = request.POST.get('email', '').strip()
+        role = request.POST.get('role')
+        department_id = request.POST.get('department')
+
+        if not new_username or not new_email:
+            context['error'] = "Username and email are required."
+            return render(request, 'manage_account/update_user.html', context)
+
         if User.objects.filter(username=new_username).exclude(id=user.id).exists():
-            messages.error(request, "Username already exists. Please choose a different one.")
-            return render(request, 'manage_account/update_user.html', {'edit_user': user})
+            context['error'] = "Username already exists."
+            return render(request, 'manage_account/update_user.html', context)
 
-        # 更新 User
         user.username = new_username
         user.email = new_email
-
-        # 更新 Group
         user.groups.clear()
         group, _ = Group.objects.get_or_create(name=role)
         user.groups.add(group)
 
-        # 更新 UserProfile role
         profile.role = role
+        if role == 'HR':
+            profile.department = None
+        else:
+            profile.department = Department.objects.get(id=department_id)
 
         user.save()
         profile.save()
@@ -115,9 +222,17 @@ def hr_update_user(request, user_id):
         messages.success(request, "User updated successfully.")
         return redirect('/dashboard/')
 
-    return render(request, 'manage_account/update_user.html', {'edit_user': user})
+    return render(request, 'manage_account/update_user.html', context)
 
+@login_required
+def hr_delete_user(request, user_id):
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
 
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('/dashboard/')
 
 @login_required
 def hr_toggle_user(request, user_id):
@@ -137,27 +252,35 @@ def dashboard(request):
     if user.groups.filter(name='HR').exists():
 
         if request.method == 'POST':
-            approve_id = request.POST.get('approve_id')
+            action = request.POST.get('action')
+            
+            if action == 'approve':
+                approve_id = request.POST.get('approve_id')
+                try:
+                    profile = UserProfile.objects.get(user__id=approve_id)
+                    profile.is_approved = True
+                    profile.save()
+                    user = profile.user
+                    user.is_active = True
+                    user.save()
+                    role = profile.role
+                    group, _ = Group.objects.get_or_create(name=role)
+                    user.groups.clear()
+                    user.groups.add(group)
+                except UserProfile.DoesNotExist:
+                    pass
 
-            try:
-                profile = UserProfile.objects.get(user__id=approve_id)
+            elif action == 'reject':
+                reject_id = request.POST.get('reject_id')
+                try:
+                    user = User.objects.get(id=reject_id)
+                    user.delete()
+                except User.DoesNotExist:
+                    pass
 
-                profile.is_approved = True
-                profile.save()
-
-                role = profile.role  
-
-                group, _ = Group.objects.get_or_create(name=role)
-
-                approved_user = profile.user
-                approved_user.groups.clear()
-                approved_user.groups.add(group)
-
-            except UserProfile.DoesNotExist:
-                pass
 
         pending_users = UserProfile.objects.filter(is_approved=False)
-        all_users = User.objects.exclude(is_superuser=True)
+        all_users = User.objects.filter(userprofile__is_approved=True).exclude(is_superuser=True)
 
         return render(
             request,
@@ -168,16 +291,13 @@ def dashboard(request):
             }
         )
 
-
     elif user.groups.filter(name='HOD').exists():
         return render(request, 'dashboard/hod_dashboard.html')
-
     elif user.groups.filter(name='Trainer').exists():
         return render(request, 'dashboard/trainer_dashboard.html')
-
     else:
         return render(request, 'dashboard/employee_dashboard.html')
-   
+
 @login_required
 def toggle_user_status(request, user_id):
     if not request.user.groups.filter(name='HR').exists():

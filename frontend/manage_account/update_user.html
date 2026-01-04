@@ -93,36 +93,39 @@
 </style>
 
 <h1>Edit User</h1>
-<p class="subtitle">Update the user information below.</p>
+<p class="subtitle">Edit the details below.</p>
 
 <div class="card">
-    {% if messages %}
-        {% for message in messages %}
-            <p class="status-message error">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-
     <form method="post">
         {% csrf_token %}
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" value="{{ edit_user.username }}" required>
+        <input type="hidden" name="action" id="action" value="submit">
 
-        <label for="email">Email:</label>
-        <input type="email" name="email" id="email" value="{{ edit_user.email }}">
+        {% if message %}<p class="status-message success">{{ message }}</p>{% endif %}
+        {% if error %}<p class="status-message error">{{ error }}</p>{% endif %}
 
-        <label for="role">Role:</label>
-        <select name="role" id="role">
-            <option value="Employee" {% if edit_user.userprofile.role == "Employee" %}selected{% endif %}>Employee</option>
-            <option value="Trainer" {% if edit_user.userprofile.role == "Trainer" %}selected{% endif %}>Trainer</option>
-            <option value="HOD" {% if edit_user.userprofile.role == "HOD" %}selected{% endif %}>HOD</option>
-            <option value="HR" {% if edit_user.userprofile.role == "HR" %}selected{% endif %}>HR</option>
-        </select>
+        <label>Username:</label>
+        <input type="text" name="username" value="{{ edit_user.username }}" required><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ edit_user.email }}" required><br>
+
+        <label>Role:</label>
+        <select name="role" onchange="document.getElementById('action').value='change_role'; this.form.submit();">
+            {% for r in roles %}
+                <option value="{{ r }}" {% if r == selected_role %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label>Department:</label>
+        <select name="department">
+            {% for d in departments %}
+                <option value="{{ d.id }}" {% if edit_user.userprofile.department and edit_user.userprofile.department.id == d.id %}selected{% endif %}>{{ d.name }}</option>
+            {% endfor %}
+        </select><br>
 
         <div class="button-group">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary" onclick="document.getElementById('action').value='submit';">Update User</button>
         </div>
     </form>
 </div>
-
 {% endblock %}

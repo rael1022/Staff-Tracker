@@ -108,7 +108,24 @@
 
         <div class="mb-2">
             <label>CPD Points:</label>
-            <input type="number" name="cpd_points" value="{{ training.cpd_points }}">
+            <input type="number" name="cpd_points" min="0" value="{{ training.cpd_points }}">
+        </div>
+
+        <div class="mb-2">
+            <label>Duration (hours):</label>
+            <input type="number" name="duration_hours" min="1" value="{{ training.duration_hours }}">
+        </div>
+
+        <div class="mb-2">
+            <label>Department:</label>
+            <select name="department_id">
+                <option value="">-- Select Department --</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if training.department and training.department.id == dept.id %}selected{% endif %}>
+                    {{ dept.name }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
 
         <div class="mb-2">

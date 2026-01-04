@@ -3,76 +3,138 @@
 {% block content %}
 
 <style>
-    h2 {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        text-align: center;
-    }
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
 
-    .card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
+.filter-card {
+    background: #f9fafc;
+    padding: 20px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+.filter-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        font-size: 14px;
-        text-align: left;
-    }
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-between;
+    align-items: flex-end;
+}
 
-    th {
-        background-color: #f2f4f7;
-        font-weight: 600;
-    }
+.filter-group {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+}
 
-    .status {
-        font-weight: 500;
-    }
+.filter-group label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #555;
+}
 
-    .status-pending {
-        color: #ff9800;
-    }
+.filter-group input[type="date"] {
+    padding: 7px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-    .status-approved {
-        color: green;
-    }
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 10px;
+}
 
-    .status-rejected {
-        color: red;
-    }
+.btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
 
-    .btn-link {
-        color: #007bff;
-        text-decoration: none;
-        font-weight: 500;
-    }
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
 
-    .btn-link:hover {
-        text-decoration: underline;
-    }
+.btn-primary:hover {
+    background-color: #0056b3;
+}
 
-    .back-link {
-        display: inline-block;
-        margin-top: 20px;
-        font-size: 14px;
-        color: #007bff;
-        text-decoration: none;
-    }
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
 
-    .back-link:hover {
-        text-decoration: underline;
-    }
-    .btn-register {
+.btn-secondary:hover {
+    background-color: #565e64;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f4f7;
+    font-weight: 600;
+}
+
+.status {
+    font-weight: 500;
+}
+
+.status-pending {
+    color: #ff9800;
+}
+
+.status-approved {
+    color: green;
+}
+
+.status-rejected {
+    color: red;
+}
+
+.btn-register {
     display: inline-block;
     padding: 6px 14px;
     font-size: 13px;
@@ -87,9 +149,37 @@
     background-color: #0056b3;
 }
 
+@media (max-width: 700px) {
+    .filter-form {
+        flex-direction: column;
+    }
+    .filter-actions {
+        justify-content: center;
+    }
+}
 </style>
 
 <h2>Available Trainings</h2>
+
+<div class="filter-card">
+    <h3>Filter Trainings</h3>
+    <form method="get" class="filter-form">
+        <div class="filter-group">
+            <label for="start_date">Start Date</label>
+            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+        </div>
+
+        <div class="filter-group">
+            <label for="end_date">End Date</label>
+            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+</div>
 
 <div class="card">
     <table>
@@ -98,6 +188,7 @@
                 <th>Title</th>
                 <th>Date</th>
                 <th>Time</th>
+                <th>Duration (hours)</th>
                 <th>Location</th>
                 <th>CPD Points</th>
                 <th>Status</th>
@@ -112,6 +203,7 @@
                 <td>{{ training.title }}</td>
                 <td>{{ training.date }}</td>
                 <td>{{ training.time }}</td>
+                <td>{{ training.duration_hours }}</td>
                 <td>{{ training.location }}</td>
                 <td>{{ training.cpd_points }}</td>
                 <td>
@@ -129,7 +221,6 @@
                         <a href="{% url 'register_training' training.id %}" class="btn-register">
                             Register
                         </a>
-
                         {% endif %}
                     {% endwith %}
                 </td>
@@ -137,7 +228,6 @@
                     {% with reg=registrations|get_training_registration:training.id %}
                         {% if reg and reg.status == 'Approved' %}
                             <a href="{% url 'pre_assessment' training_id=training.id %}">Pre-Assessment</a>
-                            
                             {% if training.is_completed %}
                                 <br>
                                 <a href="{% url 'post_assessment' training_id=training.id %}">Post-Assessment</a>
@@ -150,8 +240,7 @@
                         {% if reg and reg.status == 'Approved' %}
                             {% if not training.has_evaluated %}
                                 {% if training.status == 'Complete' %}
-                                    <a href="{% url 'submit_evaluation' training.id %}" 
-                                    class="btn btn-primary btn-sm">
+                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
                                         Evaluate
                                     </a>
                                 {% else %}
@@ -168,7 +257,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">No trainings available.</td>
+                <td colspan="9">No trainings available.</td>
             </tr>
             {% endfor %}
         </tbody>

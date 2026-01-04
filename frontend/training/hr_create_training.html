@@ -101,6 +101,7 @@
 <div class="card">
     <form method="POST">
         {% csrf_token %}
+
         <label for="title">Title:</label>
         <input type="text" name="title" id="title" required>
 
@@ -117,7 +118,18 @@
         <input type="text" name="location" id="location" required>
 
         <label for="cpd_points">CPD Points:</label>
-        <input type="number" name="cpd_points" id="cpd_points" value="0" class="w-20">
+        <input type="number" name="cpd_points" id="cpd_points" min="0" value="0" class="w-20">
+
+        <label for="duration_hours">Duration (hours):</label>
+        <input type="number" name="duration_hours" id="duration_hours" min="1" value="1" class="w-20">
+
+        <label for="department_id">Department:</label>
+        <select name="department_id" id="department_id">
+            <option value="">-- Select Department --</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+        </select>
 
         <label for="trainer_id">Trainer:</label>
         <select name="trainer_id" id="trainer_id">
@@ -127,7 +139,7 @@
             {% endfor %}
         </select>
 
-        <div style="text-align: center;">
+        <div style="text-align: center; margin-top: 20px;">
             <button type="submit" class="btn btn-success">Create</button>
             <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Cancel</a>
         </div>

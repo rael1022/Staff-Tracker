@@ -24,6 +24,9 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            if user.is_superuser:
+                login(request, user)
+                return redirect('/dashboard/')
             try:
                 profile = user.userprofile  
                 if not profile.is_approved:

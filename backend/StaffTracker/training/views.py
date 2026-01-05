@@ -277,7 +277,6 @@ def create_training(request):
     departments = Department.objects.all()
     return render(request, 'training/create_training.html', {'departments': departments})
 
-
 @login_required
 def edit_training(request, training_id):
     from datetime import datetime
@@ -414,20 +413,16 @@ def uncomplete_registration(request, reg_id):
 def employee_dashboard(request):
     user = request.user
 
-    # 获取 user profile 和 department
     user_profile = getattr(user, 'userprofile', None)
     user_department = user_profile.department if user_profile else None
 
-    # 获取过滤日期
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
 
-    # trainings queryset
     trainings = Training.objects.all()
     if user_department:
         trainings = trainings.filter(department=user_department)
 
-    # 日期过滤
     start_date = None
     end_date = None
     if start_date_str:

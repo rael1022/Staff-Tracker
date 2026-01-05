@@ -41,6 +41,11 @@ def login_view(request):
     
     return render(request, 'login/login.html')
 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from .models import UserProfile, Department
+from django.db import IntegrityError
+
 def register_view(request):
     selected_role = None
     departments = Department.objects.none()
@@ -80,20 +85,31 @@ def register_view(request):
         if department_value:
             department = get_object_or_404(Department, id=department_value)
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            is_active=False
-        )
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                is_active=False
+            )
 
-        UserProfile.objects.create(
-            user=user,
-            role=selected_role,
-            extra_info=extra_info,
-            department=department,
-            is_approved=False
-        )
+            profile, created = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'role': selected_role,
+                    'extra_info': extra_info,
+                    'department': department,
+                    'is_approved': False
+                }
+            )
+
+        except IntegrityError:
+            return render(request, "register/register.html", {
+                "error": "An error occurred while creating the user. Please try again.",
+                "selected_role": selected_role,
+                "departments": departments,
+                "department_value": department_value
+            })
 
         return render(request, "register/register.html", {
             "message": "Register Successful. Awaiting HR approval.",

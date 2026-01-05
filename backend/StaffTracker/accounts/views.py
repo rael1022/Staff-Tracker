@@ -11,9 +11,9 @@ from django.contrib import messages
 from department.models import Department
 
 ROLE_DEPARTMENTS = {
-    'Employee': ['IT', 'Finance', 'Marketing'],
-    'Trainer': ['Training', 'IT', 'Ops'],
-    'HOD': ['IT', 'HR Ops', 'Finance'],
+    'Employee': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'Trainer': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'HOD': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
     'HR': [],  
 }
 

@@ -6,6 +6,7 @@ class AccountsConfig(AppConfig):
     name = 'accounts'
 
     def ready(self):
+        import accounts.signals
         from django.contrib.auth.models import Group
 
         def create_default_groups(sender, **kwargs):
@@ -13,3 +14,4 @@ class AccountsConfig(AppConfig):
                 Group.objects.get_or_create(name=name)
 
         post_migrate.connect(create_default_groups, sender=self)
+

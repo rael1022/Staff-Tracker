@@ -14,54 +14,62 @@ http://127.0.0.1:8000/login/
 
 Staff-Tracker/
 ├─ backend/
-│  ├─ .myvenv/                  # Python 虚拟环境
-│  │  └─ StaffTracker/          # Django 后端
-│  │     ├─ manage.py
-│  │     ├─ StaffTracker/
+│  ├─ .myvenv/                  # Python 虚拟环境（包含 django 环境）
+│  │  └─ StaffTracker/
+│  │     ├─ manage.py           # Django 管理命令入口
+│  │     ├─ StaffTracker/        # 项目主配置目录
 │  │     │  ├─ __init__.py
-│  │     │  ├─ settings.py
-│  │     │  ├─ urls.py           # include 各 app urls
-│  │     │  └─ wsgi.py
+│  │     │  ├─ settings.py       # Django 配置文件（数据库、app、静态文件、模板）
+│  │     │  ├─ urls.py           # 项目 URL 路由（include 各 app urls）
+│  │     │  └─ wsgi.py           # WSGI 入口文件
 │  │
-│  ├─ accounts/
+│  ├─ accounts/                  # 用户账户管理 app
 │  │  ├─ __init__.py
-│  │  ├─ admin.py
+│  │  ├─ admin.py                # Django admin 注册
 │  │  ├─ models.py               # UserProfile 模型
 │  │  ├─ views.py                # login, register, dashboard, hr_create_user, hr_update_user, hr_toggle_user
 │  │  ├─ urls.py                 # login/, register/, dashboard/, hr/create-user/, hr/update-user/<int:user_id>/, hr/toggle-user/<int:user_id>/
-│  │  ├─ forms.py                # 可选
-│  │  └─ migrations/
+│  │  ├─ forms.py                # 可选，用户注册/更新表单
+│  │  └─ migrations/             # 数据库迁移文件
 │  │
-│  ├─ training/
+│  ├─ training/                  # 培训管理 app
 │  │  ├─ __init__.py
-│  │  ├─ models.py
-│  │  ├─ views.py
-│  │  ├─ urls.py
+│  │  ├─ models.py               # Training, TrainingRegistration 模型
+│  │  ├─ views.py                # employee_dashboard, register_training, assessment views 等
+│  │  ├─ urls.py                 # employee/, register/<int:training_id>/, assessment urls
 │  │  └─ templatetags/
 │  │      ├─ __init__.py
-│  │      └─ training_tags.py
+│  │      └─ training_tags.py    # 自定义模板过滤器，比如 get_training_registration
 │  │
-│  ├─ department/
+│  ├─ department/                # 部门管理 app
 │  │  ├─ __init__.py
 │  │  ├─ models.py               # Department 模型
 │  │  └─ admin.py
 │  │
-│  └─ ...  # 其他 app（registration, attendance, assessment, etc.）
+│  ├─ assessment/                # 评估相关 app（可选）
+│  │  ├─ __init__.py
+│  │  ├─ models.py
+│  │  ├─ views.py
+│  │  └─ urls.py
+│  │
+│  └─ ...                        # 其他 app，比如 attendance, certificate, registration 等
 │
-├─ frontend/
+├─ frontend/                      # 模板目录
 │  ├─ manage_account/
-│  │  ├─ create_user.html        # HR 创建用户模板
-│  │  └─ update_user.html        # HR 编辑用户模板
+│  │  ├─ create_user.html        # HR 创建用户页面
+│  │  └─ update_user.html        # HR 编辑用户页面
 │  │
 │  ├─ dashboard/
 │  │  ├─ hr_dashboard.html
 │  │  ├─ hod_dashboard.html
 │  │  ├─ trainer_dashboard.html
-│  │  └─ employee_dashboard.html
+│  │  └─ employee_dashboard.html # 员工培训列表页面
 │  │
 │  ├─ login/
 │  │  └─ login.html
 │  └─ register/
 │      └─ register.html
 │
+
+
 

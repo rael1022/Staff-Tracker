@@ -8,7 +8,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.http import HttpResponse
 from .models import Attendance
+from training.models import Training, TrainingRegistration
+from cpd.models import CPDRecord
 from accounts.models import UserProfile
+from certificate.models import Certificate
+from datetime import date, timedelta
 import json
 import base64
 import io
@@ -46,6 +50,10 @@ def trainer_training_list(request):
         
         data = []
         for training in trainings:
+            attendances = Attendance.objects.filter(training_id=str(training.id))
+            present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
+            total_count = attendances.count()
+            
             data.append({
                 'id': training.id,
                 'title': training.title,
@@ -57,6 +65,11 @@ def trainer_training_list(request):
                 'status': 'upcoming' if training.date > today else 
                          'ongoing' if training.date == today else 
                          'completed',
+                'attendance': {
+                    'present': present_count,
+                    'absent': attendances.filter(status=Attendance.Status.ABSENT).count(),
+                    'total': total_count
+                }
             })
         
         print(f"=== DEBUG: Returning {len(data)} trainings from database")
@@ -220,24 +233,11 @@ def get_training_attendance(request, training_id):
         for att in attendances:
             user_info = None
             if att.user:
-                try:
-                    from registration.models import UserProfile
-                    user_profile = UserProfile.objects.get(user=att.user)
-                    user_info = {
-                        'id': att.user.id,
-                        'username': att.user.username,
-                        'full_name': f"{att.user.first_name} {att.user.last_name}".strip() or att.user.username,
-                        'role': user_profile.role,
-                        'is_approved': user_profile.is_approved,
-                    }
-                except:
-                    user_info = {
-                        'id': att.user.id,
-                        'username': att.user.username,
-                        'full_name': att.user.username,
-                        'role': 'Unknown',
-                        'is_approved': False,
-                    }
+                user_info = {
+                    'id': att.user.id,
+                    'username': att.user.username,
+                    'full_name': f"{att.user.first_name} {att.user.last_name}".strip() or att.user.username,
+                }
             
             data.append({
                 'id': str(att.id),
@@ -439,8 +439,6 @@ def qr_checkin(request):
             print("Warning: UserProfile check skipped")
             
         try:
-            from training.models import TrainingRegistration
-            
             register_record = TrainingRegistration.objects.filter(
                 employee=user,
                 training_id=training_id
@@ -458,8 +456,8 @@ def qr_checkin(request):
                     'message': 'Your registration is pending approval'
                 }, status=403)
                 
-        except ImportError:
-            print("Warning: TrainingRegistration check skipped")
+        except Exception as e:
+            print(f"Warning: TrainingRegistration check error: {str(e)}")
             
         existing = Attendance.objects.filter(
             user=user,
@@ -472,7 +470,7 @@ def qr_checkin(request):
                 'success': False,
                 'message': 'You have already checked in for this training'
             }, status=400)
-            
+        
         attendance = Attendance.objects.create(
             user=user,
             training_id=training_id,
@@ -480,34 +478,53 @@ def qr_checkin(request):
             check_in_time=timezone.now(),
         )
         
+        try:
+            training_obj = Training.objects.filter(id=training_id).first()
+
+            if training_obj:
+                Certificate.objects.get_or_create(
+                    user=user,
+                    training=training_obj,
+                    defaults={
+                        'issue_date': date.today(),
+                        'expiry_date': date.today() + timedelta(days=365)
+                    }
+                )
+        except Exception as e:
+            print(f"Certificate error: {e}")
+        
         cpd_created = False
         cpd_points = 0
         
         try:
-            from training.models import Training
-            from cpd.models import CPDRecord
-            
             try:
                 training_id_int = int(training_id)
             except ValueError:
                 training_id_int = training_id
                 
             training = Training.objects.filter(id=training_id_int).first()
-            if training and hasattr(training, 'cpd_points'):
+            
+            if training:
                 cpd_points = training.cpd_points
+                print(f"=== DEBUG: Found training '{training.title}', CPD points: {cpd_points}")
+                
+                cpd_record = CPDRecord.objects.create(
+                    user=user,
+                    training=training,
+                    points=cpd_points,
+                    earned_date=timezone.now().date()
+                )
+                cpd_created = True
+                print(f"=== DEBUG: CPD record created: {cpd_record}")
             else:
-                cpd_points = 1
-            
-            cpd_record = CPDRecord.objects.create(
-                user=user,
-                training_id=training_id,
-                points=cpd_points,
-                earned_date=timezone.now().date()
-            )
-            cpd_created = True
-            
-        except ImportError:
-            print("Warning: CPD calculation skipped")
+                print(f"=== DEBUG: Training not found for ID: {training_id}")
+                
+        except ImportError as e:
+            print(f"=== DEBUG: ImportError in CPD creation: {e}")
+        except Exception as e:
+            print(f"=== DEBUG: Error creating CPD record: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
             
         response_data = {
             'success': True,
@@ -527,6 +544,13 @@ def qr_checkin(request):
             response_data['cpd'] = {
                 'points_earned': cpd_points,
                 'record_created': True,
+                'training_title': training.title if training else 'Unknown',
+            }
+        else:
+            response_data['cpd'] = {
+                'points_earned': 0,
+                'record_created': False,
+                'error': 'Could not create CPD record',
             }
         
         return JsonResponse(response_data)

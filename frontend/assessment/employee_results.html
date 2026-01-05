@@ -159,10 +159,10 @@
 
                 <p>
                     Training Status:
-                    {% if registration.training.training_status == "Completed" %}
+                    {% if registration.complete_status == "Completed" %}
                         <span class="badge bg-success">Completed</span>
                     {% else %}
-                        <span class="badge bg-secondary">Upcoming</span>
+                        <span class="badge bg-secondary">Not Completed</span>
                     {% endif %}
                 </p>
 
@@ -170,23 +170,29 @@
 
                 <p>
                     <strong>Pre-Assessment:</strong>
-                    {% if item.pre_done %}
-                        <span class="status-completed">✓ Completed</span>
+                    {% if item.assessment_available == 'pre' %}
+                        {% if item.pre_done %}
+                            <span class="status-completed">✓ Completed</span>
+                        {% else %}
+                            <a href="{% url 'pre_assessment' training_id=registration.training.id %}">
+                                Take Pre-Assessment
+                            </a>
+                        {% endif %}
                     {% else %}
-                        <a href="{% url 'pre_assessment' training_id=registration.training.id %}">
-                            Take Pre-Assessment
-                        </a>
+                        <span class="status-muted">Not available (training completed)</span>
                     {% endif %}
                 </p>
 
                 <p>
                     <strong>Post-Assessment:</strong>
-                    {% if item.post_done %}
-                        <span class="status-completed">✓ Completed</span>
-                    {% elif registration.training.training_status == "Completed" %}
-                        <a href="{% url 'post_assessment' training_id=registration.training.id %}">
-                            Take Post-Assessment
-                        </a>
+                    {% if item.assessment_available == 'post' %}
+                        {% if item.post_done %}
+                            <span class="status-completed">✓ Completed</span>
+                        {% else %}
+                            <a href="{% url 'post_assessment' training_id=registration.training.id %}">
+                                Take Post-Assessment
+                            </a>
+                        {% endif %}
                     {% else %}
                         <span class="status-muted">
                             Available after training completion

@@ -149,6 +149,53 @@ th {
     background-color: #0056b3;
 }
 
+.assessment-status {
+    font-weight: 500;
+}
+
+.assessment-completed {
+    color: green;
+    cursor: default;
+}
+
+.assessment-no-questions {
+    color: #ff9800;
+}
+
+.assessment-available {
+    color: #007bff;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.modal-close {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 @media (max-width: 700px) {
     .filter-form {
         flex-direction: column;
@@ -227,28 +274,65 @@ th {
                 <td>
                     {% with reg=registrations|get_training_registration:training.id %}
                         {% if reg and reg.status == 'Approved' %}
-                            <a href="{% url 'pre_assessment' training_id=training.id %}">Pre-Assessment</a>
-                            {% if training.is_completed %}
-                                <br>
-                                <a href="{% url 'post_assessment' training_id=training.id %}">Post-Assessment</a>
+                            {% load assessment_tags %}
+                            
+                            {% if training.id|has_pre_assessment_questions %}
+                                {% if training.id|has_completed_pre_assessment:request.user %}
+                                    <span class="assessment-status assessment-completed">Pre ✓</span>
+                                {% elif reg.complete_status != 'Completed' %}
+                                    <a href="{% url 'pre_assessment' training_id=training.id %}" 
+                                    class="assessment-available">Pre-Assessment</a>
+                                {% else %}
+                                    <span class="text-muted">Pre (Not Available)</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="assessment-status assessment-no-questions">No Pre</span>
                             {% endif %}
+                            
+                            <br>
+                            
+                            {% if reg.complete_status == 'Completed' %}
+                                {% if training.id|has_post_assessment_questions %}
+                                    {% if training.id|has_completed_post_assessment:request.user %}
+                                        <span class="assessment-status assessment-completed">Post ✓</span>
+                                    {% else %}
+                                        {% if training.id|has_completed_pre_assessment:request.user %}
+                                            <a href="{% url 'post_assessment' training_id=training.id %}" 
+                                            class="assessment-available">Post-Assessment</a>
+                                        {% else %}
+                                            <span class="text-muted">Complete Pre First</span>
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    <span class="assessment-status assessment-no-questions">No Post</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Post (Training Not Completed)</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not Eligible</span>
                         {% endif %}
                     {% endwith %}
                 </td>
                 <td>
                     {% with reg=registrations|get_training_registration:training.id %}
                         {% if reg and reg.status == 'Approved' %}
-                            {% if not training.has_evaluated %}
-                                {% if training.status == 'Complete' %}
-                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
-                                        Evaluate
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">Training Not Completed</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-success">✓ Evaluated</span>
-                            {% endif %}
+                            {% with evaluated=reg.training.evaluations.all %}
+                                {% for eval in evaluated %}
+                                    {% if eval.user_id == request.user.id %}
+                                        <span class="text-success">✓ Evaluated</span>
+                                        {% if not forloop.last %}{% endif %}
+                                    {% endif %}
+                                {% empty %}
+                                    {% if reg.complete_status == 'Completed' %}
+                                        <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
+                                            Evaluate
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Training Not Completed</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
                         {% else %}
                             <span class="text-muted">Not Eligible</span>
                         {% endif %}
@@ -262,6 +346,35 @@ th {
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<script>
+function showCompletedMessage() {
+    document.getElementById('completedModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('completedModal').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const completedAssessments = document.querySelectorAll('.assessment-completed');
+    completedAssessments.forEach(element => {
+        element.style.cursor = 'default';
+        element.onclick = function(e) {
+            e.preventDefault();
+            showCompletedMessage();
+        };
+    });
+});
+</script>
+
+<div id="completedModal" class="modal">
+    <div class="modal-content">
+        <h3>Assessment Already Completed</h3>
+        <p>You have already completed this assessment.</p>
+        <button class="modal-close" onclick="closeModal()">OK</button>
+    </div>
 </div>
 
 {% endblock %}

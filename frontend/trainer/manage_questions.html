@@ -248,9 +248,9 @@
         
         <div class="section training-selector">
             <h2>Select Training</h2>
-            <form method="GET" action="{% url 'manage_assessment_questions' %}">
+            <form method="GET" id="trainingForm">
                 <label for="trainingSelect">Select Training</label>
-                <select id="trainingSelect" name="training_id" onchange="this.form.submit()">
+                <select id="trainingSelect" name="training_id" onchange="changeTraining()">
                     <option value="">-- Select a Training --</option>
                     {% for training in trainings %}
                         <option value="{{ training.id }}" 
@@ -424,16 +424,6 @@
                     class="btn btn-primary" target="_blank">
                         View Detailed Results
                     </a>
-
-                    <a href="{% url 'pre_assessment' training_id=selected_training.id %}" 
-                    class="btn btn-secondary" target="_blank">
-                        Take Pre-Assessment (Test)
-                    </a>
-
-                    <a href="{% url 'post_assessment' training_id=selected_training.id %}" 
-                    class="btn btn-secondary" target="_blank">
-                        Take Post-Assessment (Test)
-                    </a>
                 </div>
                 
                 <div class="stats">
@@ -464,6 +454,15 @@
             document.getElementById(tabName + '-tab').classList.add('active');
             
             event.target.classList.add('active');
+        }
+
+        function changeTraining() {
+            const select = document.getElementById('trainingSelect');
+            const trainingId = select.value;
+            
+            if (trainingId) {
+                window.location.href = "{% url 'manage_assessment_questions' %}" + trainingId + "/";
+            }
         }
         
         document.addEventListener('DOMContentLoaded', function() {

@@ -104,9 +104,8 @@ def submit_evaluation(request, training_id):
         except Registration.DoesNotExist:
             messages.warning(request, 'You are not registered for this training.')
             return redirect('employee_dashboard')
-    
-    if hasattr(training, 'status') and training.status != 'Complete':
-        messages.warning(request, 'This training is not completed yet.')
+    else:
+        messages.error(request, 'Registration module is not available.')
         return redirect('employee_dashboard')
     
     if request.method == 'POST':

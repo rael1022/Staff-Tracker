@@ -18,11 +18,15 @@ def create_pre_assessment(request, training_id):
         training=training,
         employee=request.user,
         status='Approved'
-    ).exists()
+    ).first()
     
     if not registration:
         messages.error(request, "You need to be registered for this training to take the pre-assessment.")
         return redirect('employee_dashboard')
+
+    if registration.complete_status == 'Completed':
+        messages.info(request, "Training already completed. Please take the post-assessment.")
+        return redirect('post_assessment', training_id=training_id)
     
     already_done = PreAssessment.objects.filter(
         training=training,
@@ -88,10 +92,14 @@ def create_post_assessment(request, training_id):
         training=training,
         employee=request.user,
         status='Approved'
-    ).exists()
+    ).first()
     
     if not registration:
         messages.error(request, "You need to be registered for this training to take the post-assessment.")
+        return redirect('employee_dashboard')
+
+    if registration.complete_status != 'Completed':
+        messages.error(request, "You need to complete the training first before taking the post-assessment.")
         return redirect('employee_dashboard')
     
     already_done = PostAssessment.objects.filter(
@@ -111,13 +119,6 @@ def create_post_assessment(request, training_id):
     
     if not pre_done:
         messages.warning(request, "You need to complete the pre-assessment first.")
-        return redirect('employee_dashboard')
-    
-    training_datetime = datetime.combine(training.date, training.time)
-    training_end_datetime = training_datetime + timedelta(hours=2)
-    
-    if timezone.now() < training_end_datetime:
-        messages.info(request, "Post-assessment is only available after training completion.")
         return redirect('employee_dashboard')
     
     questions = AssessmentQuestion.objects.filter(
@@ -368,22 +369,35 @@ def employee_results(request):
     for reg in registrations:
         training = reg.training
 
-        pre_done = PreAssessment.objects.filter(
-            training=training,
-            user=request.user,
-            status='Completed'
-        ).exists()
-
-        post_done = PostAssessment.objects.filter(
-            training=training,
-            user=request.user,
-            status='Completed'
-        ).exists()
+        if reg.complete_status == 'Not Completed':
+            pre_done = PreAssessment.objects.filter(
+                training=training,
+                user=request.user,
+                status='Completed'
+            ).exists()
+            
+            post_done = False
+            assessment_available = 'pre'
+        else:  
+            pre_done = PreAssessment.objects.filter(
+                training=training,
+                user=request.user,
+                status='Completed'
+            ).exists()
+            
+            post_done = PostAssessment.objects.filter(
+                training=training,
+                user=request.user,
+                status='Completed'
+            ).exists()
+            
+            assessment_available = 'post'
 
         registration_status.append({
             'registration': reg,
             'pre_done': pre_done,
             'post_done': post_done,
+            'assessment_available': assessment_available,
         })
     
     context = {

@@ -353,6 +353,61 @@ def hr_training_registrations(request):
         'registrations': registrations
     })
 
+@login_required
+def trainer_completions(request):
+    trainer_trainings = Training.objects.filter(trainer=request.user)
+    
+    registrations = TrainingRegistration.objects.filter(
+        training__in=trainer_trainings
+    ).select_related('employee', 'training').order_by('-requested_at')
+    
+    status_filter = request.GET.get('status', '')
+    complete_filter = request.GET.get('complete_status', '')
+    
+    if status_filter:
+        registrations = registrations.filter(status=status_filter)
+    
+    if complete_filter:
+        registrations = registrations.filter(complete_status=complete_filter)
+    
+    context = {
+        'registrations': registrations,
+        'status_filter': status_filter,
+        'complete_filter': complete_filter,
+        'STATUS_CHOICES': TrainingRegistration.STATUS_CHOICES,
+        'COMPLETE_CHOICES': TrainingRegistration.COMPLETE_CHOICES,
+    }
+    
+    return render(request, 'trainer/trainer_completions.html', context)
+
+@login_required
+def complete_registration(request, reg_id):
+    registration = get_object_or_404(TrainingRegistration, id=reg_id)
+    
+    if registration.training.trainer != request.user:
+        messages.error(request, "You are not authorized to update this registration.")
+        return redirect('trainer_completions')
+    
+    registration.complete_status = 'Completed'
+    registration.save()
+    messages.success(request, f"Marked {registration.employee.username}'s registration as Completed.")
+    
+    return redirect('trainer_completions')
+
+@login_required
+def uncomplete_registration(request, reg_id):
+    registration = get_object_or_404(TrainingRegistration, id=reg_id)
+    
+    if registration.training.trainer != request.user:
+        messages.error(request, "You are not authorized to update this registration.")
+        return redirect('trainer_completions')
+    
+    registration.complete_status = 'Not Completed'
+    registration.save()
+    messages.warning(request, f"Marked {registration.employee.username}'s registration as Not Completed.")
+    
+    return redirect('trainer_completions')
+
 # ---------------- Employee ----------------
 
 @login_required

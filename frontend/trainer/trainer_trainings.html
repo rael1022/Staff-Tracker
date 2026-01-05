@@ -307,7 +307,6 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Employee</th>
-                                    <th>Role</th>
                                     <th>Status</th>
                                     <th>Check-in Time</th>
                                     <th>Method</th>
@@ -569,9 +568,6 @@
                     <td>
                         <div class="fw-medium">${escapeHtml(user.full_name)}</div>
                         <small class="text-muted">@${escapeHtml(user.username)}</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-secondary">${escapeHtml(user.role)}</span>
                     </td>
                     <td>
                         ${isPresent ? 

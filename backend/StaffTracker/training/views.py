@@ -5,7 +5,8 @@ from .models import Training, TrainingRegistration
 from department.models import Department
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_date
-from datetime import datetime
+from django.utils import timezone
+from datetime import datetime, timedelta
 
 # ---------------- HR ----------------
 def is_hr(user):
@@ -60,21 +61,18 @@ def hr_create_training(request):
         time_str = request.POST.get('time')
         location = request.POST.get('location')
 
-        # CPD Points 非负
         cpd_points = request.POST.get('cpd_points', 0)
         try:
             cpd_points = max(0, int(cpd_points))
         except ValueError:
             cpd_points = 0
 
-        # Duration 非负
         duration_hours = request.POST.get('duration_hours', 1)
         try:
             duration_hours = max(1, int(duration_hours))
         except ValueError:
             duration_hours = 1
 
-        # Trainer
         trainer_user = None
         trainer_id = request.POST.get('trainer_id')
         if trainer_id:
@@ -83,7 +81,6 @@ def hr_create_training(request):
             except User.DoesNotExist:
                 trainer_user = None
 
-        # Department
         dept_id = request.POST.get('department_id')
         department = None
         if dept_id:
@@ -356,18 +353,22 @@ def hr_training_registrations(request):
 def trainer_completions(request):
     trainer_trainings = Training.objects.filter(trainer=request.user)
     
-    registrations = TrainingRegistration.objects.filter(
-        training__in=trainer_trainings
-    ).select_related('employee', 'training').order_by('-requested_at')
-    
-    status_filter = request.GET.get('status', '')
-    complete_filter = request.GET.get('complete_status', '')
-    
-    if status_filter:
-        registrations = registrations.filter(status=status_filter)
-    
-    if complete_filter:
-        registrations = registrations.filter(complete_status=complete_filter)
+    if not trainer_trainings.exists():
+        registrations = TrainingRegistration.objects.none()
+        messages.info(request, "You are not assigned as a trainer for any training sessions.")
+    else:
+        registrations = TrainingRegistration.objects.filter(
+            training__in=trainer_trainings
+        ).select_related('employee', 'training').order_by('-requested_at')
+        
+        status_filter = request.GET.get('status', '')
+        complete_filter = request.GET.get('complete_status', '')
+        
+        if status_filter:
+            registrations = registrations.filter(status=status_filter)
+        
+        if complete_filter:
+            registrations = registrations.filter(complete_status=complete_filter)
     
     context = {
         'registrations': registrations,
@@ -414,6 +415,24 @@ def employee_dashboard(request):
     user_profile = getattr(user, 'userprofile', None)
     user_department = user_profile.department if user_profile else None
 
+    user_registrations = TrainingRegistration.objects.filter(
+        employee=user, 
+        complete_status='Not Completed'
+    ).select_related('training')
+    
+    for reg in user_registrations:
+        training = reg.training
+        
+        training_start_datetime = datetime.combine(training.date, training.time)
+        training_end_datetime = training_start_datetime + timedelta(hours=training.duration_hours)
+        
+        training_end_aware = timezone.make_aware(training_end_datetime)
+        
+        current_time = timezone.now()
+        if current_time >= training_end_aware:
+            reg.complete_status = 'Completed'
+            reg.save()
+    
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
     trainer_id = request.GET.get('trainer')

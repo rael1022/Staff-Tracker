@@ -12,6 +12,7 @@ from training.models import Training, TrainingRegistration
 from cpd.models import CPDRecord
 from accounts.models import UserProfile
 from certificate.models import Certificate
+from assessment.models import PostAssessment
 from datetime import date, timedelta
 import json
 import base64
@@ -470,6 +471,36 @@ def qr_checkin(request):
                 'success': False,
                 'message': 'You have already checked in for this training'
             }, status=400)
+        
+        try:
+            training_obj = Training.objects.filter(id=training_id).first()
+    
+            if not training_obj:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Training not found'
+                }, status=404)
+        
+            post_assessment_completed = PostAssessment.objects.filter(
+                training=training_obj,
+                user=user,
+                status='Completed'
+            ).exists()
+            
+            if not post_assessment_completed:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'You must complete the post assessment before checking in'
+                }, status=403)
+                
+        except ImportError:
+            print("Warning: PostAssessment model not found. Skipping post assessment check.")
+        except Exception as e:
+            print(f"Error checking post assessment: {e}")
+            return JsonResponse({
+                'success': False,
+                'message': f'Error checking assessment status: {str(e)}'
+            }, status=500)
         
         attendance = Attendance.objects.create(
             user=user,

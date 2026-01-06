@@ -9,12 +9,11 @@ from django.shortcuts import render, redirect
 from .models import UserProfile
 from django.contrib import messages
 from department.models import Department
-from django.db import IntegrityError
 
 ROLE_DEPARTMENTS = {
-    'Employee': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'Employee': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
     'Trainer': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
-    'HOD': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'HOD': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
     'HR': [],  
 }
 
@@ -115,9 +114,10 @@ def register_view(request):
 
         return render(request, "register/register.html", {
             "message": "Register Successful. Awaiting HR approval.",
-            "selected_role": selected_role,
-            "departments": departments,
-            "department_value": department_value
+            "selected_role": '',   
+            "departments": Department.objects.none(),  
+            "department_value": ''  ,
+            "request": {"POST": {"username": "", "email": ""}} 
         })
 
     return render(request, "register/register.html", {

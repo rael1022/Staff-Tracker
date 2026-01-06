@@ -521,7 +521,7 @@ def qr_checkin(request):
         
         attendance = Attendance.objects.create(
             user=user,
-            training=training_obj,
+            training_id=training_id,
             status=Attendance.Status.PRESENT,
             check_in_time=timezone.now(),
         )

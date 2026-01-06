@@ -8,6 +8,7 @@ class Certificate(models.Model):
     training = models.ForeignKey("training.Training", on_delete=models.CASCADE)
     issue_date = models.DateField()
     expiry_date = models.DateField()
+    trainer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='issued_certificates')
 
     def is_expired(self):
         return date.today() > self.expiry_date

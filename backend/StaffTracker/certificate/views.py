@@ -14,7 +14,7 @@ def certificate_list(request):
 
 @login_required
 def issued_certificates(request):
-    certs = Certificate.objects.all()
+    certs = Certificate.objects.filter(trainer=request.user)
     return render(request, 'certificate/issued_certificates.html', {
         'certs': certs
     })

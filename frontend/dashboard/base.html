@@ -157,28 +157,6 @@
 
             <a href="{% url 'dashboard' %}">Dashboard</a>
 
-            {% if user.is_authenticated and user.userprofile.role == "HOD" %}
-                <a href="{% url 'hod_dashboard' %}">
-                    Manage Training Approvals
-                </a>
-                <a href="{% url 'hod_department_report' %}">
-                    Hod Department Report
-                </a>
-                <a href="{% url 'hod_department_training_progress' %}">
-                    Hod department training progress
-                </a>
-            {% endif %}
-
-            {% if user.is_authenticated and user.userprofile.role == "Trainer" %}
-                <a href="{% url 'trainer_dashboard' %}">Manage Trainings</a>
-                <a href="{% url 'trainer_trainings_page' %}">Attendance QR Generate</a>
-                <a href="{% url 'manage_assessment_questions' %}">Manage Assessment Questions</a>
-                <a href="{% url 'view_results' %}">View Assessment Results</a>
-                <a href="{% url 'trainer_evaluations' %}">View Evaluations</a>
-                <a href="{% url 'issued_certificates' %}">Issued Certificates</a>
-                <a href="{% url 'trainer_completions' %}">Manage Completions</a>
-            {% endif %}
-
             {% if user.is_authenticated and user.userprofile.role == "Employee" %}
                 <a href="{% url 'employee_dashboard' %}">View Trainings</a>
                 <a href="{% url 'my_certificates' %}">View certificate list</a>

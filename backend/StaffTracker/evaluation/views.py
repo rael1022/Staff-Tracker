@@ -152,6 +152,9 @@ def trainer_evaluations(request, training_id=None):
             'recommend_percentage': evaluations.filter(question5_would_recommend=True).count() / max(evaluations.count(), 1) * 100
         }
         
+        question_scores = [avg_ratings['q1'], avg_ratings['q2'], avg_ratings['q3'], avg_ratings['q4']]
+        avg_ratings['question_avg'] = round(sum(question_scores) / len(question_scores), 2)
+        
         paginator = Paginator(evaluations, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)

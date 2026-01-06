@@ -53,7 +53,15 @@ def trainer_training_list(request):
         for training in trainings:
             attendances = Attendance.objects.filter(training_id=str(training.id))
             present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
-            total_count = attendances.count()
+            
+            try:
+                total_registered = TrainingRegistration.objects.filter(
+                    training=training,
+                    status='Approved'
+                ).count()
+            except Exception as e:
+                print(f"=== DEBUG: Error getting registered count for training {training.id}: {e}")
+                total_registered = attendances.count()
             
             data.append({
                 'id': training.id,
@@ -69,7 +77,9 @@ def trainer_training_list(request):
                 'attendance': {
                     'present': present_count,
                     'absent': attendances.filter(status=Attendance.Status.ABSENT).count(),
-                    'total': total_count
+                    'total': total_registered,
+                    'registered_total': total_registered, 
+                    'attendance_total': attendances.count()
                 }
             })
         
@@ -685,18 +695,18 @@ def trainer_attendance_view(request):
             
             present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
             absent_count = attendances.filter(status=Attendance.Status.ABSENT).count()
-            total_count = attendances.count()
+            
             
             try:
-                from training.models import TrainingRegistration
-                registered_users = TrainingRegistration.objects.filter(
-                    training_id=training.id,
+                total_registered = TrainingRegistration.objects.filter(
+                    training=training,
                     status='Approved'
                 ).count()
-                
-                not_checked_in = max(0, registered_users - present_count)
-            except ImportError:
-                not_checked_in = 0
+            except Exception as e:
+                print(f"Error getting registered count: {e}")
+                total_registered = attendances.count()
+            
+            not_checked_in = max(0, total_registered - present_count)
             
             training_data.append({
                 'id': training.id,
@@ -704,10 +714,12 @@ def trainer_attendance_view(request):
                 'date': training.date,
                 'time': training.time,
                 'location': training.location,
-                'total_attendance': total_count,
+                'total_attendance': total_registered,
                 'present_count': present_count,
                 'absent_count': absent_count,
                 'not_checked_in': not_checked_in,
+                'registered_total': total_registered,
+                'attendance_total': attendances.count(),
                 'status': 'upcoming' if training.date > timezone.now().date() else 
                          'ongoing' if training.date == timezone.now().date() else 
                          'completed',

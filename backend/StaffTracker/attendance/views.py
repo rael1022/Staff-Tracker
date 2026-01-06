@@ -53,7 +53,15 @@ def trainer_training_list(request):
         for training in trainings:
             attendances = Attendance.objects.filter(training_id=str(training.id))
             present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
-            total_count = attendances.count()
+            
+            try:
+                total_registered = TrainingRegistration.objects.filter(
+                    training=training,
+                    status='Approved'
+                ).count()
+            except Exception as e:
+                print(f"=== DEBUG: Error getting registered count for training {training.id}: {e}")
+                total_registered = attendances.count()
             
             data.append({
                 'id': training.id,
@@ -69,7 +77,9 @@ def trainer_training_list(request):
                 'attendance': {
                     'present': present_count,
                     'absent': attendances.filter(status=Attendance.Status.ABSENT).count(),
-                    'total': total_count
+                    'total': total_registered,
+                    'registered_total': total_registered, 
+                    'attendance_total': attendances.count()
                 }
             })
         
@@ -228,6 +238,15 @@ def generate_qr_code(request):
 @login_required
 def get_training_attendance(request, training_id):
     try:
+        from training.models import Training
+        training = get_object_or_404(Training, id=training_id)
+
+        if training.trainer != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'You are not allowed to view this training attendance.'
+            }, status=403)
+            
         attendances = Attendance.objects.filter(training_id=training_id)
         
         data = []
@@ -249,19 +268,12 @@ def get_training_attendance(request, training_id):
                 'is_qr_checkin': bool(att.check_in_time),
             })
         
-        training_info = None
-        try:
-            from training.models import Training
-            training = Training.objects.filter(id=training_id).first()
-            if training:
-                training_info = {
-                    'id': training.id,
-                    'title': training.title,
-                    'date': training.date.isoformat() if training.date else None,
-                    'location': training.location,
-                }
-        except ImportError:
-            pass
+        training_info = {
+            'id': training.id,
+            'title': training.title,
+            'date': training.date.isoformat() if training.date else None,
+            'location': training.location,
+        }
         
         return JsonResponse({
             'success': True,
@@ -422,6 +434,19 @@ def qr_checkin(request):
             }, status=401)
         
         try:
+            training_obj = Training.objects.filter(id=training_id).first()
+            if not training_obj:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Training not found'
+                }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error finding training: {str(e)}'
+            }, status=500)
+        
+        try:
             user_profile = UserProfile.objects.get(user=user)
             
             if user_profile.role != 'Employee':
@@ -473,14 +498,6 @@ def qr_checkin(request):
             }, status=400)
         
         try:
-            training_obj = Training.objects.filter(id=training_id).first()
-    
-            if not training_obj:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Training not found'
-                }, status=404)
-        
             post_assessment_completed = PostAssessment.objects.filter(
                 training=training_obj,
                 user=user,
@@ -510,9 +527,17 @@ def qr_checkin(request):
         )
         
         try:
-            training_obj = Training.objects.filter(id=training_id).first()
-
-            if training_obj:
+            if hasattr(training_obj, 'trainer') and training_obj.trainer:
+                Certificate.objects.get_or_create(
+                    user=user,
+                    training=training_obj,
+                    trainer=training_obj.trainer,
+                    defaults={
+                        'issue_date': date.today(),
+                        'expiry_date': date.today() + timedelta(days=365)
+                    }
+                )
+            else:
                 Certificate.objects.get_or_create(
                     user=user,
                     training=training_obj,
@@ -685,18 +710,18 @@ def trainer_attendance_view(request):
             
             present_count = attendances.filter(status=Attendance.Status.PRESENT).count()
             absent_count = attendances.filter(status=Attendance.Status.ABSENT).count()
-            total_count = attendances.count()
+            
             
             try:
-                from training.models import TrainingRegistration
-                registered_users = TrainingRegistration.objects.filter(
-                    training_id=training.id,
+                total_registered = TrainingRegistration.objects.filter(
+                    training=training,
                     status='Approved'
                 ).count()
-                
-                not_checked_in = max(0, registered_users - present_count)
-            except ImportError:
-                not_checked_in = 0
+            except Exception as e:
+                print(f"Error getting registered count: {e}")
+                total_registered = attendances.count()
+            
+            not_checked_in = max(0, total_registered - present_count)
             
             training_data.append({
                 'id': training.id,
@@ -704,10 +729,12 @@ def trainer_attendance_view(request):
                 'date': training.date,
                 'time': training.time,
                 'location': training.location,
-                'total_attendance': total_count,
+                'total_attendance': total_registered,
                 'present_count': present_count,
                 'absent_count': absent_count,
                 'not_checked_in': not_checked_in,
+                'registered_total': total_registered,
+                'attendance_total': attendances.count(),
                 'status': 'upcoming' if training.date > timezone.now().date() else 
                          'ongoing' if training.date == timezone.now().date() else 
                          'completed',

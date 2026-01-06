@@ -3,57 +3,108 @@
 {% block content %}
 
 <style>
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 16px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+body {
+    background: #f5f7fa;
+    font-family: 'Inter', sans-serif;
+}
+
+/* 容器 */
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* 标题 */
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4c7df0;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* 总积分 */
+.total {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: #eef1ff;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 表格样式 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+thead th {
+    background: #f0f4ff;
+    color: #1e293b;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 12px;
+    border-bottom: 1px solid #dbe2ff;
+}
+
+tbody td {
+    padding: 12px 12px;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:hover td {
+    background-color: #f6f8ff;
+    transition: background 0.2s ease;
+}
+
+/* 空数据 */
+.empty {
+    text-align: center;
+    font-size: 16px;
+    color: #9ca3af;
+    padding: 50px 0;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
     }
 
-    h1 {
-        font-size: 24px;
-        color: #4c7df0;
-        margin-bottom: 12px;
+    thead tr {
+        display: none;
     }
 
-    .total {
-        font-size: 18px;
-        background: #eef1ff;
-        padding: 12px 16px;
-        border-radius: 10px;
-        margin-bottom: 25px;
-        font-weight: bold;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 14px;
-    }
-
-    th, td {
+    tbody tr {
+        margin-bottom: 15px;
+        background: #f9fafb;
+        border-radius: 12px;
         padding: 12px;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
     }
 
-    th {
-        background: #dde2ff;
+    tbody td {
+        border: none;
+        padding: 6px 12px;
+        position: relative;
+    }
+
+    tbody td::before {
+        content: attr(data-label);
         font-weight: 600;
+        color: #374151;
+        display: block;
+        margin-bottom: 4px;
     }
-
-    tr:hover td {
-        background-color: #f6f7ff;
-    }
-
-    .empty {
-        text-align: center;
-        color: #777;
-        margin-top: 20px;
-    }
+}
 </style>
 
 <div class="container">
@@ -67,7 +118,8 @@
     <table>
         <thead>
             <tr>
-                <th>Training</th>
+                <th>Training Title</th>
+                <th>Trainer</th>
                 <th>Points</th>
                 <th>Earned Date</th>
             </tr>
@@ -75,9 +127,10 @@
         <tbody>
             {% for record in records %}
             <tr>
-                <td>{{ record.training }}</td>
-                <td>{{ record.points }}</td>
-                <td>{{ record.earned_date }}</td>
+                <td data-label="Training Title">{{ record.training.title }}</td>
+                <td data-label="Trainer">{{ record.training.trainer.get_full_name|default:record.training.trainer.username }}</td>
+                <td data-label="Points">{{ record.points }}</td>
+                <td data-label="Earned Date">{{ record.earned_date|date:"d M Y" }}</td>
             </tr>
             {% endfor %}
         </tbody>

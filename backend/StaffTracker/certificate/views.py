@@ -1,18 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Certificate
+from datetime import date
 
 # Create your views here.
 @login_required
 def certificate_list(request):
     certs = Certificate.objects.filter(user=request.user)
     return render(request, 'certificate/certificate_list.html', {
-        'certs': certs
+        'certs': certs,
+        'today': date.today(),
     })
 
 @login_required
 def issued_certificates(request):
-    certs = Certificate.objects.all()
+    certs = Certificate.objects.filter(trainer=request.user)
     return render(request, 'certificate/issued_certificates.html', {
         'certs': certs
     })

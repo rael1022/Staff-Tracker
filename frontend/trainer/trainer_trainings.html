@@ -403,7 +403,7 @@
                 const statusClass = getStatusClass(training.status);
                 
                 const presentCount = training.attendance?.present || 0;
-                const totalCount = training.attendance?.total || 0;
+                const totalCount = training.attendance?.registered_total || training.attendance?.total || 0;
                 const attendancePercent = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
                 
                 row.innerHTML = `

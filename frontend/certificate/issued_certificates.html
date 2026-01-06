@@ -64,7 +64,7 @@
         {% for cert in certs %}
         <tr>
             <td>{{ cert.user }}</td>
-            <td>{{ cert.training }}</td>
+            <td>{{ cert.training.title }}</td>
             <td>{{ cert.issue_date }}</td>
             <td>{{ cert.expiry_date }}</td>
             <td>

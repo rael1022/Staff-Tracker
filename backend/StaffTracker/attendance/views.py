@@ -238,6 +238,15 @@ def generate_qr_code(request):
 @login_required
 def get_training_attendance(request, training_id):
     try:
+        from training.models import Training
+        training = get_object_or_404(Training, id=training_id)
+
+        if training.trainer != request.user:
+            return JsonResponse({
+                'success': False,
+                'message': 'You are not allowed to view this training attendance.'
+            }, status=403)
+            
         attendances = Attendance.objects.filter(training_id=training_id)
         
         data = []
@@ -259,19 +268,12 @@ def get_training_attendance(request, training_id):
                 'is_qr_checkin': bool(att.check_in_time),
             })
         
-        training_info = None
-        try:
-            from training.models import Training
-            training = Training.objects.filter(id=training_id).first()
-            if training:
-                training_info = {
-                    'id': training.id,
-                    'title': training.title,
-                    'date': training.date.isoformat() if training.date else None,
-                    'location': training.location,
-                }
-        except ImportError:
-            pass
+        training_info = {
+            'id': training.id,
+            'title': training.title,
+            'date': training.date.isoformat() if training.date else None,
+            'location': training.location,
+        }
         
         return JsonResponse({
             'success': True,

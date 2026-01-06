@@ -4,50 +4,98 @@
     <title>Certificate Preview</title>
     <style>
         body {
-            background: #f4f6fb;
-            padding: 40px;
+            background: linear-gradient(120deg, #f5f5f5, #e0e0e0); /* 高级浅灰渐变 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Georgia', serif;
         }
+
         .certificate {
-            width: 700px;
-            margin: auto;
-            background: white;
-            padding: 40px;
-            border: 6px solid #4c7df0;
+            width: 750px;
+            background: #1f1f1f; /* 深灰卡片 */
+            padding: 60px 50px;
+            border-radius: 20px;
             text-align: center;
-            font-family: "Times New Roman";
+            border: 6px solid transparent;
+            border-image: linear-gradient(135deg, #fbbf24, #f59e0b) 1; /* 金色渐变边框 */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            color: #fff;
         }
+
         h1 {
-            color: #4c7df0;
-            margin-bottom: 30px;
+            font-size: 40px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .name {
-            font-size: 26px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        .training {
-            font-size: 20px;
+
+        p {
+            font-size: 18px;
             margin: 10px 0;
+            color: #d1d5db;
         }
+
+        .name {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 25px 0;
+            letter-spacing: 0.5px;
+            color: #fbbf24;
+        }
+
+        .training {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 15px 0;
+            color: #fcd34d;
+        }
+
+        .line {
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            margin: 30px auto;
+            border-radius: 2px;
+        }
+
         .date {
-            margin-top: 30px;
+            font-size: 16px;
+            color: #d1d5db;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 800px) {
+            .certificate {
+                width: 90%;
+                padding: 40px 30px;
+            }
+
+            h1 { font-size: 32px; }
+            .name { font-size: 28px; }
+            .training { font-size: 20px; }
         }
     </style>
 </head>
 <body>
-<div class="certificate">
-    <h1>Certificate of Completion</h1>
+    <div class="certificate">
+        <h1>Certificate of Completion</h1>
+        <p>This certifies that</p>
+        <div class="name">{{ cert.user }}</div>
+        <p>has successfully completed</p>
+        <div class="training">{{ cert.training }}</div>
 
-    <p>This certifies that</p>
-    <div class="name">{{ cert.user }}</div>
+        <div class="line"></div>
 
-    <p>has successfully completed</p>
-    <div class="training">{{ cert.training }}</div>
-
-    <div class="date">
-        Issued on {{ cert.issue_date }} <br>
-        Valid until {{ cert.expiry_date }}
+        <div class="date">
+            Issued on {{ cert.issue_date }} <br>
+            Valid until {{ cert.expiry_date }}
+        </div>
     </div>
-</div>
 </body>
 </html>

@@ -98,7 +98,12 @@
     <input type="hidden" name="role" value="{{ selected_role|default:'' }}">
 
     <label>Department</label>
-    <select name="department" {% if selected_role|default:'' == 'HR' %}disabled{% endif %}>
+    <select name="department"         
+        {% if selected_role|default:'' == 'HR' %}
+            disabled
+        {% else %}
+            required
+        {% endif %}>
         <option value="">-- Select Department --</option>
         {% for dept in departments %}
             <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == department_value|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>

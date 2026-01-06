@@ -38,12 +38,22 @@
         </select>
 
         <label>Department:</label>
-        <select name="department">
+        <select name="department"
+                {% if request.POST.role|default:'' == 'HR' %}
+                    disabled
+                {% else %}
+                    required
+                {% endif %}
+        >
             <option value="">-- Select Department --</option>
             {% for d in departments %}
-                <option value="{{ d.id }}" {% if request.POST.department == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+                <option value="{{ d.id }}"
+                    {% if request.POST.department == d.id|stringformat:"s" %}selected{% endif %}>
+                    {{ d.name }}
+                </option>
             {% endfor %}
         </select>
+
 
         <label>Username:</label>
         <input type="text" name="username" value="{{ request.POST.username }}" required>

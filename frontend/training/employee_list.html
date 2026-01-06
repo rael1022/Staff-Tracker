@@ -73,24 +73,102 @@ h2 {
     border: none;
     cursor: pointer;
     display: inline-block;
+}h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-.btn-primary {
-    background-color: #007bff;
+.filter-card {
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+    transition: all 0.2s ease;
+}
+
+.filter-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #555;
+}
+
+.filter-group select,
+.filter-group input[type="date"] {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+.filter-group select:focus,
+.filter-group input[type="date"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.filter-actions .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.filter-actions .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
+.filter-actions .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(79,70,229,0.35);
 }
 
-.btn-secondary {
-    background-color: #6c757d;
+.filter-actions .btn-secondary {
+    background: #6c757d;
     color: #fff;
 }
 
-.btn-secondary:hover {
-    background-color: #565e64;
+.filter-actions .btn-secondary:hover {
+    background: #565e64;
 }
 
 .card {
@@ -204,6 +282,7 @@ th {
         justify-content: center;
     }
 }
+
 </style>
 
 <h2>Available Trainings</h2>
@@ -211,6 +290,18 @@ th {
 <div class="filter-card">
     <h3>Filter Trainings</h3>
     <form method="get" class="filter-form">
+        <div class="filter-group">
+            <label for="trainer">Trainer</label>
+            <select name="trainer" id="trainer">
+                <option value="">-- All Trainers --</option>
+                {% for t in trainers %}
+                    <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
+                        {{ t.get_full_name|default:t.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="filter-group">
             <label for="start_date">Start Date</label>
             <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
@@ -235,6 +326,7 @@ th {
                 <th>Title</th>
                 <th>Date</th>
                 <th>Time</th>
+                <th>Trainer</th>
                 <th>Duration (hours)</th>
                 <th>Location</th>
                 <th>CPD Points</th>
@@ -250,6 +342,7 @@ th {
                 <td>{{ training.title }}</td>
                 <td>{{ training.date }}</td>
                 <td>{{ training.time }}</td>
+                <td>{{ training.trainer }}</td>
                 <td>{{ training.duration_hours }}</td>
                 <td>{{ training.location }}</td>
                 <td>{{ training.cpd_points }}</td>

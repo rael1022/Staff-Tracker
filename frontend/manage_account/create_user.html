@@ -3,114 +3,31 @@
 {% block content %}
 
 <style>
-    h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-
-    p.subtitle {
-        font-size: 14px;
-        color: #333;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin: 0 auto 30px auto;
-        max-width: 500px;
-    }
-
-    form label {
-        display: block;
-        margin-top: 15px;
-        margin-bottom: 5px;
-        font-weight: 500;
-    }
-
-    form input[type="text"],
-    form input[type="email"],
-    form input[type="password"],
-    form select {
-        width: 100%;
-        padding: 8px 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-sizing: border-box;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        display: inline-block;
-        margin-top: 15px;
-        margin-right: 10px;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
-    }
-
-    .btn-secondary:hover {
-        background-color: #565e64;
-    }
-
-    .status-message {
-        margin-top: 15px;
-        text-align: center;
-        font-size: 14px;
-    }
-
-    .status-message.success {
-        color: green;
-    }
-
-    .status-message.error {
-        color: red;
-    }
-
-    form .button-group {
-        text-align: center;
-    }
+    h1 { font-size: 24px; margin-bottom: 10px; text-align: center; }
+    p.subtitle { font-size: 14px; color: #333; margin-bottom: 20px; text-align: center; }
+    .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin: 0 auto 30px auto; max-width: 500px; }
+    form label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
+    form input[type="text"], form input[type="email"], form input[type="password"], form select { width: 100%; padding: 8px 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    .btn { padding: 10px 20px; font-size: 14px; border-radius: 6px; border: none; cursor: pointer; display: inline-block; margin-top: 15px; margin-right: 10px; text-decoration: none; }
+    .btn-primary { background-color: #007bff; color: #fff; }
+    .btn-primary:hover { background-color: #0056b3; }
+    .btn-secondary { background-color: #6c757d; color: #fff; }
+    .btn-secondary:hover { background-color: #565e64; }
+    .status-message { margin-top: 15px; text-align: center; font-size: 14px; }
+    .status-message.success { color: green; }
+    .status-message.error { color: red; }
 </style>
+
 <h1>Create New User</h1>
 <p class="subtitle">Fill in the details below to create a new user account.</p>
 
 <div class="card">
-    <form method="post">
+    <form method="post" id="createUserForm">
         {% csrf_token %}
         <input type="hidden" name="action" id="action" value="submit">
 
         {% if message %}<p class="status-message success">{{ message }}</p>{% endif %}
         {% if error %}<p class="status-message error">{{ error }}</p>{% endif %}
-
-        <label>Username:</label>
-        <input type="text" name="username" value="{{ request.POST.username }}" required>
-
-        <label>Email:</label>
-        <input type="email" name="email" value="{{ request.POST.email }}" required>
-
-        <label>Password:</label>
-        <input type="password" name="password" required>
 
         <label>Role:</label>
         <select name="role" onchange="document.getElementById('action').value='refresh'; this.form.submit();" required>
@@ -128,9 +45,38 @@
             {% endfor %}
         </select>
 
+        <label>Username:</label>
+        <input type="text" name="username" value="{{ request.POST.username }}" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ request.POST.email }}" required>
+
+        <label>Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label>Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+
+        <p class="status-message error" id="passwordError" style="display:none;">Passwords do not match.</p>
+
         <div style="text-align:center;">
             <button type="submit" class="btn btn-primary" onclick="document.getElementById('action').value='submit';">Create User</button>
         </div>
     </form>
 </div>
+
+<script>
+document.getElementById('createUserForm').addEventListener('submit', function(event) {
+    var pwd = document.getElementById('password').value;
+    var confirmPwd = document.getElementById('confirm_password').value;
+
+    if (pwd !== confirmPwd) {
+        event.preventDefault();
+        document.getElementById('passwordError').style.display = 'block';
+    } else {
+        document.getElementById('passwordError').style.display = 'none';
+    }
+});
+</script>
+
 {% endblock %}

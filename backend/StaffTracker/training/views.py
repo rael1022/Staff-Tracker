@@ -408,20 +408,22 @@ def uncomplete_registration(request, reg_id):
     return redirect('trainer_completions')
 
 # ---------------- Employee ----------------
-
 @login_required
 def employee_dashboard(request):
     user = request.user
-
     user_profile = getattr(user, 'userprofile', None)
     user_department = user_profile.department if user_profile else None
 
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
+    trainer_id = request.GET.get('trainer')
 
     trainings = Training.objects.all()
     if user_department:
         trainings = trainings.filter(department=user_department)
+
+    if trainer_id:
+        trainings = trainings.filter(trainer__id=trainer_id)
 
     start_date = None
     end_date = None
@@ -439,8 +441,9 @@ def employee_dashboard(request):
         except ValueError:
             end_date = None
 
-    # 获取该员工报名情况
     registrations = TrainingRegistration.objects.filter(employee=user)
+
+    trainers = User.objects.filter(groups__name='Trainer')
 
     context = {
         'trainings': trainings,
@@ -448,6 +451,8 @@ def employee_dashboard(request):
         'start_date': start_date_str,
         'end_date': end_date_str,
         'user_department': user_department,
+        'trainers': trainers,
+        'selected_trainer': trainer_id,
     }
 
     return render(request, 'training/employee_list.html', context)

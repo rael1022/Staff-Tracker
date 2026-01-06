@@ -94,6 +94,7 @@
         <tr>
             <th>Username</th>
             <th>Email</th>
+            <th>Role</th>
             <th>Action</th>
         </tr>
 
@@ -101,6 +102,7 @@
         <tr>
             <td>{{ profile.user.username }}</td>
             <td>{{ profile.user.email }}</td>
+            <td>{{ profile.role }}</td>
             <td>
                 <form method="post" class="inline-form" style="display:inline-block;">
                     {% csrf_token %}

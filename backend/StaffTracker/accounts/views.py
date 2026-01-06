@@ -9,11 +9,12 @@ from django.shortcuts import render, redirect
 from .models import UserProfile
 from django.contrib import messages
 from department.models import Department
+from django.db import IntegrityError
 
 ROLE_DEPARTMENTS = {
-    'Employee': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
-    'Trainer': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
-    'HOD': ['IT Support', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'Employee': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'Trainer': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
+    'HOD': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
     'HR': [],  
 }
 
@@ -41,11 +42,6 @@ def login_view(request):
     
     return render(request, 'login/login.html')
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from .models import UserProfile, Department
-from django.db import IntegrityError
-
 def register_view(request):
     selected_role = None
     departments = Department.objects.none()
@@ -53,7 +49,9 @@ def register_view(request):
 
     if request.method == "POST" and 'role' in request.POST and 'username' not in request.POST:
         selected_role = request.POST.get("role")
-        if selected_role and selected_role != "HR":
+        if selected_role == "HR":
+            departments = Department.objects.none()
+        elif selected_role:
             allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
             departments = Department.objects.filter(name__in=allowed_dept_names)
         else:
@@ -62,11 +60,6 @@ def register_view(request):
     if request.method == "POST" and 'username' in request.POST:
         selected_role = request.POST.get("role")
         department_value = request.POST.get("department")
-        if selected_role and selected_role != "HR":
-            allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
-            departments = Department.objects.filter(name__in=allowed_dept_names)
-        else:
-            departments = Department.objects.all()
 
         username = request.POST['username'].strip()
         email = request.POST['email'].strip()
@@ -74,6 +67,14 @@ def register_view(request):
         extra_info = request.POST.get('extra_info', '')
 
         if User.objects.filter(username=username).exists():
+            if selected_role == "HR":
+                departments = Department.objects.none()
+            elif selected_role:
+                allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+                departments = Department.objects.filter(name__in=allowed_dept_names)
+            else:
+                departments = Department.objects.all()
+
             return render(request, "register/register.html", {
                 "error": "Username already exists",
                 "selected_role": selected_role,
@@ -82,34 +83,35 @@ def register_view(request):
             })
 
         department = None
-        if department_value:
+        if selected_role != "HR" and department_value:
             department = get_object_or_404(Department, id=department_value)
 
-        try:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                is_active=False
-            )
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_active=False
+        )
 
-            profile, created = UserProfile.objects.get_or_create(
-                user=user,
-                defaults={
-                    'role': selected_role,
-                    'extra_info': extra_info,
-                    'department': department,
-                    'is_approved': False
-                }
-            )
+        profile = UserProfile.objects.create(
+            user=user,
+            role=selected_role,
+            department=department,
+            extra_info=extra_info,
+            is_approved=False
+        )
 
-        except IntegrityError:
-            return render(request, "register/register.html", {
-                "error": "An error occurred while creating the user. Please try again.",
-                "selected_role": selected_role,
-                "departments": departments,
-                "department_value": department_value
-            })
+        if selected_role:
+            group, _ = Group.objects.get_or_create(name=selected_role)
+            user.groups.add(group)
+
+        if selected_role == "HR":
+            departments = Department.objects.none()
+        elif selected_role:
+            allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+            departments = Department.objects.filter(name__in=allowed_dept_names)
+        else:
+            departments = Department.objects.all()
 
         return render(request, "register/register.html", {
             "message": "Register Successful. Awaiting HR approval.",
@@ -161,10 +163,10 @@ def hr_create_user(request):
         user = User.objects.create_user(username=username, email=email, password=password)
 
         department = None
-        if department_id:
+        if role != "HR" and department_id:
             department = get_object_or_404(Department, id=department_id)
 
-        UserProfile.objects.create(
+        profile = UserProfile.objects.create(
             user=user,
             role=role,
             department=department,
@@ -177,9 +179,6 @@ def hr_create_user(request):
         context['message'] = "User created successfully."
         context['departments'] = Department.objects.filter(name__in=ROLE_DEPARTMENTS.get(role, []))
         context['selected_role'] = role
-
-    elif request.method == 'POST' and action == 'refresh':
-        pass
 
     return render(request, 'manage_account/create_user.html', context)
 
@@ -299,7 +298,7 @@ def dashboard(request):
 
 
         pending_users = UserProfile.objects.filter(is_approved=False)
-        all_users = User.objects.filter(userprofile__is_approved=True).exclude(is_superuser=True)
+        all_users = User.objects.filter(userprofile__is_approved=True)
 
         return render(
             request,

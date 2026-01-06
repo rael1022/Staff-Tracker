@@ -7,6 +7,7 @@ ROLE_CHOICES = (
     ('Employee', 'Employee'),
     ('Trainer', 'Trainer'),
     ('HOD', 'HOD'),
+    ('HR', 'HR'),
 )
 
 class UserProfile(models.Model):

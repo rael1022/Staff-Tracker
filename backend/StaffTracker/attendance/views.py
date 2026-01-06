@@ -434,6 +434,19 @@ def qr_checkin(request):
             }, status=401)
         
         try:
+            training_obj = Training.objects.filter(id=training_id).first()
+            if not training_obj:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Training not found'
+                }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error finding training: {str(e)}'
+            }, status=500)
+        
+        try:
             user_profile = UserProfile.objects.get(user=user)
             
             if user_profile.role != 'Employee':
@@ -485,14 +498,6 @@ def qr_checkin(request):
             }, status=400)
         
         try:
-            training_obj = Training.objects.filter(id=training_id).first()
-    
-            if not training_obj:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'Training not found'
-                }, status=404)
-        
             post_assessment_completed = PostAssessment.objects.filter(
                 training=training_obj,
                 user=user,
@@ -516,15 +521,23 @@ def qr_checkin(request):
         
         attendance = Attendance.objects.create(
             user=user,
-            training_id=training_id,
+            training=training_obj,
             status=Attendance.Status.PRESENT,
             check_in_time=timezone.now(),
         )
         
         try:
-            training_obj = Training.objects.filter(id=training_id).first()
-
-            if training_obj:
+            if hasattr(training_obj, 'trainer') and training_obj.trainer:
+                Certificate.objects.get_or_create(
+                    user=user,
+                    training=training_obj,
+                    trainer=training_obj.trainer,
+                    defaults={
+                        'issue_date': date.today(),
+                        'expiry_date': date.today() + timedelta(days=365)
+                    }
+                )
+            else:
                 Certificate.objects.get_or_create(
                     user=user,
                     training=training_obj,

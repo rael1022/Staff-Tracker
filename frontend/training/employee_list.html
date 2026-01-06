@@ -1,4 +1,5 @@
 {% extends 'dashboard/base.html' %}
+{% load evaluation_tags %}
 
 {% block content %}
 
@@ -410,22 +411,17 @@ th {
                 <td>
                     {% with reg=registrations|get_training_registration:training.id %}
                         {% if reg and reg.status == 'Approved' %}
-                            {% with evaluated=reg.training.evaluations.all %}
-                                {% for eval in evaluated %}
-                                    {% if eval.user_id == request.user.id %}
-                                        <span class="text-success">✓ Evaluated</span>
-                                        {% if not forloop.last %}{% endif %}
-                                    {% endif %}
-                                {% empty %}
-                                    {% if reg.complete_status == 'Completed' %}
-                                        <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
-                                            Evaluate
-                                        </a>
-                                    {% else %}
-                                        <span class="text-muted">Training Not Completed</span>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endwith %}
+                            {% if reg.complete_status == 'Completed' %}
+                                {% if training|has_evaluated:request.user %}
+                                    <span class="text-success">✓ Evaluated</span>
+                                {% else %}
+                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
+                                        Evaluate
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Training Not Completed</span>
+                            {% endif %}
                         {% else %}
                             <span class="text-muted">Not Eligible</span>
                         {% endif %}

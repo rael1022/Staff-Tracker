@@ -60,21 +60,18 @@ def hr_create_training(request):
         time_str = request.POST.get('time')
         location = request.POST.get('location')
 
-        # CPD Points 非负
         cpd_points = request.POST.get('cpd_points', 0)
         try:
             cpd_points = max(0, int(cpd_points))
         except ValueError:
             cpd_points = 0
 
-        # Duration 非负
         duration_hours = request.POST.get('duration_hours', 1)
         try:
             duration_hours = max(1, int(duration_hours))
         except ValueError:
             duration_hours = 1
 
-        # Trainer
         trainer_user = None
         trainer_id = request.POST.get('trainer_id')
         if trainer_id:
@@ -83,7 +80,6 @@ def hr_create_training(request):
             except User.DoesNotExist:
                 trainer_user = None
 
-        # Department
         dept_id = request.POST.get('department_id')
         department = None
         if dept_id:

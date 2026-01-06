@@ -20,14 +20,14 @@
     <table>
         <tr>
             <th>Employee</th>
-            <th>Training ID</th>
+            <th>Training</th>
             <th>Status</th>
             <th>Date</th>
         </tr>
         {% for a in attendances %}
         <tr>
-            <td>{{ a.user_id }}</td>
-            <td>{{ a.training_id }}</td>
+            <td>{{ a.user.username }}</td>
+            <td>{{ a.training_obj.title }}</td>
             <td>{{ a.status }}</td>
             <td>{{ a.date }}</td>
         </tr>

@@ -7,6 +7,7 @@ from cpd.models import CPDRecord
 from attendance.models import Attendance
 from accounts.models import UserProfile
 from department.models import Department
+from training.models import Training
 
 @login_required
 def reports_dashboard(request):
@@ -59,6 +60,10 @@ def hod_department_training_progress(request):
     user_ids = [e.user.id for e in employees]  
     attendances = Attendance.objects.filter(user_id__in=user_ids)
 
+    trainings_dict = {str(t.id): t for t in Training.objects.all()}
+
+    for a in attendances:
+        a.training_obj = trainings_dict.get(str(a.training_id))
 
     return render(request, 'reports/department_training_progress.html', {
         'department': department,

@@ -3,77 +3,180 @@
 {% block content %}
 
 <style>
+    body {
+        background: #f0f2f7;
+        font-family: 'Inter', sans-serif;
+    }
+
     .container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 24px 28px;
-        border-radius: 14px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        max-width: 1100px;
+        margin: 50px auto;
+        padding: 0 15px;
     }
 
     h1 {
-        font-size: 24px;
-        font-weight: 600;
-        color: #4c7df0;
-        margin-bottom: 18px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: 700;
+        background: linear-gradient(90deg, #4c7df0, #365fd8);
+        -webkit-background-clip: text; 
+        background-clip: text;
+        -webkit-text-fill-color: transparent; 
+        color: transparent;
+        margin-bottom: 40px;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
+
+    .cert-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #ffffff, #eef4ff);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 6px solid #4c7df0;
+    }
+
+    .cert-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+    }
+
+    .cert-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .training-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .training-title::before {
+        content: "🎓";
+        font-size: 20px;
+    }
+
+    .trainer-name {
         font-size: 14px;
+        color: #64748b;
     }
 
-    th, td {
-        padding: 12px 14px;
-        border-bottom: 1px solid #e5e7eb;
-        text-align: left;
+    .dates {
+        font-size: 13px;
+        color: #475569;
     }
 
-    th {
-        background-color: #eef1ff;
+    .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         font-weight: 600;
-        color: #333;
+        font-size: 13px;
+        text-transform: uppercase;
     }
 
-    tr:hover td {
-        background-color: #f9fafb;
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .status-valid .status-dot {
+        background-color: #10b981;
+    }
+
+    .status-expired .status-dot {
+        background-color: #ef4444;
+    }
+
+    .btn-view {
+        padding: 10px 22px;
+        background: linear-gradient(135deg, #4c7df0, #365fd8);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 12px;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(76,125,240,0.4);
+    }
+
+    .btn-view::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: -100%;
+        background: rgba(255,255,255,0.2);
+        transform: skewX(-20deg);
+        transition: all 0.5s ease;
+    }
+
+    .btn-view:hover::after {
+        left: 200%;
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(76,125,240,0.5);
     }
 
     .empty {
         text-align: center;
-        color: #777;
-        padding: 20px;
+        color: #94a3b8;
+        font-size: 16px;
+        padding: 60px 0;
+    }
+
+    @media (max-width: 768px) {
+        .cert-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+            border-left: none;
+        }
+        .btn-view {
+            align-self: flex-end;
+        }
     }
 </style>
 
 <div class="container">
     <h1>My Certificates</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Training</th>
-                <th>Issued Date</th>
-                <th>Expiry Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cert in certs %}
-            <tr>
-                <td>{{ cert.training }}</td>
-                <td>{{ cert.issue_date }}</td>
-                <td>{{ cert.expiry_date }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="empty">No certificates available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% if certs %}
+        {% for cert in certs %}
+        <div class="cert-card">
+            <div class="cert-info">
+                <div class="training-title">{{ cert.training.title }}</div>
+                <div class="trainer-name">{{ cert.training.trainer.get_full_name|default:cert.training.trainer.username }}</div>
+                <div class="dates">Issued: {{ cert.issue_date|date:"d M Y" }} | Expiry: {{ cert.expiry_date|date:"d M Y" }}</div>
+            </div>
+
+            <div class="status {% if cert.expiry_date < today %}status-expired{% else %}status-valid{% endif %}">
+                <span class="status-dot"></span>
+                {% if cert.expiry_date < today %}Expired{% else %}Valid{% endif %}
+            </div>
+
+            <a href="{% url 'certificate_preview' cert.id %}" class="btn-view">View</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty">No certificates available.</div>
+    {% endif %}
 </div>
 
 {% endblock %}

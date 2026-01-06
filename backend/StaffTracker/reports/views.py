@@ -52,7 +52,8 @@ def attendance_summary_report(request):
 
 @login_required
 def hod_department_training_progress(request):
-    department = Department.objects.filter(hod=request.user).first()
+    profile = request.user.userprofile
+    department = profile.department
 
     employees = UserProfile.objects.filter(department=department)
     user_ids = [e.user.id for e in employees]  
@@ -66,7 +67,15 @@ def hod_department_training_progress(request):
 
 @login_required
 def hod_department_report(request):
-    department = Department.objects.filter(hod=request.user).first()
+    profile = request.user.userprofile
+    department = profile.department
+
+    if not department:
+        return render(request, 'reports/department_report.html', {
+            'department': None,
+            'records': [],
+            'total_cpd': 0,
+        })
 
     employees = UserProfile.objects.filter(department=department)
 

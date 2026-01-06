@@ -9,7 +9,7 @@ class DepartmentConfig(AppConfig):
         from .models import Department
 
         def create_default_departments(sender, **kwargs):
-            dept_names = ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer','Customer Support', 'Legal']
+            dept_names = ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal']
             for name in dept_names:
                 Department.objects.get_or_create(name=name)
 

@@ -1,138 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Staff Training Tracker</title>
+  <meta charset="UTF-8" />
+  <title>Staff Training</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+    }
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Arial, sans-serif;
-        }
+    body {
+      margin: 0;
+      background: #ffffff;
+      color: #111;
+    }
 
-        body {
-            background-color: #fff;
-        }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      border-bottom: 2px solid #2f80ff;
+    }
 
-        /* Header */
-        .site-header {
-            width: 100%;
-            border-bottom: 1px solid #e5e5e5;
-            background-color: #ffffff;
-        }
+    .logo span {
+      display: block;
+      font-size: 11px;
+      color: #666;
+    }
 
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .nav a {
+      margin: 0 12px;
+      text-decoration: none;
+      color: #111;
+      font-size: 14px;
+    }
 
-        /* Logo */
-        .logo {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .logo-main {
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
+    .avatar {
+      background: #000;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-size: 12px;
+    }
 
-        .logo-sub {
-            font-size: 10px;
-            color: #666;
-            letter-spacing: 0.8px;
-        }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 100px 150px;
+      gap: 80px;
+      animation: fadeUp 0.6s ease-out both;
+    }
 
-        /* Navigation */
-        .main-nav {
-            display: flex;
-            gap: 32px;
-        }
+    .left {
+      padding: 50px 0;
+    }
 
-        .main-nav a {
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-        }
+    .left h1 {
+      font-size: 42px;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s ease-out both;
+      animation-delay: 0.1s;
+    }
 
-        .main-nav a:hover {
-            color: #007bff;
-        }
+    .left p {
+      color: #666;
+      max-width: 420px;
+      line-height: 1.6;
+      animation: fadeUp 0.6s ease-out both;
+      animation-delay: 0.2s;
+    }
 
-        /* Auth section */
-        .auth {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+    .primary-btn {
+      margin-top: 32px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      background: linear-gradient(135deg, #000, #333);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      cursor: pointer;
+      animation: fadeUp 0.6s ease-out both;
+      animation-delay: 0.3s;
+      transition: all 0.25s ease;
+    }
 
-        .auth .login {
-            text-decoration: none;
-            font-size: 14px;
-            color: #333;
-        }
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+    }
 
-        .auth .login:hover {
-            color: #007bff;
-        }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow:
+        0 10px 30px rgba(47, 128, 255, 0.25),
+        0 20px 60px rgba(0, 0, 0, 0.08);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
 
-        .auth .btn {
-            padding: 8px 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            text-decoration: none;
-            color: #333;
-            transition: all 0.2s ease;
-        }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-height: 40px;
+    }
 
-        .auth .btn:hover {
-            background-color: #f5f5f5;
-        }
+    .card-description {
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 30px;
+      line-height: 1.5;
+      animation: fadeUp 0.6s ease-out both;
+      animation-delay: 0.05s;
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-nav {
-                display: none;
-            }
-        }
-    </style>
+    .option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.option-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.option-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px; /* 可选：圆角 */
+}
+
+.option-text h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.option-text p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.option:hover {
+  background: #f5f9ff;
+  border-color: #2f80ff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(47,128,255,0.15);
+}
+
+.option:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(47,128,255,0.15);
+}
+
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 20px 50px rgba(47, 128, 255, 0.35),
+        0 30px 80px rgba(0, 0, 0, 0.12);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes rainbowGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
 </head>
 <body>
-
-<header class="site-header">
-    <div class="header-container">
-
-        <!-- Logo -->
-        <div class="logo">
-            <span class="logo-main">STAFF TRAINING</span>
-            <span class="logo-sub">AND CERTIFICATION TRACKER</span>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="main-nav">
-            <a href="#">Experts</a>
-            <a href="#">Community Groups</a>
-            <a href="#">Support</a>
-        </nav>
-
-        <!-- Auth -->
-        <div class="auth">
-            <a href="#" class="login">Login</a>
-            <a href="#" class="btn">Create account</a>
-        </div>
-
+  <header class="topbar">
+    <div class="logo">
+      <strong>STAFF TRAINING</strong>
+      <span>AND CERTIFICATION TRACKER</span>
     </div>
-</header>
+    <nav class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Manage Trainings</a>
+      <a href="#">Training Registration</a>
+      <a href="#">View Attendance report</a>
+    </nav>
+    <div class="user">
+      <span class="avatar">teio</span>
+      <a href="#">Logout</a>
+    </div>
+  </header>
 
+  <main class="container">
+    <section class="left">
+      <h1>Never miss any task</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit enim nec, proin faucibus nibh et sagittis a.</p>
+      <button class="primary-btn">Add First Task</button>
+    </section>
+
+    <section class="right">
+      <div class="card">
+        <div class="card-header">
+          <h3>Choose template</h3>
+        </div>
+        <p class="card-description">
+          Select a template that fits your workflow to get started quickly.
+        </p>
+<div class="option">
+  <div class="option-icon">
+    <img src="https://via.placeholder.com/40" alt="List Icon">
+  </div>
+  <div class="option-text">
+    <h4>List</h4>
+    <p>Display and organize items efficiently</p>
+  </div>
+</div>
+
+<div class="option">
+  <div class="option-icon">
+    <img src="https://via.placeholder.com/40" alt="Compare Icon">
+  </div>
+  <div class="option-text">
+    <h4>Compare</h4>
+    <p>Contrast options side by side</p>
+  </div>
+</div>
+
+<div class="option">
+  <div class="option-icon">
+    <img src="https://via.placeholder.com/40" alt="Spotlight Icon">
+  </div>
+  <div class="option-text">
+    <h4>Spotlight</h4>
+    <p>Highlight key features or elements</p>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

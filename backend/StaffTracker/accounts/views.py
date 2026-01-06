@@ -12,9 +12,9 @@ from department.models import Department
 from django.db import IntegrityError
 
 ROLE_DEPARTMENTS = {
-    'Employee': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'Employee': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
     'Trainer': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
-    'HOD': ['IT', 'Finance', 'Marketing', 'Training', 'Risk Management', 'Software Developer'],
+    'HOD': ['IT', 'Finance', 'Marketing', 'Risk Management', 'Customer Support', 'Legal'],
     'HR': [],  
 }
 

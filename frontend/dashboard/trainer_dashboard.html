@@ -30,21 +30,36 @@
   animation: fadeUp 0.6s ease-out both;
 }
 
-.primary-btn {
-  margin-top: 24px;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 10px;
-  color: #fff;
-  background: linear-gradient(135deg, #000, #333);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: all 0.25s ease;
+.left .motivation {
+  font-size: 14px;
+  color: #6366f1; 
+  opacity: 0.75;
+  max-width: 420px;
+  line-height: 1.6;
+  margin-top: 22px;
+  animation: softFade 0.9s ease-out both;
+  animation-delay: 0.2s;
 }
 
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+@keyframes softFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.75;
+    transform: translateY(0);
+  }
+}
+
+.left .motivation::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, transparent);
+  margin-bottom: 10px;
+  opacity: 0.4;
 }
 
 .card-options {
@@ -146,7 +161,9 @@
   <section class="left">
     <h1>Trainer Dashboard</h1>
     <p>Welcome, <strong>{{ request.user.username }}</strong></p>
-    <button class="primary-btn">Get Started</button>
+    <p class="motivation">
+      Skill beats talent when practiced daily.
+    </p>
   </section>
 
   <section class="right">

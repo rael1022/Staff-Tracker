@@ -27,21 +27,36 @@
   line-height: 1.6;
 }
 
-.primary-btn {
-  margin-top: 24px;
-  padding: 12px 26px;
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  background: linear-gradient(135deg, #111, #333);
-  cursor: pointer;
-  transition: transform .25s ease, box-shadow .25s ease;
-  box-shadow: 0 10px 28px rgba(0,0,0,.25);
+.left .motivation {
+  font-size: 14px;
+  color: #6366f1; 
+  opacity: 0.75;
+  max-width: 420px;
+  line-height: 1.6;
+  margin-top: 22px;
+  animation: softFade 0.9s ease-out both;
+  animation-delay: 0.2s;
 }
 
-.primary-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 40px rgba(0,0,0,.35);
+@keyframes softFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.75;
+    transform: translateY(0);
+  }
+}
+
+.left .motivation::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, transparent);
+  margin-bottom: 10px;
+  opacity: 0.4;
 }
 
 .card-options {
@@ -229,7 +244,9 @@ tr:hover td {
   <section class="left">
     <h1>HR Dashboard</h1>
     <p>Welcome, <strong>{{ user.username }}</strong></p>
-    <button class="primary-btn">Get Started</button>
+    <p class="motivation">
+      Managing people is hard. That's why it matters.
+    </p>
   </section>
 
   <section class="right">
@@ -254,7 +271,7 @@ tr:hover td {
 
       <a href="{% url 'hr_certificate_report' %}" class="option">
         <div class="option-icon"><img src="{% static 'assets/img/attendance_summary.png' %}"></div>
-        <div class="option-text"><h4>View Certificates</h4><p>View and filter employees certificates</p></div>
+        <div class="option-text"><h4>View Employee Certificates</h4><p>View and filter employees certificates</p></div>
       </a>
     </div>
   </section>

@@ -1,241 +1,254 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Assessment Results</title>
-    <style>
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h2 {
-            font-weight: 600;
-        }
-
-        h4 {
-            font-weight: 600;
-            margin-top: 30px;
-        }
-
-        .performance-summary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .summary-stats {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-size: 32px;
-            margin: 0;
-        }
-
-        .stat-item p {
-            margin-top: 6px;
-            opacity: 0.85;
-        }
-
-        .card,
-        .assessment-card {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.25s ease;
-        }
-
-        .card:hover,
-        .assessment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-        }
-
-        .training-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .status-badge,
-        .status-completed,
-        .status-pending,
-        .status-muted {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .status-muted {
-            background-color: #e9ecef;
-            color: #6c757d;
-        }
-
-        .assessment-link,
-        a {
-            color: #0d6efd;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .assessment-link:hover,
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .list-group-item {
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #dee2e6;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .summary-stats {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
 {% extends "dashboard/base.html" %}
 {% load static %}
 
+{% block title %}My Assessment Results{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
 
-    <h2 class="mb-4">My Assessment Results</h2>
+<style>
+/* ===== Wrapper ===== */
+.assess-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 28px;
+}
 
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-center p-3">
-                <h5>Average Score</h5>
-                {% if average_score %}
-                    <h3>{{ average_score }}%</h3>
-                {% else %}
-                    <h3>--</h3>
-                {% endif %}
-            </div>
+/* ===== Header ===== */
+.assess-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+}
+
+.assess-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.assess-metric {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.assess-metric strong {
+    font-size: 20px;
+    color: #2563eb;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    margin-left: 6px;
+}
+
+/* ===== Section ===== */
+.section {
+    margin-top: 36px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 14px;
+}
+
+/* ===== Card ===== */
+.assess-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+}
+
+.assess-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #111827;
+}
+
+/* ===== Rows ===== */
+.row-line {
+    font-size: 13px;
+    color: #374151;
+    margin-top: 8px;
+}
+
+.row-line strong {
+    font-weight: 500;
+}
+
+/* ===== Status ===== */
+.status {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.status-ok {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.status-wait {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ===== Links ===== */
+.action {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.action:hover {
+    text-decoration: underline;
+}
+
+/* ===== History ===== */
+.history {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-item {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+/* ===== Empty ===== */
+.empty {
+    padding: 40px;
+    text-align: center;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .assess-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+</style>
+
+<div class="assess-wrapper">
+
+    <!-- Header -->
+    <div class="assess-header">
+        <h1>Assessment Results</h1>
+        <div class="assess-metric">
+            Average Score
+            <strong>{{ average_score|default:"--" }}%</strong>
         </div>
     </div>
 
-    <h4 class="mb-3">Training Assessments</h4>
+    <!-- Training Assessments -->
+    <div class="section">
+        <div class="section-title">Training Assessments</div>
 
-    {% if registration_status %}
-        {% for item in registration_status %}
-            {% with registration=item.registration %}
-            <div class="card mb-3 p-3">
+        {% if registration_status %}
+            {% for item in registration_status %}
+                {% with registration=item.registration %}
+                <div class="assess-card">
 
-                <h5>{{ registration.training.title }}</h5>
+                    <h3>{{ registration.training.title }}</h3>
 
-                <p>
-                    Training Status:
-                    {% if registration.complete_status == "Completed" %}
-                        <span class="badge bg-success">Completed</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Not Completed</span>
-                    {% endif %}
-                </p>
-
-                <hr>
-
-                <p>
-                    <strong>Pre-Assessment:</strong>
-                    {% if item.assessment_available == 'pre' %}
-                        {% if item.pre_done %}
-                            <span class="status-completed">✓ Completed</span>
+                    <div class="row-line">
+                        Training Status:
+                        {% if registration.complete_status == "Completed" %}
+                            <span class="status status-ok">Completed</span>
                         {% else %}
-                            <a href="{% url 'pre_assessment' training_id=registration.training.id %}">
-                                Take Pre-Assessment
-                            </a>
+                            <span class="status status-wait">Not Completed</span>
                         {% endif %}
-                    {% else %}
-                        <span class="status-muted">Not available (training completed)</span>
-                    {% endif %}
-                </p>
+                    </div>
 
-                <p>
-                    <strong>Post-Assessment:</strong>
-                    {% if item.assessment_available == 'post' %}
-                        {% if item.post_done %}
-                            <span class="status-completed">✓ Completed</span>
+                    <div class="row-line">
+                        <strong>Pre-Assessment:</strong>
+                        {% if item.assessment_available == 'pre' %}
+                            {% if item.pre_done %}
+                                <span class="status status-ok">Completed</span>
+                            {% else %}
+                                <a class="action"
+                                   href="{% url 'pre_assessment' training_id=registration.training.id %}">
+                                    Take Pre-Assessment
+                                </a>
+                            {% endif %}
                         {% else %}
-                            <a href="{% url 'post_assessment' training_id=registration.training.id %}">
-                                Take Post-Assessment
-                            </a>
+                            <span class="status status-wait">Not available</span>
                         {% endif %}
-                    {% else %}
-                        <span class="status-muted">
-                            Available after training completion
-                        </span>
-                    {% endif %}
-                </p>
+                    </div>
 
+                    <div class="row-line">
+                        <strong>Post-Assessment:</strong>
+                        {% if item.assessment_available == 'post' %}
+                            {% if item.post_done %}
+                                <span class="status status-ok">Completed</span>
+                            {% else %}
+                                <a class="action"
+                                   href="{% url 'post_assessment' training_id=registration.training.id %}">
+                                    Take Post-Assessment
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <span class="status status-wait">Available after completion</span>
+                        {% endif %}
+                    </div>
+
+                </div>
+                {% endwith %}
+            {% endfor %}
+        {% else %}
+            <div class="empty">No approved trainings found</div>
+        {% endif %}
+    </div>
+
+    <!-- History -->
+    <div class="section">
+        <div class="section-title">Assessment History</div>
+
+        <div class="section-title" style="margin-top:16px;">Pre-Assessments</div>
+        {% if pre_assessments %}
+            <div class="history">
+                {% for assessment in pre_assessments %}
+                <div class="history-item">
+                    <strong>{{ assessment.training.title }}</strong><br>
+                    Score: {{ assessment.score }}% · {{ assessment.assessment_date }}
+                </div>
+                {% endfor %}
             </div>
-            {% endwith %}
-        {% endfor %}
-    {% else %}
-        <p>No approved trainings found.</p>
-    {% endif %}
+        {% else %}
+            <div class="empty">No pre-assessments completed</div>
+        {% endif %}
 
-    <h4 class="mt-5 mb-3">Assessment History</h4>
-
-    <h5>Pre-Assessments</h5>
-    {% if pre_assessments %}
-        <ul class="list-group mb-4">{% for assessment in pre_assessments %}
-            <li class="list-group-item">
-                <strong>{{ assessment.training.title }}</strong><br>
-                Score: {{ assessment.score }}% <br>
-                Date: {{ assessment.assessment_date }}
-            </li>{% endfor %}
-        </ul>
-    {% else %}
-        <p>No pre-assessments completed.</p>
-    {% endif %}
-
-    <h5>Post-Assessments</h5>
-    {% if post_assessments %}
-        <ul class="list-group">{% for assessment in post_assessments %}
-            <li class="list-group-item">
-                <strong>{{ assessment.training.title }}</strong><br>
-                Score: {{ assessment.score }}% <br>
-                Date: {{ assessment.assessment_date }}
-            </li>{% endfor %}
-        </ul>
-    {% else %}
-        <p>No post-assessments completed.</p>
-    {% endif %}
+        <div class="section-title" style="margin-top:24px;">Post-Assessments</div>
+        {% if post_assessments %}
+            <div class="history">
+                {% for assessment in post_assessments %}
+                <div class="history-item">
+                    <strong>{{ assessment.training.title }}</strong><br>
+                    Score: {{ assessment.score }}% · {{ assessment.assessment_date }}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty">No post-assessments completed</div>
+        {% endif %}
+    </div>
 
 </div>
+
 {% endblock %}
-</body>
-</html>

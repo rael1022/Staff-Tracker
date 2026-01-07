@@ -3,145 +3,210 @@
 {% block content %}
 
 <style>
-    h1 {
-        font-size: 24px;
-        font-weight: bold;
+    /* ===== Page Header ===== */
+    .page-header {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 
-    .form-card {
-        max-width: 600px;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 24px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    .form-card label {
-        display: block;
+    .page-header h1 {
+        font-size: 26px;
+        font-weight: 700;
         margin-bottom: 6px;
-        font-weight: 500;
     }
 
-    .form-card input,
-    .form-card textarea,
-    .form-card select {
-        width: 100%;
-        padding: 8px 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+    .page-header p {
         font-size: 14px;
-        box-sizing: border-box;
+        color: #6b7280;
     }
 
-    .mb-2 {
-        margin-bottom: 14px;
+    /* ===== Card ===== */
+    .card {
+        max-width: 760px;
+        margin: 0 auto 40px auto;
+        padding: 28px 32px;
+        background: rgba(255,255,255,0.95);
+        border-radius: 16px;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.08);
     }
 
-    .button-group {
-        text-align: center;
-        margin-top: 20px;
+    /* ===== Form ===== */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    /* ===== Two Column ===== */
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .number-small {
+        max-width: 120px;
+    }
+
+    /* ===== Buttons ===== */
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 14px;
     }
 
     .btn {
-        padding: 10px 18px;
-        border-radius: 6px;
+        padding: 10px 22px;
         font-size: 14px;
-        text-decoration: none;
-        border: none;
+        border-radius: 12px;
+        font-weight: 500;
         cursor: pointer;
-        margin: 0 5px;
-        display: inline-block;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        transition: all 0.25s ease;
     }
 
     .btn-success {
-        background-color: #28a745;
-        color: #fff;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        box-shadow: 0 6px 14px rgba(34,197,94,0.4);
     }
 
     .btn-success:hover {
-        background-color: #1e7e34;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(34,197,94,0.6);
     }
 
     .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
     }
 
     .btn-secondary:hover {
-        background-color: #565e64;
+        background: #e5e7eb;
+    }
+
+    @media (max-width: 600px) {
+        .card {
+            padding: 22px;
+        }
     }
 </style>
 
-<h1>Edit Training</h1>
+<div class="page-header">
+    <h1>Edit Training</h1>
+    <p>Update the details of this training session</p>
+</div>
 
-<div class="form-card">
+<div class="card">
     <form method="POST">
         {% csrf_token %}
 
-        <div class="mb-2">
-            <label>Title:</label>
+        <div class="form-group">
+            <label>Title</label>
             <input type="text" name="title" value="{{ training.title }}" required>
         </div>
 
-        <div class="mb-2">
-            <label>Description:</label>
+        <div class="form-group">
+            <label>Description</label>
             <textarea name="description">{{ training.description }}</textarea>
         </div>
 
-        <div class="mb-2">
-            <label>Date:</label>
-            <input type="date" name="date" value="{{ training.date }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" name="date" value="{{ training.date }}">
+            </div>
+
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" name="time" value="{{ training.time }}">
+            </div>
         </div>
 
-        <div class="mb-2">
-            <label>Time:</label>
-            <input type="time" name="time" value="{{ training.time }}">
-        </div>
-
-        <div class="mb-2">
-            <label>Location:</label>
+        <div class="form-group">
+            <label>Location</label>
             <input type="text" name="location" value="{{ training.location }}">
         </div>
 
-        <div class="mb-2">
-            <label>CPD Points:</label>
-            <input type="number" name="cpd_points" min="1" value="{{ training.cpd_points }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>CPD Points</label>
+                <input type="number" name="cpd_points" min="1"
+                       value="{{ training.cpd_points }}" class="number-small">
+            </div>
+
+            <div class="form-group">
+                <label>Duration (hours)</label>
+                <input type="number" name="duration_hours" min="1"
+                       value="{{ training.duration_hours }}" class="number-small">
+            </div>
         </div>
 
-        <div class="mb-2">
-            <label>Duration (hours):</label>
-            <input type="number" name="duration_hours" min="1" value="{{ training.duration_hours }}">
-        </div>
-
-        <div class="mb-2">
-            <label>Department:</label>
+        <div class="form-group">
+            <label>Department</label>
             <select name="department_id">
-                <option value="">-- Select Department --</option>
+                <option value="">Select Department</option>
                 {% for dept in departments %}
-                <option value="{{ dept.id }}" {% if training.department and training.department.id == dept.id %}selected{% endif %}>
+                <option value="{{ dept.id }}"
+                    {% if training.department and training.department.id == dept.id %}selected{% endif %}>
                     {{ dept.name }}
                 </option>
                 {% endfor %}
             </select>
         </div>
 
-        <div class="mb-2">
-            <label>Trainer:</label>
+        <div class="form-group">
+            <label>Trainer</label>
             <select name="trainer_id">
-                <option value="">-- Select Trainer --</option>
+                <option value="">Select Trainer</option>
                 {% for trainer in trainers %}
-                <option value="{{ trainer.id }}" {% if training.trainer and training.trainer.id == trainer.id %}selected{% endif %}>
+                <option value="{{ trainer.id }}"
+                    {% if training.trainer and training.trainer.id == trainer.id %}selected{% endif %}>
                     {{ trainer.username }}
                 </option>
                 {% endfor %}
             </select>
         </div>
 
-        <div class="button-group">
-            <button type="submit" class="btn btn-success">Update</button>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Update Training</button>
             <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>

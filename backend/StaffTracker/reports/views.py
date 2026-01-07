@@ -8,6 +8,9 @@ from attendance.models import Attendance
 from accounts.models import UserProfile
 from department.models import Department
 from training.models import Training
+from django.db import models
+import csv
+from django.http import HttpResponse
 
 @login_required
 def reports_dashboard(request):
@@ -135,6 +138,7 @@ def hod_department_training_progress(request):
         'attendances': attendances
     })
 
+
 @login_required
 def hod_department_report(request):
     profile = request.user.userprofile
@@ -142,6 +146,41 @@ def hod_department_report(request):
 
     if not department:
         return render(request, 'reports/department_report.html', {
+            'department': None
+        })
+
+    employees = UserProfile.objects.filter(department=department)
+    user_ids = employees.values_list('user_id', flat=True)
+
+    attendance_total = Attendance.objects.filter(user_id__in=user_ids).count()
+    present_count = Attendance.objects.filter(
+        user_id__in=user_ids,
+        status='Present'
+    ).count()
+
+    attendance_rate = 0
+    if attendance_total > 0:
+        attendance_rate = round((present_count / attendance_total) * 100, 1)
+
+    total_cpd = CPDRecord.objects.filter(
+        user_id__in=user_ids
+    ).aggregate(total=models.Sum('points'))['total'] or 0
+
+    return render(request, 'reports/department_report.html', {
+        'department': department,
+        'attendance_rate': attendance_rate,
+        'total_cpd': total_cpd,
+        'employee_count': employees.count()
+    })
+
+
+@login_required
+def hod_department_cpdreport(request):
+    profile = request.user.userprofile
+    department = profile.department
+
+    if not department:
+        return render(request, 'reports/department_cpdreport.html', {
             'department': None,
             'records': [],
             'total_cpd': 0,
@@ -155,8 +194,86 @@ def hod_department_report(request):
 
     total_cpd = sum(r.points for r in cpd_records)
 
-    return render(request, 'reports/department_report.html', {
+    return render(request, 'reports/department_cpdreport.html', {
         'department': department,
         'records': cpd_records,
         'total_cpd': total_cpd
     })
+
+@login_required
+def hod_department_attendancereport(request):
+    profile = request.user.userprofile
+    department = profile.department
+
+    employees = UserProfile.objects.filter(department=department)
+    user_ids = [e.user.id for e in employees]  
+    attendances = Attendance.objects.filter(user_id__in=user_ids)
+
+    trainings_dict = {str(t.id): t for t in Training.objects.all()}
+
+    for a in attendances:
+        a.training_obj = trainings_dict.get(str(a.training_id))
+
+    return render(request, 'reports/department_attendancereport.html', {
+        'department': department,
+        'attendances': attendances
+    })
+
+@login_required
+def hod_department_attendance_download(request):
+    profile = request.user.userprofile
+    department = profile.department
+
+    employees = UserProfile.objects.filter(department=department)
+    user_ids = employees.values_list('user_id', flat=True)
+
+    attendances = Attendance.objects.filter(user_id__in=user_ids)
+
+    trainings_dict = {str(t.id): t for t in Training.objects.all()}
+    for a in attendances:
+        a.training_obj = trainings_dict.get(str(a.training_id))
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = (
+        f'attachment; filename="{department.name}_attendance_report.csv"'
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(['Employee', 'Training', 'Status', 'Date'])
+
+    for a in attendances:
+        writer.writerow([
+            a.user.username,
+            a.training_obj.title if a.training_obj else '-',
+            a.status,
+            a.date
+        ])
+
+    return response
+
+@login_required
+def hod_department_cpd_download(request):
+    profile = request.user.userprofile
+    department = profile.department
+
+    employees = UserProfile.objects.filter(department=department)
+    users = [e.user for e in employees]
+
+    cpd_records = CPDRecord.objects.filter(user__in=users)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = (
+        f'attachment; filename="{department.name}_cpd_report.csv"'
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(['Employee', 'Training', 'CPD Points'])
+
+    for r in cpd_records:
+        writer.writerow([
+            r.user.username,
+            r.training.title if r.training else '-',
+            r.points
+        ])
+
+    return response

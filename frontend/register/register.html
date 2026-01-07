@@ -155,4 +155,11 @@ document.getElementById('registerForm').addEventListener('submit', function(even
         document.getElementById('passwordError').style.display = 'none';
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    {% if message %}
+        alert("{{ message|escapejs }}");
+    {% endif %}
+});
+
 </script>

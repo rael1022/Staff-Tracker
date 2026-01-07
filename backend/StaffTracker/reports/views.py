@@ -61,20 +61,60 @@ def cpd_summary_report(request):
     })
 
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from attendance.models import Attendance
+from accounts.models import UserProfile
+from department.models import Department
+from training.models import Training
+
 @login_required
 def attendance_summary_report(request):
-    records = Attendance.objects.all().order_by('-date', '-check_in_time')
+    records = Attendance.objects.select_related('user')
+
+    department_id = request.GET.get('department')
+    training_name = request.GET.get('training')
+    status = request.GET.get('status')
+
+    if department_id:
+        records = records.filter(user__userprofile__department_id=department_id)
+
+    if training_name:
+        matched_trainings = Training.objects.filter(title__icontains=training_name)
+        matched_ids = matched_trainings.values_list('id', flat=True)
+        records = records.filter(training_id__in=[str(tid) for tid in matched_ids])
+
+    if status in ['Present', 'Absent']:
+        records = records.filter(status=status)
+
+    trainings = Training.objects.all()
+    training_map = {str(t.id): t for t in trainings}
+    for r in records:
+        r.training_obj = training_map.get(r.training_id)
+        r.department_name = (
+            r.user.userprofile.department.name
+            if r.user and r.user.userprofile.department
+            else '-'
+        )
 
     total = records.count()
     present = records.filter(status='Present').count()
     absent = records.filter(status='Absent').count()
 
-    return render(request, 'reports/attendance_summary.html', {
+    context = {
         'records': records,
         'total': total,
         'present': present,
         'absent': absent,
-    })
+        'departments': Department.objects.all(),
+        'trainings': trainings,
+        'selected_department': int(department_id) if department_id else '',
+        'selected_training': training_name or '',
+        'selected_status': status or '',
+    }
+
+    return render(request, 'reports/attendance_summary.html', context)
+
 
 @login_required
 def hod_department_training_progress(request):

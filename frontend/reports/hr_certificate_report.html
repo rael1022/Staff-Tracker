@@ -123,22 +123,38 @@ tr:hover td {
 
 /* ACTION BUTTON */
 .btn-outline {
-  padding: 7px 18px;
+  padding: 7px 20px;
   border-radius: 999px;
   border: 1px solid #d1d5db;
-  background: #fff;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
   font-size: 12px;
-  color: #111;
+  font-weight: 500;
+  color: #1f2937;
   cursor: pointer;
   text-decoration: none;
-  transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: 
+    background .2s ease,
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
 }
 
 .btn-outline:hover {
-  background: #f5f7fa;
+  background: linear-gradient(180deg, #f8fbff, #eef4ff);
+  border-color: #2f80ff;
+  color: #2f80ff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+  box-shadow: 0 10px 22px rgba(47,128,255,.25);
 }
+
+.btn-outline:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 12px rgba(47,128,255,.2);
+}
+
 
 /* EMPTY STATE */
 .empty-row td {
@@ -215,7 +231,7 @@ tr:hover td {
         </td>
         <td>
           <a href="{% url 'certificate_preview' cert.id %}" class="btn-outline">
-            View
+            👁 View
           </a>
         </td>
       </tr>

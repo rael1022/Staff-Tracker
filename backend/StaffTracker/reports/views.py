@@ -19,8 +19,8 @@ def hr_certificate_report(request):
         'user',
         'trainer',
         'training',
-        'user__userprofile',      # User → UserProfile
-        'trainer__userprofile',   # Trainer → UserProfile
+        'user__userprofile',
+        'trainer__userprofile', 
         'training__department',
     )
 

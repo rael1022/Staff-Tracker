@@ -1,78 +1,219 @@
 {% extends 'dashboard/base.html' %}
-
 {% block content %}
 
 <style>
-    h1 { font-size: 24px; margin-bottom: 10px; text-align: center; }
-    p.subtitle { font-size: 14px; color: #333; margin-bottom: 20px; text-align: center; }
-    .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin: 0 auto 30px auto; max-width: 500px; }
-    form label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
-    form input[type="text"], form input[type="email"], form input[type="password"], form select { width: 100%; padding: 8px 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-    .btn { padding: 10px 20px; font-size: 14px; border-radius: 6px; border: none; cursor: pointer; display: inline-block; margin-top: 15px; margin-right: 10px; text-decoration: none; }
-    .btn-primary { background-color: #007bff; color: #fff; }
-    .btn-primary:hover { background-color: #0056b3; }
-    .btn-secondary { background-color: #6c757d; color: #fff; }
-    .btn-secondary:hover { background-color: #565e64; }
-    .status-message { margin-top: 15px; text-align: center; font-size: 14px; }
-    .status-message.success { color: green; }
-    .status-message.error { color: red; }
+/* ===== Layout ===== */
+.create-user-wrapper {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.create-user-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.create-user-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.create-user-header p {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* ===== Card ===== */
+.create-user-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px 26px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* ===== Form ===== */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 9px 11px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.form-group select:disabled {
+    background: #f9fafb;
+    color: #9ca3af;
+}
+
+/* ===== Status ===== */
+.status-message {
+    font-size: 13px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.status-message.success {
+    color: #065f46;
+}
+
+.status-message.error {
+    color: #991b1b;
+}
+
+/* ===== Button ===== */
+.button-group {
+    text-align: center;
+    margin-top: 22px;
+}
+
+.btn-primary {
+    background: #4f46e5;
+    color: #ffffff;
+    border: none;
+    padding: 10px 36px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+        transform .12s ease,
+        box-shadow .12s ease,
+        background .12s ease;
+    box-shadow: 0 6px 14px rgba(79,70,229,0.25);
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(79,70,229,0.35);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(79,70,229,0.25);
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(99,102,241,0.4),
+        0 6px 14px rgba(79,70,229,0.25);
+}
 </style>
 
-<h1>Create New User</h1>
-<p class="subtitle">Fill in the details below to create a new user account.</p>
+<div class="create-user-wrapper">
 
-<div class="card">
-    <form method="post" id="createUserForm">
-        {% csrf_token %}
-        <input type="hidden" name="action" id="action" value="submit">
+    <div class="create-user-header">
+        <h1>Create New User</h1>
+        <p>Fill in the details to create a new account</p>
+    </div>
 
-        {% if message %}<p class="status-message success">{{ message }}</p>{% endif %}
-        {% if error %}<p class="status-message error">{{ error }}</p>{% endif %}
+    <div class="create-user-card">
+        <form method="post" id="createUserForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="action" value="submit">
 
-        <label>Role:</label>
-        <select name="role" onchange="document.getElementById('action').value='refresh'; this.form.submit();" required>
-            <option value="">-- Select Role --</option>
-            {% for r in roles %}
-                <option value="{{ r }}" {% if selected_role == r %}selected{% endif %}>{{ r }}</option>
-            {% endfor %}
-        </select>
+            {% if message %}
+                <p class="status-message success">{{ message }}</p>
+            {% endif %}
+            {% if error %}
+                <p class="status-message error">{{ error }}</p>
+            {% endif %}
 
-        <label>Department:</label>
-        <select name="department"
-                {% if request.POST.role|default:'' == 'HR' %}
-                    disabled
-                {% else %}
-                    required
-                {% endif %}
-        >
-            <option value="">-- Select Department --</option>
-            {% for d in departments %}
-                <option value="{{ d.id }}"
-                    {% if request.POST.department == d.id|stringformat:"s" %}selected{% endif %}>
-                    {{ d.name }}
-                </option>
-            {% endfor %}
-        </select>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role"
+                        onchange="document.getElementById('action').value='refresh'; this.form.submit();"
+                        required>
+                    <option value="">Select role</option>
+                    {% for r in roles %}
+                        <option value="{{ r }}" {% if selected_role == r %}selected{% endif %}>
+                            {{ r }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
+            <div class="form-group">
+                <label>Department</label>
+                <select name="department"
+                        {% if request.POST.role|default:'' == 'HR' %}
+                            disabled
+                        {% else %}
+                            required
+                        {% endif %}>
+                    <option value="">Select department</option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}"
+                            {% if request.POST.department == d.id|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+                            {{ d.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <label>Username:</label>
-        <input type="text" name="username" value="{{ request.POST.username }}" required>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="{{ request.POST.username }}" required>
+            </div>
 
-        <label>Email:</label>
-        <input type="email" name="email" value="{{ request.POST.email }}" required>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="{{ request.POST.email }}" required>
+            </div>
 
-        <label>Password:</label>
-        <input type="password" id="password" name="password" required>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <label>Confirm Password:</label>
-        <input type="password" id="confirm_password" name="confirm_password" required>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
 
-        <p class="status-message error" id="passwordError" style="display:none;">Passwords do not match.</p>
+            <p class="status-message error" id="passwordError" style="display:none;">
+                Passwords do not match.
+            </p>
 
-        <div style="text-align:center;">
-            <button type="submit" class="btn btn-primary" onclick="document.getElementById('action').value='submit';">Create User</button>
-        </div>
-    </form>
+            <div class="button-group">
+                <button type="submit"
+                        class="btn-primary"
+                        onclick="document.getElementById('action').value='submit';">
+                    Create User
+                </button>
+            </div>
+        </form>
+    </div>
+
 </div>
 
 <script>

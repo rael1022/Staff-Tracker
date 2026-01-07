@@ -251,6 +251,11 @@ tr:hover td {
         <div class="option-icon"><img src="{% static 'assets/img/attendance_summary.png' %}"></div>
         <div class="option-text"><h4>Attendance Report</h4><p>Check attendance status</p></div>
       </a>
+
+      <a href="{% url 'hr_certificate_report' %}" class="option">
+        <div class="option-icon"><img src="{% static 'assets/img/attendance_summary.png' %}"></div>
+        <div class="option-text"><h4>View Certificates</h4><p>View and filter employees certificates</p></div>
+      </a>
     </div>
   </section>
 </div>
@@ -314,37 +319,6 @@ tr:hover td {
           </form>
         </td>
       </tr>
-      {% endfor %}
-    </table>
-  </div>
-</div>
-
-<div class="section-card">
-  <div class="section-header"><h2>View Certificates</h2></div>
-  <div class="table-wrap">
-    <table>
-      <tr><th>User</th><th>Training</th><th>Issue Date</th><th>Expiry Date</th><th>Status</th><th>Action</th></tr>
-      {% for cert in certificates %}
-      <tr>
-        <td>{{ cert.user.username }}</td>
-        <td>{{ cert.training.title }}</td>
-        <td>{{ cert.issue_date }}</td>
-        <td>{{ cert.expiry_date }}</td>
-        <td>
-          {% if cert.is_expired %}
-            <span class="badge badge-red">Expired</span>
-          {% else %}
-            <span class="badge badge-green">Valid</span>
-          {% endif %}
-        </td>
-        <td>
-          <form method="post" action="{% url 'hr_delete_certificate' cert.id %}" class="inline-form">{% csrf_token %}
-            <button class="btn btn-danger">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="6">No certificates found</td></tr>
       {% endfor %}
     </table>
   </div>

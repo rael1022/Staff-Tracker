@@ -14,16 +14,41 @@ def reports_dashboard(request):
     return render(request, 'reports/dashboard.html')
 
 
-@login_required
-def certificate_expiry_report(request):
-    soon = date.today() + timedelta(days=30)
-    expiring = Certificate.objects.filter(expiry_date__lte=soon)
+def hr_certificate_report(request):
+    certificates = Certificate.objects.select_related(
+        'user',
+        'trainer',
+        'training',
+        'user__userprofile',      # User → UserProfile
+        'trainer__userprofile',   # Trainer → UserProfile
+        'training__department',
+    )
 
-    return render(request, 'reports/certificate_expiry.html', {
-        'expiring': expiring,
-        'soon_date': soon,
-    })
+    department_id = request.GET.get('department')
+    trainer_id = request.GET.get('trainer')
+    status = request.GET.get('status')
 
+    if department_id:
+        certificates = certificates.filter(
+            user__userprofile__department_id=department_id
+        )
+
+    if trainer_id:
+        certificates = certificates.filter(trainer_id=trainer_id)
+
+    today = date.today()
+    if status == 'valid':
+        certificates = certificates.filter(expiry_date__gte=today)
+    elif status == 'expired':
+        certificates = certificates.filter(expiry_date__lt=today)
+
+    context = {
+        'certificates': certificates,
+        'departments': Department.objects.all(),
+        'trainers': UserProfile.objects.filter(role='Trainer'),
+    }
+
+    return render(request, 'reports/hr_certificate_report.html', context)
 
 @login_required
 def cpd_summary_report(request):

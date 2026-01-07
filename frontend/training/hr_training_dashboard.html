@@ -3,166 +3,195 @@
 {% block content %}
 
 <style>
-    h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
+    /* ===== Page Title ===== */
+    .page-header {
+        margin-bottom: 24px;
     }
 
-    h2 {
-        font-size: 18px;
-        margin-top: 30px;
-        margin-bottom: 10px;
+    .page-header h1 {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 6px;
     }
 
+    .page-header p {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    /* ===== Card Base ===== */
     .card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin: 30px 0;
+        background: rgba(255,255,255,0.9);
+        padding: 24px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        margin-bottom: 32px;
     }
 
-     .filter-card {
-        background: #f9fafc;
-        padding: 20px 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        max-width: 900px;
-        margin: 0 auto 30px auto;
+    /* ===== Filter Card ===== */
+    .filter-card {
+        max-width: 960px;
+        margin: 0 auto 36px auto;
+        background: linear-gradient(135deg, #f9fafb, #ffffff);
     }
 
     .filter-card h2 {
         font-size: 20px;
         font-weight: 600;
         text-align: center;
-        margin-bottom: 15px;
-        color: #333;
+        margin-bottom: 18px;
+        color: #1f2937;
     }
 
     .filter-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: space-between;
-        align-items: flex-end;
-    }
-
-    .filter-group {
-        flex: 1 1 200px;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        align-items: end;
     }
 
     .filter-group label {
         font-size: 13px;
         font-weight: 500;
-        margin-bottom: 5px;
-        color: #555;
+        margin-bottom: 6px;
+        color: #374151;
     }
 
     .filter-group select,
     .filter-group input[type="date"] {
-        padding: 7px 10px;
+        padding: 8px 12px;
         font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        width: 100%;
-        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
     }
 
     .filter-actions {
+        grid-column: 1 / -1;
         display: flex;
-        gap: 10px;
-        flex: 1 1 100%;
         justify-content: center;
+        gap: 12px;
         margin-top: 10px;
     }
 
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
-        border: none;
-    }
-
-    .btn-secondary:hover {
-        background-color: #565e64;
-    }
-
-    @media (max-width: 700px) {
-        .filter-form {
-            flex-direction: column;
-        }
-        .filter-actions {
-            justify-content: center;
-        }
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-    table th,
-    table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        font-size: 14px;
-        text-align: left;
-    }
-
-    table th {
-        background-color: #f2f4f7;
-        font-weight: 600;
-    }
-
+    /* ===== Buttons ===== */
     .btn {
-        padding: 8px 16px;
+        padding: 8px 18px;
+        border-radius: 10px;
         font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background-color: #fff;
+        font-weight: 500;
         cursor: pointer;
+        border: 1px solid transparent;
         text-decoration: none;
-        display: inline-block;
-        margin-right: 10px;
-        margin-bottom: 10px;
-        color: #007bff;
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        box-shadow: 0 4px 10px rgba(99,102,241,0.35);
     }
 
     .btn-primary:hover {
-        background-color: #0056b3;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(99,102,241,0.5);
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
     }
 
     .btn-danger {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
     }
 
     .btn-danger:hover {
-        background-color: #a71d2a;
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
+    /* ===== Table ===== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+        font-size: 14px;
+    }
+
+    table thead {
+        background: #f3f4f6;
+    }
+
+    table th {
+        text-align: left;
+        padding: 12px;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1f2937;
+    }
+
+    table tbody tr:hover {
+        background: rgba(99,102,241,0.05);
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .empty-row {
+        text-align: center;
+        color: #6b7280;
+        padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .table-actions {
+            flex-direction: column;
+        }
     }
 </style>
 
-<h1>HR Training Dashboard</h1>
-<p>Welcome HR <strong>{{ user.username }}</strong></p>
+<div class="page-header">
+    <h1>HR Training Dashboard</h1>
+    <p>Welcome back, <strong>{{ user.username }}</strong></p>
+</div>
 
 <div class="card filter-card">
     <h2>Filter Trainings</h2>
     <form method="get" class="filter-form">
+
         <div class="filter-group">
-            <label for="department">Department</label>
-            <select name="department" id="department">
-                <option value="">-- All Departments --</option>
+            <label>Department</label>
+            <select name="department">
+                <option value="">All Departments</option>
                 {% for dept in departments %}
-                <option value="{{ dept.id }}" {% if selected_department and selected_department|add:"" == dept.id|add:"" %}selected{% endif %}>
+                <option value="{{ dept.id }}" {% if selected_department|stringformat:"s" == dept.id|stringformat:"s" %}selected{% endif %}>
                     {{ dept.name }}
                 </option>
                 {% endfor %}
@@ -170,11 +199,11 @@
         </div>
 
         <div class="filter-group">
-            <label for="trainer">Trainer</label>
-            <select name="trainer" id="trainer">
-                <option value="">-- All Trainers --</option>
+            <label>Trainer</label>
+            <select name="trainer">
+                <option value="">All Trainers</option>
                 {% for t in trainers %}
-                <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
+                <option value="{{ t.id }}" {% if selected_trainer|stringformat:"s" == t.id|stringformat:"s" %}selected{% endif %}>
                     {{ t.username }}
                 </option>
                 {% endfor %}
@@ -182,26 +211,28 @@
         </div>
 
         <div class="filter-group">
-            <label for="start_date">Start Date</label>
-            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            <label>Start Date</label>
+            <input type="date" name="start_date" value="{{ start_date }}">
         </div>
 
         <div class="filter-group">
-            <label for="end_date">End Date</label>
-            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            <label>End Date</label>
+            <input type="date" name="end_date" value="{{ end_date }}">
         </div>
 
         <div class="filter-actions">
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button class="btn btn-primary">Apply Filter</button>
             <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Reset</a>
         </div>
     </form>
 </div>
 
-
 <div class="card">
-    <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ Create New Training</a>
-    <h2>Training List</h2>
+    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0;">Training List</h2>
+        <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ New Training</a>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -210,48 +241,38 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Location</th>
-                <th>CPD Points</th>
-                <th>Duration (hrs)</th>
+                <th>CPD</th>
+                <th>Duration</th>
                 <th>Department</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for training in trainings %}
+        {% for training in trainings %}
             <tr>
                 <td>{{ training.title }}</td>
-                <td>
-                    {% if training.trainer %}
-                        {{ training.trainer.username }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
+                <td>{{ training.trainer.username|default:"-" }}</td>
                 <td>{{ training.date }}</td>
                 <td>{{ training.time }}</td>
                 <td>{{ training.location }}</td>
                 <td>{{ training.cpd_points }}</td>
-                <td>{{ training.duration_hours }}</td>
+                <td>{{ training.duration_hours }}h</td>
+                <td>{{ training.department.name|default:"-" }}</td>
                 <td>
-                    {% if training.department %}
-                        {{ training.department.name }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'hr_edit_training' training.id %}" class="btn btn-primary">Edit</a>
-                    <form method="post" action="{% url 'hr_delete_training' training.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+                    <div class="table-actions">
+                        <a href="{% url 'hr_edit_training' training.id %}" class="btn btn-secondary">Edit</a>
+                        <form method="post" action="{% url 'hr_delete_training' training.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
-            {% empty %}
+        {% empty %}
             <tr>
-                <td colspan="9" class="text-center">No trainings available.</td>
+                <td colspan="9" class="empty-row">No trainings found</td>
             </tr>
-            {% endfor %}
+        {% endfor %}
         </tbody>
     </table>
 </div>

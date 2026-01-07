@@ -7,7 +7,7 @@ from cpd.models import CPDRecord
 from attendance.models import Attendance
 from accounts.models import UserProfile
 from department.models import Department
-from training.models import Training
+from training.models import Training, TrainingRegistration
 from django.db import models
 import csv
 from django.http import HttpResponse
@@ -124,19 +124,67 @@ def hod_department_training_progress(request):
     profile = request.user.userprofile
     department = profile.department
 
+    employee_name = request.GET.get('employee', '').strip()
+    training_name = request.GET.get('training', '').strip()
+    completion_status = request.GET.get('status', '')
+    certificate_filter = request.GET.get('certificate', '')
+
     employees = UserProfile.objects.filter(department=department)
-    user_ids = [e.user.id for e in employees]  
-    attendances = Attendance.objects.filter(user_id__in=user_ids)
+    if employee_name:
+        employees = employees.filter(user__username__icontains=employee_name)
+    user_ids = employees.values_list('user_id', flat=True)
 
-    trainings_dict = {str(t.id): t for t in Training.objects.all()}
+    registrations = TrainingRegistration.objects.filter(employee_id__in=user_ids)\
+        .select_related('employee', 'training')
 
-    for a in attendances:
-        a.training_obj = trainings_dict.get(str(a.training_id))
+    if training_name:
+        registrations = registrations.filter(training__title__icontains=training_name)
 
-    return render(request, 'reports/department_training_progress.html', {
+    if completion_status in ['Completed', 'Not Completed']:
+        registrations = registrations.filter(complete_status=completion_status)
+
+    attendance_qs = Attendance.objects.filter(user_id__in=user_ids)
+    attendance_map = {(att.user_id, att.training_id): att.status for att in attendance_qs}
+
+    certificates = Certificate.objects.filter(user_id__in=user_ids)
+    cert_map = {(c.user_id, str(c.training.id)): c for c in certificates}
+
+    cpd_qs = CPDRecord.objects.filter(user_id__in=user_ids)
+    cpd_map = {}
+    for r in cpd_qs:
+        key = (r.user_id, str(r.training.id))
+        cpd_map[key] = cpd_map.get(key, 0) + r.points
+
+    today = date.today()
+
+    filtered_regs = []
+    for r in registrations:
+        training_id_str = str(r.training.id)
+        r.attendance_status = attendance_map.get((r.employee.id, training_id_str), '-')
+        r.certificate = cert_map.get((r.employee.id, training_id_str))
+        r.cpd_points = cpd_map.get((r.employee.id, training_id_str), 0)
+
+        if certificate_filter == 'Active':
+            if not r.certificate or r.certificate.expiry_date < today:
+                continue
+        elif certificate_filter == 'Expired':
+            if not r.certificate or r.certificate.expiry_date >= today:
+                continue
+
+        filtered_regs.append(r)
+
+    context = {
         'department': department,
-        'attendances': attendances
-    })
+        'registrations': filtered_regs,
+        'selected_employee': employee_name,
+        'selected_training': training_name,
+        'selected_status': completion_status,
+        'selected_certificate': certificate_filter,
+        'today': today,
+    }
+
+    return render(request, 'reports/department_training_progress.html', context)
+
 
 
 @login_required

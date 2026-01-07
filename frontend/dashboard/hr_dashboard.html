@@ -272,12 +272,15 @@ tr:hover td {
         <td>{{ profile.role }}</td>
         <td>
           <form method="post" class="inline-form">{% csrf_token %}
-            <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
-            <button class="btn btn-primary">Approve</button>
+              <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
+              <input type="hidden" name="action" value="approve">
+              <button class="btn btn-primary">Approve</button>
           </form>
+
           <form method="post" class="inline-form">{% csrf_token %}
-            <input type="hidden" name="reject_id" value="{{ profile.user.id }}">
-            <button class="btn btn-danger">Reject</button>
+              <input type="hidden" name="reject_id" value="{{ profile.user.id }}">
+              <input type="hidden" name="action" value="reject">
+              <button class="btn btn-danger">Reject</button>
           </form>
         </td>
       </tr>

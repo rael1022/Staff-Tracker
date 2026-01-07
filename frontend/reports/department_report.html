@@ -1,23 +1,22 @@
 {% extends 'dashboard/base.html' %}
-{% load static %}
 {% block content %}
 
 <style>
 /* ===== Layout ===== */
 .report-container {
-    max-width: 1000px;
+    max-width: 1080px;
     margin: 0 auto;
 }
 
-/* ===== Page Title ===== */
+/* ===== Title ===== */
 .report-title {
-    margin-bottom: 36px;
+    margin-bottom: 44px;
 }
 
 .report-title h1 {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 600;
-    margin-bottom: 6px;
+    letter-spacing: .2px;
 }
 
 .report-title p {
@@ -29,98 +28,124 @@
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 48px;
+    gap: 28px;
+    margin-bottom: 56px;
 }
 
 .summary-card {
     background: #ffffff;
-    border-radius: 18px;
-    padding: 26px 24px;
-    box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+    border-radius: 20px;
+    padding: 30px 26px;
     border: 1px solid #e5e7eb;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
     transition: transform .25s ease, box-shadow .25s ease;
 }
 
+/* Accent top line */
+.summary-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #6366f1, #00d4ff);
+}
+
 .summary-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 42px rgba(99,102,241,0.25);
+    transform: translateY(-6px);
+    box-shadow: 0 26px 60px rgba(99,102,241,0.25);
 }
 
 .summary-label {
     font-size: 13px;
     color: #6b7280;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
 .summary-value {
-    font-size: 28px;
+    font-size: 34px;
     font-weight: 700;
-    color: #4f46e5;
+    color: #111827;
 }
 
-/* ===== Actions ===== */
+/* ===== Section ===== */
 .section-title {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
+/* ===== Actions ===== */
 .actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+    gap: 32px;
 }
 
 .action-card {
     background: #ffffff;
-    padding: 28px;
-    border-radius: 18px;
+    padding: 32px;
+    border-radius: 20px;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+    position: relative;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+/* Left accent bar */
+.action-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #6366f1, #00d4ff);
 }
 
 .action-card:hover {
-    transform: translateY(-4px);
-    border-color: #6366f1;
-    box-shadow: 0 16px 36px rgba(99,102,241,0.25);
+    transform: translateY(-6px);
+    box-shadow: 0 26px 56px rgba(99,102,241,0.25);
 }
 
 .action-card h3 {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .action-card p {
     font-size: 14px;
     color: #6b7280;
-    margin-bottom: 18px;
-    line-height: 1.6;
+    line-height: 1.7;
+    margin-bottom: 20px;
 }
 
 .action-card a {
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
-    color: #6366f1;
+    color: #4f46e5;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     transition: gap .2s ease;
 }
 
 .action-card a:hover {
-    gap: 10px;
+    gap: 14px;
 }
 </style>
 
 <div class="report-container">
 
     <div class="report-title">
-        <h1>{{ department.name }} Department Overview</h1>
-        <p>Summary of attendance and professional development</p>
+        <h1>{{ department.name }} Department</h1>
+        <p>Attendance & Professional Development Overview</p>
     </div>
 
     <!-- SUMMARY -->
@@ -147,9 +172,7 @@
     <div class="actions">
         <div class="action-card">
             <h3>Attendance Report</h3>
-            <p>
-                View attendance records by employee and training sessions.
-            </p>
+            <p>Detailed attendance records by employee and training session.</p>
             <a href="{% url 'hod_department_attendancereport' %}">
                 View report →
             </a>
@@ -157,9 +180,7 @@
 
         <div class="action-card">
             <h3>CPD Report</h3>
-            <p>
-                Review CPD points accumulated by department employees.
-            </p>
+            <p>CPD points and certification overview for department staff.</p>
             <a href="{% url 'hod_department_cpdreport' %}">
                 View report →
             </a>

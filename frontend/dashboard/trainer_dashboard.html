@@ -47,13 +47,27 @@
   box-shadow: 0 18px 40px rgba(0,0,0,0.25);
 }
 
-/* === Quick Actions 卡片 === */
 .card-options {
   background: #fff;
   border-radius: 16px;
   padding: 28px;
   box-shadow: 0 10px 30px rgba(47,128,255,0.25), 0 20px 60px rgba(0,0,0,0.08);
   transition: all 0.3s ease;
+  max-height: 420px;   
+  overflow-y: auto; 
+}
+
+.card-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-options::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.card-options::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .card-options:hover {
@@ -71,7 +85,6 @@
   margin-bottom: 20px;
 }
 
-/* === option 带图标 === */
 .option {
   display: flex;
   align-items: center;
@@ -145,7 +158,7 @@
 
       <a href="{% url 'trainer_dashboard' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/manage-trainings.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>Manage Trainings</h4>
@@ -155,7 +168,7 @@
 
       <a href="{% url 'trainer_trainings_page' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/qr-code.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>Attendance QR</h4>
@@ -165,7 +178,7 @@
 
       <a href="{% url 'manage_assessment_questions' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/quiz.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>Assessment Questions</h4>
@@ -175,7 +188,7 @@
 
       <a href="{% url 'view_results' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/my_results.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>View Assessment Results</h4>
@@ -195,7 +208,7 @@
 
       <a href="{% url 'issued_certificates' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/my_certificates.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>Issued Certificates</h4>
@@ -205,7 +218,7 @@
 
       <a href="{% url 'trainer_completions' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/work-in-progress.png' %}" alt="Department Report">
         </div>
         <div class="option-text">
           <h4>Manage Completions</h4>

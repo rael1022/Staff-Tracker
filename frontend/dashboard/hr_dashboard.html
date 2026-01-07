@@ -4,7 +4,6 @@
 {% load static %}
 
 <style>
-/* === 整体布局 === */
 .dashboard-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -13,7 +12,6 @@
   animation: fadeUp 0.6s ease-out both;
 }
 
-/* === 左侧 === */
 .left {
   padding: 80px 0;
 }
@@ -52,7 +50,6 @@
   box-shadow: 0 18px 40px rgba(0,0,0,0.25);
 }
 
-/* === Quick Actions 卡片 === */
 .card-options {
   background: #fff;
   border-radius: 16px;
@@ -129,7 +126,6 @@
   box-shadow: 0 6px 16px rgba(47,128,255,0.15);
 }
 
-/* === 表格卡片风格统一 === */
 .card {
   background: #fff;
   border-radius: 16px;
@@ -206,7 +202,6 @@
   font-weight: 500;
 }
 
-/* fadeUp 动画 */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -214,7 +209,6 @@
 
 </style>
 
-<!-- === 左右布局 === -->
 <div class="dashboard-container">
   <section class="left">
     <h1>HR Dashboard</h1>

@@ -184,14 +184,33 @@ def hr_delete_training(request, training_id):
 @login_required
 @user_passes_test(is_hr)
 def hr_training_registrations(request):
-    trainings = Training.objects.all().prefetch_related(
+    trainings = Training.objects.select_related(
+        'trainer', 'department'
+    ).prefetch_related(
         'trainingregistration_set__employee'
     )
 
-    return render(request, 'training/employee_registrations.html', {
-        'trainings': trainings
-    })
+    # ===== 获取筛选参数 =====
+    trainer_id = request.GET.get('trainer')
+    department_id = request.GET.get('department')
 
+    if trainer_id:
+        trainings = trainings.filter(trainer_id=trainer_id)
+
+    if department_id:
+        trainings = trainings.filter(department_id=department_id)
+
+    # ===== 下拉选项数据 =====
+    trainers = User.objects.filter(training__isnull=False).distinct()
+    departments = Department.objects.all()
+
+    return render(request, 'training/employee_registrations.html', {
+        'trainings': trainings,
+        'trainers': trainers,
+        'departments': departments,
+        'selected_trainer': trainer_id,
+        'selected_department': department_id,
+    })
 
 # ---------------- Trainer ----------------
 @login_required

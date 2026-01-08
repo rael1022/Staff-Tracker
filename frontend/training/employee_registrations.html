@@ -3,71 +3,86 @@
 {% block content %}
 
 <style>
-    h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
+h1 { font-size: 24px; margin-bottom: 10px; }
+p { margin-bottom: 20px; font-size: 14px; color: #333; }
+.card { background: #fff; padding: 50px 150px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 30px; border-radius: 20px;}
+.filter-form { display: flex; justify-content: center; gap: 24px; margin: 0 auto 28px; flex-wrap: wrap; }
+.filter-group { text-align: center; min-width: 220px; }
+.filter-group select { width: 220px; padding: 10px 14px; font-size: 14px; border-radius: 12px; border: 1px solid #d1d5db; text-align: center; }
+.filter-actions { width: 100%; display: flex; justify-content: center; gap: 14px; margin-top: 6px; }
+.filter-group label { font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #374151; display: block; }
+.btn { padding: 9px 22px; border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+.btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+.btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+.btn-modal { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; border-radius: 12px; padding: 6px 12px; font-weight: 600; position: relative; min-width: 120px; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
+.btn-modal:hover { background: #c7d2fe; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.btn-modal::after { content: '▼'; margin-left: 6px; font-size: 12px; transition: transform 0.2s; }
+.btn-modal.active::after { transform: rotate(-180deg); }
 
-    p {
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #333;
-    }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+table th, table td { border: 1px solid #ddd; padding: 10px; font-size: 14px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+table th { background-color: #f2f4f7; font-weight: 600; text-align: left; }
+table th:nth-child(1) { width: 20%; }
+table th:nth-child(2) { width: 20%; }
+table th:nth-child(3) { width: 20%; }
+table th:nth-child(4) { width: 14%; text-align: center; }
+table th:nth-child(5) { width: 10%; text-align: center; }
 
-    h2 {
-        font-size: 18px;
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
+table td:nth-child(4) { text-align: center; }
+.count { font-weight: 600; color: #007bff; text-align: center; }
 
-    .card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin-bottom: 30px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
-    table th,
-    table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        font-size: 14px;
-        text-align: left;
-        vertical-align: top;
-    }
-
-    table th {
-        background-color: #f2f4f7;
-        font-weight: 600;
-    }
-
-    .count {
-        font-weight: 600;
-        color: #007bff;
-    }
-
-    ul {
-        padding-left: 18px;
-        margin: 0;
-    }
+ul { padding-left: 18px; margin: 0; }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.modal-header h3 { margin: 0; font-size: 18px; }
+.modal-close { cursor: pointer; font-size: 20px; font-weight: bold; border: none; background: none; color: #374151; }
+.modal ul { max-height: 300px; overflow-y: auto; padding-left: 18px; margin: 0; }
+.modal li { margin-bottom: 6px; }
+.status-approved { color: green; font-weight: 600; }
+.status-pending { color: orange; font-weight: 600; }
+.status-rejected { color: red; font-weight: 600; }
 </style>
 
 <h1>Training Registrations Overview</h1>
 <p>Welcome HR <strong>{{ user.username }}</strong>. View registered employees for each training.</p>
 
 <div class="card">
+    <form method="get" class="filter-form">
+        <div class="filter-group">
+            <label>Trainer</label>
+            <select name="trainer">
+                <option value="">All Trainers</option>
+                {% for t in trainers %}
+                    <option value="{{ t.id }}" {% if selected_trainer|stringformat:"s" == t.id|stringformat:"s" %}selected{% endif %}>
+                        {{ t.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Department</label>
+            <select name="department">
+                <option value="">All Departments</option>
+                {% for d in departments %}
+                    <option value="{{ d.id }}" {% if selected_department|stringformat:"s" == d.id|stringformat:"s" %}selected{% endif %}>
+                        {{ d.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary">Apply Filter</button>
+            <a href="{% url 'hr_training_registrations' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
     <table>
         <thead>
             <tr>
                 <th>Training</th>
                 <th>Trainer</th>
+                <th>Department</th>
                 <th>Registered Employees</th>
                 <th>Total</th>
             </tr>
@@ -76,35 +91,71 @@
             {% for training in trainings %}
             <tr>
                 <td>{{ training.title }}</td>
+                <td>{{ training.trainer.username|default:"-" }}</td>
+                <td>{{ training.department.name|default:"-" }}</td>
                 <td>
-                    {% if training.trainer %}
-                        {{ training.trainer.username }}
-                    {% else %}
-                        -
-                    {% endif %}
+                    {% with total=training.trainingregistration_set.count %}
+                        <button type="button" class="btn-modal" id="btn-{{ training.id }}" onclick="toggleModal('modal-{{ training.id }}', this)">{{ total }} Employees</button>
+                    {% endwith %}
                 </td>
-                <td>
-                    {% if training.trainingregistration_set.all %}
-                        <ul>
-                            {% for reg in training.trainingregistration_set.all %}
-                                <li>{{ reg.employee.username }} ({{ reg.employee.email }})</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td class="count">
-                    {{ training.trainingregistration_set.count }}
-                </td>
+                <td class="count">{{ training.trainingregistration_set.count }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4">No trainings found.</td>
+                <td colspan="5">No trainings found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+{% for training in trainings %}
+<div id="modal-{{ training.id }}" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ training.title }} - Employees</h3>
+            <button class="modal-close" onclick="closeModal('modal-{{ training.id }}', 'btn-{{ training.id }}')">&times;</button>
+        </div>
+        <ul>
+            {% for reg in training.trainingregistration_set.all %}
+                <li>{{ reg.employee.username }} ({{ reg.employee.email }}) — 
+                    {% if reg.status == "Approved" %}
+                        <span class="status-approved">Approved</span>
+                    {% elif reg.status == "Pending" %}
+                        <span class="status-pending">Pending</span>
+                    {% else %}
+                        <span class="status-rejected">Rejected</span>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>No registered employees.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function toggleModal(modalId, btn) {
+    const modal = document.getElementById(modalId);
+    modal.style.display = 'block';
+    btn.classList.add('active');
+}
+function closeModal(modalId, btnId=null) {
+    const modal = document.getElementById(modalId);
+    modal.style.display = 'none';
+    if(btnId) document.getElementById(btnId).classList.remove('active');
+}
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if(event.target == modal){
+            modal.style.display = 'none';
+            const btn = document.getElementById('btn-' + modal.id.split('-')[1]);
+            if(btn) btn.classList.remove('active');
+        }
+    });
+}
+</script>
 
 {% endblock %}

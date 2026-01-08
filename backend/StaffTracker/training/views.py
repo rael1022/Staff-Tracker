@@ -179,21 +179,19 @@ def hr_delete_training(request, training_id):
         return redirect('hr_dashboard')
     return render(request, 'training/hr_delete_training.html', {'training': training})
 
-@login_required
-def hr_approve_registration(request, reg_id):
-    reg = get_object_or_404(TrainingRegistration, id=reg_id)
-    reg.status = 'Approved'
-    reg.save()
-    messages.success(request, f"{reg.employee.username}'s registration approved.")
-    return redirect('hr_dashboard')
+
 
 @login_required
-def hr_reject_registration(request, reg_id):
-    reg = get_object_or_404(TrainingRegistration, id=reg_id)
-    reg.status = 'Rejected'
-    reg.save()
-    messages.warning(request, f"{reg.employee.username}'s registration rejected.")
-    return redirect('hr_dashboard')
+@user_passes_test(is_hr)
+def hr_training_registrations(request):
+    trainings = Training.objects.all().prefetch_related(
+        'trainingregistration_set__employee'
+    )
+
+    return render(request, 'training/employee_registrations.html', {
+        'trainings': trainings
+    })
+
 
 # ---------------- Trainer ----------------
 @login_required
@@ -330,24 +328,6 @@ def delete_training(request, training_id):
         training.delete()
         return redirect('trainer_dashboard')
     return render(request, 'training/delete_training.html', {'training': training})
-
-
-@login_required
-@user_passes_test(is_hr)
-def hr_training_registrations(request):
-    registrations = TrainingRegistration.objects.select_related('employee', 'training').all()
-
-    if request.method == 'POST':
-        reg_id = request.POST.get('delete_id')
-        if reg_id:
-            reg = get_object_or_404(TrainingRegistration, id=reg_id)
-            reg.delete()
-            messages.success(request, "Registration deleted successfully.")
-            return redirect('hr_training_registrations')
-
-    return render(request, 'training/employee_registrations.html', {
-        'registrations': registrations
-    })
 
 @login_required
 def trainer_completions(request):

@@ -314,6 +314,13 @@ def view_results(request, training_id=None):
     pre_results = []
     post_results = []
     
+    get_training_id = request.GET.get('training_id')
+    if get_training_id:
+        try:
+            training_id = int(get_training_id)
+        except (ValueError, TypeError):
+            training_id = None
+            
     if training_id:
         selected_training = get_object_or_404(Training, id=training_id, trainer=request.user)
         
@@ -326,7 +333,8 @@ def view_results(request, training_id=None):
             training=selected_training,
             status='Completed'
         ).select_related('user').order_by('-score')
-    elif request.method == 'GET' and trainings.exists():
+        
+    elif trainings.exists():
         return redirect('view_results_training', training_id=trainings.first().id)
     
     context = {

@@ -29,7 +29,7 @@
 
 .left .motivation {
   font-size: 14px;
-  color: #6366f1; 
+  color: #6366f1;
   opacity: 0.75;
   max-width: 420px;
   line-height: 1.6;
@@ -65,6 +65,27 @@
   padding: 28px;
   box-shadow: 0 18px 55px rgba(0,0,0,.08);
   animation: fadeUp 0.7s ease forwards;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.card-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-options::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.card-options::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.card-options:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(47,128,255,0.35),
+              0 30px 80px rgba(0,0,0,0.12);
 }
 
 .card-options-header h3 {
@@ -87,7 +108,9 @@
   margin-bottom: 14px;
   text-decoration: none;
   color: #111;
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  transition: transform .25s ease,
+              box-shadow .25s ease,
+              border-color .25s ease;
 }
 
 .option:hover {
@@ -118,125 +141,15 @@
   color: #666;
 }
 
-.section-card {
-  background: #fff;
-  border-radius: 22px;
-  padding: 28px;
-  margin: 50px 45px 0;
-  box-shadow: 0 18px 55px rgba(0,0,0,.08);
-  animation: fadeUp 0.7s ease forwards;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 22px;
-}
-
-.section-header h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.section-header a {
-  font-size: 14px;
-  color: #2f80ff;
-  text-decoration: none;
-  transition: opacity .2s ease;
-}
-
-.section-header a:hover {
-  opacity: .7;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
-}
-
-th {
-  background: #f5f7fa;
-  padding: 14px;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-td {
-  padding: 14px;
-  border-bottom: 1px solid #eef0f3;
-}
-
-tr {
-  transition: background .2s ease;
-}
-
-tr:hover td {
-  background: #f9fbff;
-}
-
-.badge {
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.badge-green {
-  background: #e7f8ef;
-  color: #1e8e5a;
-}
-
-.badge-red {
-  background: #fdecea;
-  color: #b42318;
-}
-
-.btn {
-  padding: 7px 16px;
-  border-radius: 999px;
-  font-size: 12px;
-  border: none;
-  cursor: pointer;
-  margin-right: 6px;
-  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0,0,0,.15);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #2f80ff, #1c5fd4);
-  color: #fff;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #dc3545, #b42318);
-  color: #fff;
-}
-
-.btn-outline {
-  background: #fff;
-  border: 1px solid #ccc;
-  text-decoration: none;
-}
-
-.inline-form {
-  display: inline-block;
-}
-
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 
@@ -251,97 +164,63 @@ tr:hover td {
 
   <section class="right">
     <div class="card-options">
-      <div class="card-options-header"><h3>Quick Actions</h3></div>
+      <div class="card-options-header">
+        <h3>Quick Actions</h3>
+      </div>
       <p class="card-description">Choose your feature</p>
 
+      <a href="{% url 'hr_manage_users' %}" class="option">
+        <div class="option-icon">
+          <img src="{% static 'assets/img/people.png' %}">
+        </div>
+        <div class="option-text">
+          <h4>Manage Accounts</h4>
+          <p>Approve and manage user accounts</p>
+        </div>
+      </a>
+
       <a href="{% url 'hr_dashboard' %}" class="option">
-        <div class="option-icon"><img src="{% static 'assets/img/manage-trainings.png' %}"></div>
-        <div class="option-text"><h4>Manage Trainings</h4><p>View and edit all trainings</p></div>
+        <div class="option-icon">
+          <img src="{% static 'assets/img/manage-trainings.png' %}">
+        </div>
+        <div class="option-text">
+          <h4>Manage Trainings</h4>
+          <p>View and edit all trainings</p>
+        </div>
       </a>
 
       <a href="{% url 'hr_training_registrations' %}" class="option">
-        <div class="option-icon"><img src="{% static 'assets/img/training_registrations.png' %}"></div>
-        <div class="option-text"><h4>Training Registration</h4><p>Register users for trainings</p></div>
+        <div class="option-icon">
+          <img src="{% static 'assets/img/training_registrations.png' %}">
+        </div>
+        <div class="option-text">
+          <h4>Training Registration</h4>
+          <p>Register users for trainings</p>
+        </div>
       </a>
 
       <a href="{% url 'attendance_summary' %}" class="option">
-        <div class="option-icon"><img src="{% static 'assets/img/attendance_summary.png' %}"></div>
-        <div class="option-text"><h4>Attendance Report</h4><p>Check attendance status</p></div>
+        <div class="option-icon">
+          <img src="{% static 'assets/img/attendance_summary.png' %}">
+        </div>
+        <div class="option-text">
+          <h4>Attendance Report</h4>
+          <p>Check attendance status</p>
+        </div>
       </a>
 
       <a href="{% url 'hr_certificate_report' %}" class="option">
-        <div class="option-icon"><img src="{% static 'assets/img/my_certificates.png' %}"></div>
-        <div class="option-text"><h4>View Employee Certificates</h4><p>View and filter employees certificates</p></div>
+        <div class="option-icon">
+          <img src="{% static 'assets/img/my_certificates.png' %}">
+        </div>
+        <div class="option-text">
+          <h4>View Employee Certificates</h4>
+          <p>View and filter employees certificates</p>
+        </div>
       </a>
+
     </div>
   </section>
-</div>
-
-<div class="section-card">
-  <div class="section-header"><h2>Approve Pending Users</h2></div>
-  <div class="table-wrap">
-    <table>
-      <tr><th>Username</th><th>Email</th><th>Role</th><th>Action</th></tr>
-      {% for profile in pending_users %}
-      <tr>
-        <td>{{ profile.user.username }}</td>
-        <td>{{ profile.user.email }}</td>
-        <td>{{ profile.role }}</td>
-        <td>
-          <form method="post" class="inline-form">{% csrf_token %}
-              <input type="hidden" name="approve_id" value="{{ profile.user.id }}">
-              <input type="hidden" name="action" value="approve">
-              <button class="btn btn-primary">Approve</button>
-          </form>
-
-          <form method="post" class="inline-form">{% csrf_token %}
-              <input type="hidden" name="reject_id" value="{{ profile.user.id }}">
-              <input type="hidden" name="action" value="reject">
-              <button class="btn btn-danger">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="4">No pending approvals</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-</div>
-
-<div class="section-card">
-  <div class="section-header">
-    <h2>Manage User Accounts</h2>
-    <a href="{% url 'hr_create_user' %}">Create New Account</a>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <tr><th>Username</th><th>Email</th><th>Role</th><th>Department</th><th>Status</th><th>Actions</th></tr>
-      {% for u in all_users %}
-      <tr>
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
-        <td>{{ u.userprofile.role }}</td>
-        <td>{% if u.userprofile.department %}{{ u.userprofile.department.name }}{% else %}-{% endif %}</td>
-        <td>
-          {% if u.is_active %}
-            <span class="badge badge-green">Active</span>
-          {% else %}
-            <span class="badge badge-red">Inactive</span>
-          {% endif %}
-        </td>
-        <td>
-          <a href="{% url 'hr_update_user' u.id %}" class="btn btn-outline">Edit</a>
-          <form method="post" action="{% url 'hr_toggle_user' u.id %}" class="inline-form">{% csrf_token %}
-            <button class="btn btn-primary">{% if u.is_active %}Deactivate{% else %}Activate{% endif %}</button>
-          </form>
-          <form method="post" action="{% url 'hr_delete_user' u.id %}" class="inline-form">{% csrf_token %}
-            <button class="btn btn-danger">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
 </div>
 
 {% endblock %}

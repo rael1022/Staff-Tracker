@@ -40,6 +40,7 @@
         padding: 10px;
         font-size: 14px;
         text-align: left;
+        vertical-align: top;
     }
 
     table th {
@@ -47,119 +48,59 @@
         font-weight: 600;
     }
 
-    .btn {
-        padding: 6px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 5px;
-        margin-bottom: 5px;
+    .count {
+        font-weight: 600;
         color: #007bff;
     }
 
-    .btn-danger {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-    }
-
-    .btn-danger:hover {
-        background-color: #a71d2a;
-    }
-
-    .btn-success {
-        background-color: #28a745;
-        color: #fff;
-        border: none;
-    }
-
-    .btn-success:hover {
-        background-color: #1e7e34;
-    }
-
-    .btn-warning {
-        background-color: #ffc107;
-        color: #000;
-        border: none;
-    }
-
-    .btn-warning:hover {
-        background-color: #e0a800;
-    }
-
-    .status-active {
-        color: green;
-        font-weight: 500;
-    }
-
-    .status-inactive {
-        color: red;
-        font-weight: 500;
+    ul {
+        padding-left: 18px;
+        margin: 0;
     }
 </style>
 
-<h1>Employee Training Registrations</h1>
-<p>Welcome HR <strong>{{ user.username }}</strong>. Here you can manage all employee training registrations.</p>
+<h1>Training Registrations Overview</h1>
+<p>Welcome HR <strong>{{ user.username }}</strong>. View registered employees for each training.</p>
 
 <div class="card">
-    <h2>All Registrations</h2>
     <table>
         <thead>
             <tr>
-                <th>Employee</th>
-                <th>Email</th>
                 <th>Training</th>
                 <th>Trainer</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>Registered Employees</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
-            {% for reg in registrations %}
+            {% for training in trainings %}
             <tr>
-                <td>{{ reg.employee.username }}</td>
-                <td>{{ reg.employee.email }}</td>
-                <td>{{ reg.training.title }}</td>
-                <td>{% if reg.training.trainer %}{{ reg.training.trainer.username }}{% else %}-{% endif %}</td>
+                <td>{{ training.title }}</td>
                 <td>
-                    {% if reg.status == 'Completed' %}
-                        <span class="status-active">{{ reg.status }}</span>
-                    {% elif reg.status == 'Pending' %}
-                        <span class="status-inactive">{{ reg.status }}</span>
+                    {% if training.trainer %}
+                        {{ training.trainer.username }}
                     {% else %}
-                        <span>{{ reg.status }}</span>
+                        -
                     {% endif %}
                 </td>
                 <td>
-                    <!-- Delete -->
-                    <form method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="delete_id" value="{{ reg.id }}">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-
-                    <!-- Approve -->
-                    <form method="post" action="{% url 'hr_approve_registration' reg.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-success">Approve</button>
-                    </form>
-
-                    <!-- Reject -->
-                    <form method="post" action="{% url 'hr_reject_registration' reg.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Reject</button>
-                    </form>
+                    {% if training.trainingregistration_set.all %}
+                        <ul>
+                            {% for reg in training.trainingregistration_set.all %}
+                                <li>{{ reg.employee.username }} ({{ reg.employee.email }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        -
+                    {% endif %}
                 </td>
-
-
+                <td class="count">
+                    {{ training.trainingregistration_set.count }}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center">No registrations yet.</td>
+                <td colspan="4">No trainings found.</td>
             </tr>
             {% endfor %}
         </tbody>

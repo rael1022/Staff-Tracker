@@ -356,6 +356,8 @@ def trainer_completions(request):
     if not trainer_trainings.exists():
         registrations = TrainingRegistration.objects.none()
         messages.info(request, "You are not assigned as a trainer for any training sessions.")
+        completed_count = 0
+        not_completed_count = 0
     else:
         registrations = TrainingRegistration.objects.filter(
             training__in=trainer_trainings
@@ -369,13 +371,19 @@ def trainer_completions(request):
         
         if complete_filter:
             registrations = registrations.filter(complete_status=complete_filter)
-    
+
+        completed_count = registrations.filter(complete_status='Completed').count()
+        not_completed_count = registrations.filter(complete_status='Not Completed').count()
+        
     context = {
         'registrations': registrations,
         'status_filter': status_filter,
         'complete_filter': complete_filter,
         'STATUS_CHOICES': TrainingRegistration.STATUS_CHOICES,
         'COMPLETE_CHOICES': TrainingRegistration.COMPLETE_CHOICES,
+        'completed_count': completed_count,
+        'not_completed_count': not_completed_count,
+        'total_count': registrations.count(),
     }
     
     return render(request, 'trainer/trainer_completions.html', context)
@@ -388,23 +396,13 @@ def complete_registration(request, reg_id):
         messages.error(request, "You are not authorized to update this registration.")
         return redirect('trainer_completions')
     
+    if registration.complete_status == 'Completed':
+        messages.info(request, "This registration is already marked as Completed.")
+        return redirect('trainer_completions')
+    
     registration.complete_status = 'Completed'
     registration.save()
     messages.success(request, f"Marked {registration.employee.username}'s registration as Completed.")
-    
-    return redirect('trainer_completions')
-
-@login_required
-def uncomplete_registration(request, reg_id):
-    registration = get_object_or_404(TrainingRegistration, id=reg_id)
-    
-    if registration.training.trainer != request.user:
-        messages.error(request, "You are not authorized to update this registration.")
-        return redirect('trainer_completions')
-    
-    registration.complete_status = 'Not Completed'
-    registration.save()
-    messages.warning(request, f"Marked {registration.employee.username}'s registration as Not Completed.")
     
     return redirect('trainer_completions')
 
@@ -414,24 +412,6 @@ def employee_dashboard(request):
     user = request.user
     user_profile = getattr(user, 'userprofile', None)
     user_department = user_profile.department if user_profile else None
-
-    user_registrations = TrainingRegistration.objects.filter(
-        employee=user, 
-        complete_status='Not Completed'
-    ).select_related('training')
-    
-    for reg in user_registrations:
-        training = reg.training
-        
-        training_start_datetime = datetime.combine(training.date, training.time)
-        training_end_datetime = training_start_datetime + timedelta(hours=training.duration_hours)
-        
-        training_end_aware = timezone.make_aware(training_end_datetime)
-        
-        current_time = timezone.now()
-        if current_time >= training_end_aware:
-            reg.complete_status = 'Completed'
-            reg.save()
     
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')

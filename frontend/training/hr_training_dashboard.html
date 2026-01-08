@@ -3,7 +3,6 @@
 {% block content %}
 
 <style>
-/* ===== Page Header ===== */
 .page-header {
     margin-bottom: 28px;
 }
@@ -20,7 +19,6 @@
     color: #6b7280;
 }
 
-/* ===== Card ===== */
 .card {
     background: #ffffff;
     padding: 28px;
@@ -29,25 +27,16 @@
     margin-bottom: 32px;
 }
 
-/* ===== Filter Card ===== */
-.filter-card {
-    max-width: 980px;
-    margin: 0 auto 40px;
-    background: linear-gradient(135deg, #f9fafb, #ffffff);
-}
-
-.filter-card h2 {
-    font-size: 20px;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 22px;
-    color: #1f2937;
-}
-
 .filter-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 18px;
+    margin: 0 auto 28px;
+    max-width: 900px;
+}
+
+.filter-group {
+    text-align: center;
 }
 
 .filter-group label {
@@ -65,15 +54,6 @@
     font-size: 14px;
     border-radius: 12px;
     border: 1px solid #d1d5db;
-    background: #fff;
-    transition: border-color .2s ease, box-shadow .2s ease;
-}
-
-.filter-group select:focus,
-.filter-group input:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,.2);
 }
 
 .filter-actions {
@@ -81,10 +61,8 @@
     display: flex;
     justify-content: center;
     gap: 14px;
-    margin-top: 10px;
 }
 
-/* ===== Buttons ===== */
 .btn {
     padding: 9px 22px;
     border-radius: 999px;
@@ -96,18 +74,11 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: #fff;
-    box-shadow: 0 8px 22px rgba(99,102,241,.35);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(99,102,241,.45);
 }
 
 .btn-secondary {
@@ -116,23 +87,12 @@
     border: 1px solid #d1d5db;
 }
 
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
 .btn-danger {
     background: #fee2e2;
     color: #991b1b;
     border: 1px solid #fecaca;
 }
 
-.btn-danger:hover {
-    background: #ef4444;
-    color: #fff;
-    border-color: #ef4444;
-}
-
-/* ===== Table ===== */
 .table-wrap {
     overflow-x: auto;
     border-radius: 16px;
@@ -153,22 +113,12 @@ thead th {
     font-weight: 600;
     color: #374151;
     border-bottom: 1px solid #e5e7eb;
-    white-space: nowrap;
 }
 
 tbody td {
     padding: 14px 16px;
     border-bottom: 1px solid #eef0f3;
-    color: #1f2937;
     white-space: nowrap;
-}
-
-tbody tr:hover td {
-    background: #eef2ff;
-}
-
-tbody tr:last-child td {
-    border-bottom: none;
 }
 
 .table-actions {
@@ -176,19 +126,16 @@ tbody tr:last-child td {
     gap: 8px;
 }
 
-/* ===== Empty ===== */
 .empty-row {
     text-align: center;
     color: #6b7280;
     padding: 26px;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-    .table-actions {
-        flex-direction: column;
-    }
-}
+
+
+
+
 </style>
 
 <div class="page-header">
@@ -196,8 +143,8 @@ tbody tr:last-child td {
     <p>Welcome back, <strong>{{ user.username }}</strong></p>
 </div>
 
-<div class="card filter-card">
-    <h2>Filter Trainings</h2>
+<div class="card">
+
     <form method="get" class="filter-form">
 
         <div class="filter-group">
@@ -238,10 +185,9 @@ tbody tr:last-child td {
             <button class="btn btn-primary">Apply Filter</button>
             <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Reset</a>
         </div>
-    </form>
-</div>
 
-<div class="card">
+    </form>
+
     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:18px;">
         <h2 style="margin:0;">Training List</h2>
         <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ New Training</a>
@@ -291,6 +237,7 @@ tbody tr:last-child td {
             </tbody>
         </table>
     </div>
+
 </div>
 
 {% endblock %}

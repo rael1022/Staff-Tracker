@@ -467,7 +467,7 @@ def qr_checkin(request):
         try:
             register_record = TrainingRegistration.objects.filter(
                 employee=user,
-                training_id=training_id
+                training__id=training_id
             ).first()
             
             if not register_record:
@@ -497,34 +497,25 @@ def qr_checkin(request):
                 'message': 'You have already checked in for this training'
             }, status=400)
         
-        try:
-            post_assessment_completed = PostAssessment.objects.filter(
-                training=training_obj,
-                user=user,
-                status='Completed'
-            ).exists()
-            
-            if not post_assessment_completed:
-                return JsonResponse({
-                    'success': False,
-                    'message': 'You must complete the post assessment before checking in'
-                }, status=403)
-                
-        except ImportError:
-            print("Warning: PostAssessment model not found. Skipping post assessment check.")
-        except Exception as e:
-            print(f"Error checking post assessment: {e}")
-            return JsonResponse({
-                'success': False,
-                'message': f'Error checking assessment status: {str(e)}'
-            }, status=500)
-        
         attendance = Attendance.objects.create(
             user=user,
             training_id=training_id,
             status=Attendance.Status.PRESENT,
             check_in_time=timezone.now(),
         )
+        
+        try:
+            if register_record:
+                print(f"=== DEBUG: Updating complete_status to 'Completed'")
+                register_record.complete_status = 'Completed'
+                register_record.save()
+                
+                register_record.refresh_from_db()
+                print(f"=== DEBUG: Complete status AFTER: {register_record.complete_status}")
+        except Exception as e:
+            print(f"Error updating TrainingRegistration complete_status: {e}")
+            import traceback
+            traceback.print_exc()
         
         try:
             if hasattr(training_obj, 'trainer') and training_obj.trainer:
@@ -596,6 +587,14 @@ def qr_checkin(request):
             }
         }
         
+        if register_record:
+            response_data['registration_info'] = {
+                'registration_id': register_record.id,
+                'status': register_record.status,
+                'complete_status': register_record.complete_status,
+                'updated': True
+            }
+            
         if cpd_created:
             response_data['cpd'] = {
                 'points_earned': cpd_points,

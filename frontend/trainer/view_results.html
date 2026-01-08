@@ -183,7 +183,7 @@
         
         <div class="section training-selector">
             <h2>Select Training</h2>
-            <form method="GET" action="{% url 'view_results' %}">
+            <form method="GET">
                 <label for="trainingSelect">Select Training</label>
                 <select id="trainingSelect" name="training_id" onchange="this.form.submit()">
                     <option value="">-- Select a Training --</option>
@@ -199,25 +199,6 @@
         
         {% if selected_training %}
             <h2>Results for: {{ selected_training.title }}</h2>
-            
-            <div class="filters">
-                <label for="filter-type">Filter Result Type</label>
-                <select id="filter-type">
-                    <option value="all">All Results</option>
-                    <option value="pre">Pre-Assessment Only</option>
-                    <option value="post">Post-Assessment Only</option>
-                </select>
-                
-                <label for="sort-by">Sort Results By</label>
-                <select id="sort-by">
-                    <option value="score-desc">Score (High to Low)</option>
-                    <option value="score-asc">Score (Low to High)</option>
-                    <option value="name">Employee Name</option>
-                    <option value="date">Date</option>
-                </select>
-                
-                <input type="text" id="search-name" placeholder="Search by employee name...">
-            </div>
             
             <div class="results-container">
                 <div class="result-section">

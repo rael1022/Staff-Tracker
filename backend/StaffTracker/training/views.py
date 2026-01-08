@@ -179,21 +179,19 @@ def hr_delete_training(request, training_id):
         return redirect('hr_dashboard')
     return render(request, 'training/hr_delete_training.html', {'training': training})
 
-@login_required
-def hr_approve_registration(request, reg_id):
-    reg = get_object_or_404(TrainingRegistration, id=reg_id)
-    reg.status = 'Approved'
-    reg.save()
-    messages.success(request, f"{reg.employee.username}'s registration approved.")
-    return redirect('hr_dashboard')
+
 
 @login_required
-def hr_reject_registration(request, reg_id):
-    reg = get_object_or_404(TrainingRegistration, id=reg_id)
-    reg.status = 'Rejected'
-    reg.save()
-    messages.warning(request, f"{reg.employee.username}'s registration rejected.")
-    return redirect('hr_dashboard')
+@user_passes_test(is_hr)
+def hr_training_registrations(request):
+    trainings = Training.objects.all().prefetch_related(
+        'trainingregistration_set__employee'
+    )
+
+    return render(request, 'training/employee_registrations.html', {
+        'trainings': trainings
+    })
+
 
 # ---------------- Trainer ----------------
 @login_required
@@ -331,24 +329,6 @@ def delete_training(request, training_id):
         return redirect('trainer_dashboard')
     return render(request, 'training/delete_training.html', {'training': training})
 
-
-@login_required
-@user_passes_test(is_hr)
-def hr_training_registrations(request):
-    registrations = TrainingRegistration.objects.select_related('employee', 'training').all()
-
-    if request.method == 'POST':
-        reg_id = request.POST.get('delete_id')
-        if reg_id:
-            reg = get_object_or_404(TrainingRegistration, id=reg_id)
-            reg.delete()
-            messages.success(request, "Registration deleted successfully.")
-            return redirect('hr_training_registrations')
-
-    return render(request, 'training/employee_registrations.html', {
-        'registrations': registrations
-    })
-
 @login_required
 def trainer_completions(request):
     trainer_trainings = Training.objects.filter(trainer=request.user)
@@ -356,6 +336,8 @@ def trainer_completions(request):
     if not trainer_trainings.exists():
         registrations = TrainingRegistration.objects.none()
         messages.info(request, "You are not assigned as a trainer for any training sessions.")
+        completed_count = 0
+        not_completed_count = 0
     else:
         registrations = TrainingRegistration.objects.filter(
             training__in=trainer_trainings
@@ -369,13 +351,19 @@ def trainer_completions(request):
         
         if complete_filter:
             registrations = registrations.filter(complete_status=complete_filter)
-    
+
+        completed_count = registrations.filter(complete_status='Completed').count()
+        not_completed_count = registrations.filter(complete_status='Not Completed').count()
+        
     context = {
         'registrations': registrations,
         'status_filter': status_filter,
         'complete_filter': complete_filter,
         'STATUS_CHOICES': TrainingRegistration.STATUS_CHOICES,
         'COMPLETE_CHOICES': TrainingRegistration.COMPLETE_CHOICES,
+        'completed_count': completed_count,
+        'not_completed_count': not_completed_count,
+        'total_count': registrations.count(),
     }
     
     return render(request, 'trainer/trainer_completions.html', context)
@@ -388,23 +376,13 @@ def complete_registration(request, reg_id):
         messages.error(request, "You are not authorized to update this registration.")
         return redirect('trainer_completions')
     
+    if registration.complete_status == 'Completed':
+        messages.info(request, "This registration is already marked as Completed.")
+        return redirect('trainer_completions')
+    
     registration.complete_status = 'Completed'
     registration.save()
     messages.success(request, f"Marked {registration.employee.username}'s registration as Completed.")
-    
-    return redirect('trainer_completions')
-
-@login_required
-def uncomplete_registration(request, reg_id):
-    registration = get_object_or_404(TrainingRegistration, id=reg_id)
-    
-    if registration.training.trainer != request.user:
-        messages.error(request, "You are not authorized to update this registration.")
-        return redirect('trainer_completions')
-    
-    registration.complete_status = 'Not Completed'
-    registration.save()
-    messages.warning(request, f"Marked {registration.employee.username}'s registration as Not Completed.")
     
     return redirect('trainer_completions')
 
@@ -414,24 +392,6 @@ def employee_dashboard(request):
     user = request.user
     user_profile = getattr(user, 'userprofile', None)
     user_department = user_profile.department if user_profile else None
-
-    user_registrations = TrainingRegistration.objects.filter(
-        employee=user, 
-        complete_status='Not Completed'
-    ).select_related('training')
-    
-    for reg in user_registrations:
-        training = reg.training
-        
-        training_start_datetime = datetime.combine(training.date, training.time)
-        training_end_datetime = training_start_datetime + timedelta(hours=training.duration_hours)
-        
-        training_end_aware = timezone.make_aware(training_end_datetime)
-        
-        current_time = timezone.now()
-        if current_time >= training_end_aware:
-            reg.complete_status = 'Completed'
-            reg.save()
     
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')

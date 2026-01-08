@@ -17,10 +17,7 @@ urlpatterns = [
     path('hr/edit/<int:training_id>/', views.hr_edit_training, name='hr_edit_training'),
     path('hr/delete/<int:training_id>/', views.hr_delete_training, name='hr_delete_training'),
     path('hr/training/registrations/', views.hr_training_registrations, name='hr_training_registrations'),
-    path('hr/registration/<int:reg_id>/approve/', views.hr_approve_registration, name='hr_approve_registration'),
-    path('hr/registration/<int:reg_id>/reject/', views.hr_reject_registration, name='hr_reject_registration'),
 
     path('trainer/completions/', views.trainer_completions, name='trainer_completions'),
     path('trainer/complete-registration/<int:reg_id>/', views.complete_registration, name='complete_registration'),
-    path('trainer/uncomplete-registration/<int:reg_id>/', views.uncomplete_registration, name='uncomplete_registration'),
 ]

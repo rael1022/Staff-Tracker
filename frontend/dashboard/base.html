@@ -2,11 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <title>
-        {% block title %}
-        STAFF TRAINING AND CERTIFICATION TRACKER
-        {% endblock %}
+        {% block title %}STAFF TRAINING AND CERTIFICATION TRACKER{% endblock %}
     </title>
 
     <style>
@@ -14,30 +11,37 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Segoe UI", Arial, sans-serif;
+            font-family: "Segoe UI", "Inter", Arial, sans-serif;
         }
 
         body {
-            background-color: #f9f9f9;
+            background: linear-gradient(135deg, #e0eaff, #f9f9f9);
+            color: #1f2937;
         }
 
         /* ===== Header ===== */
         .site-header {
             width: 100%;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e5e5e5;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(200, 200, 200, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header-container {
             max-width: 1350px;
             margin: 0 auto;
-            padding: 14px 0;
+            padding: 16px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
 
-        /* Logo */
+        /* ===== Logo ===== */
         .logo {
             display: flex;
             flex-direction: column;
@@ -45,84 +49,145 @@
         }
 
         .logo-main {
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            background: linear-gradient(90deg, #7f00ff, #4f46e5, #00d4ff, #7f00ff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            animation: gradientMoveLogo 6s linear infinite;
         }
 
-        .logo-sub {
-            font-size: 10px;
-            color: #666;
-            letter-spacing: 0.8px;
+        @keyframes gradientMoveLogo {
+            0% { background-position: 0% 0; }
+            50% { background-position: 100% 0; }
+            100% { background-position: 0% 0; }
         }
 
-        /* Navigation */
+        /* ===== Navigation ===== */
         .main-nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 32px;
         }
 
         .main-nav a {
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
-            color: #333;
+            color: #4b5563;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .main-nav a:hover {
-            color: #007bff;
+            background: rgba(99, 102, 241, 0.15);
+            color: #6366f1;
+            transform: scale(1.05);
         }
 
-        /* Auth */
+        .main-nav a.active {
+            font-weight: 600;
+            border-bottom: 2px solid #6366f1;
+        }
+
+        /* ===== Auth ===== */
         .auth {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
         }
 
+        .auth form {
+            margin: 0;
+        }
+
+        /* Username */
         .user-greeting {
             font-size: 14px;
             font-weight: 500;
             color: white;
-            padding: 6px 27px;
-            border-radius: 10px;
-            background-color: black;
+            padding: 6px 18px;
+            border-radius: 20px;
             white-space: nowrap;
-        }
-
-
-        .auth button {
-            background: none;
-            border: none;
-            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
             cursor: pointer;
-            color: #333;
+            background: linear-gradient(270deg, #6366f1, #4f46e5);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
-        .auth button:hover {
-            color: #007bff;
+        .user-greeting .icon {
+            margin-right: 6px;
         }
 
+        .user-greeting:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 18px rgba(99,102,241,0.8), 0 0 12px rgba(255,255,255,0.7);
+        }
+
+        /* Logout icon */
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .btn-logout svg {
+            transition: transform 0.25s ease;
+        }
+
+        .btn-logout:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-logout:hover svg {
+            transform: translateX(3px);
+        }
+
+        /* Login */
         .auth .btn {
-            padding: 8px 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            padding: 8px 18px;
+            border-radius: 10px;
             font-size: 14px;
-            background-color: transparent;
+            font-weight: 500;
+            border: 1px solid #d1d5db;
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .auth .btn:hover {
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
         }
 
-        /* ===== Main ===== */
         main {
             max-width: 1200px;
-            margin: 30px auto;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
-        /* ===== Footer ===== */
         footer {
             margin-top: 60px;
             padding: 20px 0;
@@ -132,7 +197,6 @@
             color: #666;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .main-nav {
                 display: none;
@@ -146,44 +210,45 @@
 <header class="site-header">
     <div class="header-container">
 
-        <!-- Logo -->
         <div class="logo">
-            <span class="logo-main">STAFF TRAINING</span>
-            <span class="logo-sub">AND CERTIFICATION TRACKER</span>
+            <span class="logo-main">STAFF TRAINING & CERT TRACKER</span>
         </div>
 
-        <!-- Navigation -->
         <nav class="main-nav">
-
-            <a href="{% url 'dashboard' %}">Dashboard</a>
-
+            <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
         </nav>
 
-
-        <!-- Auth -->
         <div class="auth">
             {% if user.is_authenticated %}
-            <span class="user-greeting">
-                {{ request.user.username }}
-            </span>
-
+                <span class="user-greeting">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" fill="white" viewBox="0 0 24 24">
+                        <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/>
+                    </svg>
+                    {{ request.user.username }}
+                </span>
 
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit">Logout</button>
+                    <button type="submit" class="btn-logout" aria-label="Logout">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="16" height="16"
+                             fill="currentColor"
+                             viewBox="0 0 24 24">
+                            <path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5v-2H5V5h5V3z"/>
+                            <path d="M21 12l-4-4v3H9v2h8v3l4-4z"/>
+                        </svg>
+                    </button>
                 </form>
             {% else %}
                 <a href="{% url 'login' %}" class="btn">Login</a>
             {% endif %}
         </div>
 
-
     </div>
 </header>
 
 <main>
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
 </main>
 
 <footer>

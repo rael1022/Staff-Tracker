@@ -1,0 +1,164 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+<style>
+/* ===== Wrapper ===== */
+.report-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+/* ===== Card ===== */
+.report-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 32px 34px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.08);
+}
+
+/* ===== Header ===== */
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.report-title h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+}
+
+.report-title span {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6366f1;
+}
+
+
+/* ===== Actions ===== */
+.report-actions a {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 10px;
+    color: #4f46e5;
+    border: 1px solid #e0e7ff;
+    background: #eef2ff;
+    transition: all .2s ease;
+}
+
+.report-actions a:hover {
+    background: #4f46e5;
+    color: white;
+    box-shadow: 0 6px 18px rgba(79,70,229,0.35);
+}
+
+/* ===== Summary ===== */
+.summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(99,102,241,0.12);
+    color: #4f46e5;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 26px;
+}
+
+/* ===== Table ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+thead th {
+    text-align: left;
+    padding: 14px 12px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+tbody tr:hover {
+    background: rgba(99,102,241,0.04);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== Empty ===== */
+.empty-row {
+    text-align: center;
+    color: #6b7280;
+    padding: 24px;
+}
+</style>
+
+<div class="report-wrapper">
+    <div class="report-card">
+
+        <div class="report-header">
+            <div class="report-title">
+                <h1>{{ department.name }} Department</h1>
+                <span>CPD Summary Report</span>
+            </div>
+
+            <div class="report-actions">
+                <a href="{% url 'hod_department_cpd_download' %}">
+                    Download CSV
+                </a>
+            </div>
+        </div>
+
+        <div class="summary">
+            Total CPD Points:
+            <strong>{{ total_cpd }}</strong>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Training</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ r.user.username }}</td>
+                    <td>{{ r.training.title }}</td>
+                    <td>{{ r.points }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="empty-row">
+                        No CPD records found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}

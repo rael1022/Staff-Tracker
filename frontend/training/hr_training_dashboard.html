@@ -3,166 +3,156 @@
 {% block content %}
 
 <style>
-    h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-    }
+.page-header {
+    margin-bottom: 28px;
+}
 
-    h2 {
-        font-size: 18px;
-        margin-top: 30px;
-        margin-bottom: 10px;
-    }
+.page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #1f2937;
+}
 
-    .card {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        margin: 30px 0;
-    }
+.page-header p {
+    font-size: 14px;
+    color: #6b7280;
+}
 
-     .filter-card {
-        background: #f9fafc;
-        padding: 20px 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        max-width: 900px;
-        margin: 0 auto 30px auto;
-    }
+.card {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.08);
+    margin-bottom: 32px;
+}
 
-    .filter-card h2 {
-        font-size: 20px;
-        font-weight: 600;
-        text-align: center;
-        margin-bottom: 15px;
-        color: #333;
-    }
+.filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 0 auto 28px;
+    max-width: 900px;
+}
 
-    .filter-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: space-between;
-        align-items: flex-end;
-    }
+.filter-group {
+    text-align: center;
+}
 
-    .filter-group {
-        flex: 1 1 200px;
-        display: flex;
-        flex-direction: column;
-    }
+.filter-group label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #374151;
+    display: block;
+}
 
-    .filter-group label {
-        font-size: 13px;
-        font-weight: 500;
-        margin-bottom: 5px;
-        color: #555;
-    }
+.filter-group select,
+.filter-group input[type="date"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+}
 
-    .filter-group select,
-    .filter-group input[type="date"] {
-        padding: 7px 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+.filter-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
 
-    .filter-actions {
-        display: flex;
-        gap: 10px;
-        flex: 1 1 100%;
-        justify-content: center;
-        margin-top: 10px;
-    }
+.btn {
+    padding: 9px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
-        border: none;
-    }
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+}
 
-    .btn-secondary:hover {
-        background-color: #565e64;
-    }
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
 
-    @media (max-width: 700px) {
-        .filter-form {
-            flex-direction: column;
-        }
-        .filter-actions {
-            justify-content: center;
-        }
-    }
+.btn-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
 
-    table th,
-    table td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        font-size: 14px;
-        text-align: left;
-    }
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
 
-    table th {
-        background-color: #f2f4f7;
-        font-weight: 600;
-    }
+thead th {
+    background: #f3f4f6;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-    .btn {
-        padding: 8px 16px;
-        font-size: 14px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 10px;
-        margin-bottom: 10px;
-        color: #007bff;
-    }
+tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef0f3;
+    white-space: nowrap;
+}
 
-    .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-    }
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
 
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
+.empty-row {
+    text-align: center;
+    color: #6b7280;
+    padding: 26px;
+}
 
-    .btn-danger {
-        background-color: #dc3545;
-        color: #fff;
-        border: none;
-    }
 
-    .btn-danger:hover {
-        background-color: #a71d2a;
-    }
+
+
+
 </style>
 
-<h1>HR Training Dashboard</h1>
-<p>Welcome HR <strong>{{ user.username }}</strong></p>
+<div class="page-header">
+    <h1>HR Training Dashboard</h1>
+    <p>Welcome back, <strong>{{ user.username }}</strong></p>
+</div>
 
-<div class="card filter-card">
-    <h2>Filter Trainings</h2>
+<div class="card">
+
     <form method="get" class="filter-form">
+
         <div class="filter-group">
-            <label for="department">Department</label>
-            <select name="department" id="department">
-                <option value="">-- All Departments --</option>
+            <label>Department</label>
+            <select name="department">
+                <option value="">All Departments</option>
                 {% for dept in departments %}
-                <option value="{{ dept.id }}" {% if selected_department and selected_department|add:"" == dept.id|add:"" %}selected{% endif %}>
+                <option value="{{ dept.id }}" {% if selected_department|stringformat:"s" == dept.id|stringformat:"s" %}selected{% endif %}>
                     {{ dept.name }}
                 </option>
                 {% endfor %}
@@ -170,11 +160,11 @@
         </div>
 
         <div class="filter-group">
-            <label for="trainer">Trainer</label>
-            <select name="trainer" id="trainer">
-                <option value="">-- All Trainers --</option>
+            <label>Trainer</label>
+            <select name="trainer">
+                <option value="">All Trainers</option>
                 {% for t in trainers %}
-                <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
+                <option value="{{ t.id }}" {% if selected_trainer|stringformat:"s" == t.id|stringformat:"s" %}selected{% endif %}>
                     {{ t.username }}
                 </option>
                 {% endfor %}
@@ -182,78 +172,72 @@
         </div>
 
         <div class="filter-group">
-            <label for="start_date">Start Date</label>
-            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            <label>Start Date</label>
+            <input type="date" name="start_date" value="{{ start_date }}">
         </div>
 
         <div class="filter-group">
-            <label for="end_date">End Date</label>
-            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            <label>End Date</label>
+            <input type="date" name="end_date" value="{{ end_date }}">
         </div>
 
         <div class="filter-actions">
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button class="btn btn-primary">Apply Filter</button>
             <a href="{% url 'hr_dashboard' %}" class="btn btn-secondary">Reset</a>
         </div>
+
     </form>
-</div>
 
+    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:18px;">
+        <h2 style="margin:0;">Training List</h2>
+        <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ New Training</a>
+    </div>
 
-<div class="card">
-    <a href="{% url 'hr_create_training' %}" class="btn btn-primary">➕ Create New Training</a>
-    <h2>Training List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Trainer</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Location</th>
-                <th>CPD Points</th>
-                <th>Duration (hrs)</th>
-                <th>Department</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Trainer</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>CPD</th>
+                    <th>Duration</th>
+                    <th>Department</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
             {% for training in trainings %}
-            <tr>
-                <td>{{ training.title }}</td>
-                <td>
-                    {% if training.trainer %}
-                        {{ training.trainer.username }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>{{ training.date }}</td>
-                <td>{{ training.time }}</td>
-                <td>{{ training.location }}</td>
-                <td>{{ training.cpd_points }}</td>
-                <td>{{ training.duration_hours }}</td>
-                <td>
-                    {% if training.department %}
-                        {{ training.department.name }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'hr_edit_training' training.id %}" class="btn btn-primary">Edit</a>
-                    <form method="post" action="{% url 'hr_delete_training' training.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ training.title }}</td>
+                    <td>{{ training.trainer.username|default:"-" }}</td>
+                    <td>{{ training.date }}</td>
+                    <td>{{ training.time }}</td>
+                    <td>{{ training.location }}</td>
+                    <td>{{ training.cpd_points }}</td>
+                    <td>{{ training.duration_hours }}h</td>
+                    <td>{{ training.department.name|default:"-" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'hr_edit_training' training.id %}" class="btn btn-secondary">Edit</a>
+                            <form method="post" action="{% url 'hr_delete_training' training.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
             {% empty %}
-            <tr>
-                <td colspan="9" class="text-center">No trainings available.</td>
-            </tr>
+                <tr>
+                    <td colspan="9" class="empty-row">No trainings found</td>
+                </tr>
             {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 {% endblock %}

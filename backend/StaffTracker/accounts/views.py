@@ -264,55 +264,65 @@ def hr_toggle_user(request, user_id):
     return redirect('/dashboard/')
 
 @login_required
+def hr_manage_users(request):
+    if not request.user.groups.filter(name='HR').exists():
+        return redirect('/dashboard/')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'approve':
+            approve_id = request.POST.get('approve_id')
+            try:
+                profile = UserProfile.objects.get(user__id=approve_id)
+                profile.is_approved = True
+                profile.save()
+
+                user = profile.user
+                user.is_active = True
+                user.save()
+
+                role = profile.role
+                group, _ = Group.objects.get_or_create(name=role)
+                user.groups.clear()
+                user.groups.add(group)
+
+            except UserProfile.DoesNotExist:
+                pass
+
+        elif action == 'reject':
+            reject_id = request.POST.get('reject_id')
+            try:
+                user = User.objects.get(id=reject_id)
+                user.delete()
+            except User.DoesNotExist:
+                pass
+
+    pending_users = UserProfile.objects.filter(is_approved=False)
+    all_users = User.objects.filter(userprofile__is_approved=True)
+
+    return render(
+        request,
+        'manage_account/hr_user_management.html',
+        {
+            'pending_users': pending_users,
+            'all_users': all_users,
+        }
+    )
+
+@login_required
 def dashboard(request):
     user = request.user
 
     if user.groups.filter(name='HR').exists():
-
-        if request.method == 'POST':
-            action = request.POST.get('action')
-            
-            if action == 'approve':
-                approve_id = request.POST.get('approve_id')
-                try:
-                    profile = UserProfile.objects.get(user__id=approve_id)
-                    profile.is_approved = True
-                    profile.save()
-                    user = profile.user
-                    user.is_active = True
-                    user.save()
-                    role = profile.role
-                    group, _ = Group.objects.get_or_create(name=role)
-                    user.groups.clear()
-                    user.groups.add(group)
-                except UserProfile.DoesNotExist:
-                    pass
-
-            elif action == 'reject':
-                reject_id = request.POST.get('reject_id')
-                try:
-                    user = User.objects.get(id=reject_id)
-                    user.delete()
-                except User.DoesNotExist:
-                    pass
-
-
-        pending_users = UserProfile.objects.filter(is_approved=False)
-        all_users = User.objects.filter(userprofile__is_approved=True)
-
-        return render(
-            request,
-            'dashboard/hr_dashboard.html',
-            {
-                'pending_users': pending_users,
-                'all_users': all_users
-            }
-        )
+        return render(request, 'dashboard/hr_dashboard.html')
 
     elif user.groups.filter(name='HOD').exists():
         return render(request, 'dashboard/hod_dashboard.html')
+
     elif user.groups.filter(name='Trainer').exists():
         return render(request, 'dashboard/trainer_dashboard.html')
+
     else:
         return render(request, 'dashboard/employee_dashboard.html')
 

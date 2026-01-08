@@ -140,29 +140,6 @@
             </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-md-8">
-                <div class="input-group search-filter">
-                    <span class="input-group-text">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Search trainings...">
-                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()" aria-label="Clear search">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label for="statusFilter" class="form-label">Training Status</label>
-                <select class="form-select" id="statusFilter" onchange="filterTrainings()">
-                    <option value="all">All Status</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-        </div>
-
         <div class="table-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">Training Sessions</h5>
@@ -281,28 +258,7 @@
                         </div>
                     </div>
 
-                    <div class="card mb-4" id="manualCheckinSection">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0">Manual Check-in</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <label for="userSelect" class="visually-hidden">Select employee</label>
-                                    <select class="form-select" id="userSelect">
-                                        <option value="">Select employee to check in...</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <button class="btn btn-success w-100" onclick="performManualCheckin()">
-                                        <i class="bi bi-check-lg me-1"></i>Mark as Present
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
+                    <div class="table-responsive" id="manualCheckinSection">
                         <table class="table table-sm table-hover">
                             <thead class="table-light">
                                 <tr>

@@ -177,38 +177,38 @@
 <h2>Trainer Dashboard</h2>
 <p class="subtitle">Manage your trainings below</p>
 
-<div class="filter-card">
+<div class="card">
+    <div class="filter-card">
     <h3>Filter Trainings</h3>
     <form method="get" class="filter-form">
         <div class="filter-group">
-            <label for="department">Department</label>
-            <select name="department" id="department">
-                <option value="">-- All Departments --</option>
-                {% for dept in departments %}
-                <option value="{{ dept.id }}" {% if selected_department and selected_department|add:"" == dept.id|add:"" %}selected{% endif %}>
-                    {{ dept.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
+                <label for="department">Department</label>
+                <select name="department" id="department">
+                    <option value="">-- All Departments --</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept.id }}" {% if selected_department and selected_department|add:"" == dept.id|add:"" %}selected{% endif %}>
+                        {{ dept.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <div class="filter-group">
-            <label for="start_date">Start Date</label>
-            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
-        </div>
+            <div class="filter-group">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            </div>
 
-        <div class="filter-group">
-            <label for="end_date">End Date</label>
-            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
-        </div>
+            <div class="filter-group">
+                <label for="end_date">End Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            </div>
 
-        <div class="filter-actions">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'trainer_dashboard' %}" class="btn btn-secondary">Reset</a>
-        </div>
-    </form>
-</div>
-<div class="card">
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{% url 'trainer_dashboard' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
     <div class="action-bar">
         <a href="{% url 'create_training' %}" class="btn btn-primary btncreate">➕ Create New Training</a>
     </div>

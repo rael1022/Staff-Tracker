@@ -22,5 +22,4 @@ urlpatterns = [
 
     path('trainer/completions/', views.trainer_completions, name='trainer_completions'),
     path('trainer/complete-registration/<int:reg_id>/', views.complete_registration, name='complete_registration'),
-    path('trainer/uncomplete-registration/<int:reg_id>/', views.uncomplete_registration, name='uncomplete_registration'),
 ]

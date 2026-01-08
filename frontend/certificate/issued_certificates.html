@@ -1,146 +1,431 @@
 {% extends 'dashboard/base.html' %}
 {% block content %}
+
 <style>
-    body {
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: linear-gradient(120deg, #eef1ff, #f8f9fd);
-    }
+:root{
+    --primary:#4c7df0;
+    --primary-dark:#3a63d8;
+    --bg:#f4f6fb;
+    --border:#e6e9f5;
+    --text:#2c2f42;
+}
 
-    .container {
-        max-width: 1100px;
-        margin: 40px auto;
-        background: #ffffff;
-        padding: 35px;
-        border-radius: 18px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-    }
+body{
+    background:var(--bg);
+}
 
-    h1 {
-        text-align: center;
-        font-size: 28px;
-        font-weight: 600;
-        background: linear-gradient(90deg, #4c7df0, #6f9cff);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 35px;
-    }
+.container{
+    max-width:1200px;
+    margin:40px auto;
+    background:#fff;
+    padding:32px;
+    border-radius:20px;
+    box-shadow:0 20px 45px rgba(0,0,0,.08);
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        overflow: hidden;
-        border-radius: 14px;
-    }
+h1{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:8px;
 
-    thead {
-        background: #f1f4ff;
-    }
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+    color:var(--text);
 
-    th {
-        padding: 14px;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #4c5ea8;
-    }
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+}
 
-    td {
-        padding: 14px;
-        font-size: 15px;
-        color: #333;
-        border-bottom: 1px solid #eef0f6;
-        text-align: center;
-    }
+.title-logo{
+    font-size:26px;
+    line-height:1;
+    color:var(--primary);
 
-    tbody tr {
-        transition: background 0.25s ease;
-    }
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 
-    tbody tr:hover {
-        background: #f6f8ff;
-    }
 
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
+.page-desc{
+    text-align:center;
+    margin:0 auto 28px;
+    color:#6b7280;
+    font-size:14px;
+    max-width:700px;
+}
 
-    .date {
-        font-size: 14px;
-        color: #666;
-    }
+/* Filters */
+.filters{
+    display:flex;
+    gap:14px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
 
-    .btn {
-        padding: 8px 18px;
-        background: linear-gradient(135deg, #4c7df0, #6a92ff);
-        color: #fff;
-        text-decoration: none;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.25s ease;
-        box-shadow: 0 6px 14px rgba(76,125,240,0.35);
-    }
+.filters input,
+.filters select{
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    font-size:14px;
+    min-width:180px;
+    transition:.2s;
+}
 
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 22px rgba(76,125,240,0.45);
-    }
+.filters input:focus,
+.filters select:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(76,125,240,.15);
+}
 
-    .empty {
-        padding: 30px;
-        text-align: center;
-        color: #777;
-        font-style: italic;
-    }
+/* Table */
+.cert-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+}
 
-    @media (max-width: 768px) {
-        th, td {
-            font-size: 13px;
-            padding: 10px;
-        }
+.cert-table th{
+    background:#f1f4ff;
+    padding:14px;
+    font-weight:600;
+    color:#555;
+    border-bottom:1px solid var(--border);
+}
 
-        h1 {
-            font-size: 24px;
-        }
-    }
+.cert-table td{
+    padding:14px;
+    border-bottom:1px solid var(--border);
+    text-align:center;
+    font-size:14px;
+}
+
+.cert-table tbody tr:hover{
+    background:#fafbff;
+}
+
+/* Status badge */
+.status-active,
+.status-expired,
+.status-soon{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    display:inline-block;
+}
+
+.status-active{
+    background:#e8f7ef;
+    color:#1c8b4f;
+}
+
+.status-expired{
+    background:#fdeaea;
+    color:#c0392b;
+}
+
+.status-soon{
+    background:#fff4e5;
+    color:#e67e22;
+}
+
+/* Buttons */
+.btn{
+    padding:7px 16px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+    transition:.2s;
+    text-decoration:none;
+    display:inline-block;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:var(--primary-dark);
+}
+
+.btn-secondary{
+    background:#6c757d;
+    color:#fff;
+}
+
+/* Action buttons */
+.btn-action{
+    padding:7px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:.2s;
+}
+
+.btn-preview{
+    background:#eef0f5;
+    color:#4b5563;
+}
+
+.btn-preview:hover{
+    background:#e2e5ec;
+    box-shadow:0 6px 16px rgba(0,0,0,.08);
+}
+
+.btn-edit{
+    background:var(--primary);
+    color:#fff;
+    margin-left:6px;
+}
+
+.btn-edit:hover{
+    background:var(--primary-dark);
+    box-shadow:0 6px 18px rgba(76,125,240,.35);
+}
+
+/* Update button – subtle & professional */
+.btn-update{
+    background:#16a34a; 
+    color:#fff;
+    font-weight:600;
+    padding:7px 18px;
+    box-shadow:0 4px 10px rgba(22,163,74,.25);
+}
+
+.btn-update:hover{
+    background:#15803d;
+    box-shadow:0 6px 14px rgba(22,163,74,.35);
+}
+
+.btn-update:active{
+    transform:translateY(1px);
+    box-shadow:0 3px 8px rgba(22,163,74,.3);
+}
+
+
+
+/* Modal */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.modal-content{
+    background:#fff;
+    padding:28px;
+    border-radius:18px;
+    width:90%;
+    max-width:420px;
+    animation:pop .25s ease;
+}
+
+@keyframes pop{
+    from{transform:scale(.9);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+.modal h3{
+    margin-top:0;
+    margin-bottom:16px;
+    font-weight:700;
+}
+
+.modal input[type="date"]{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    margin-bottom:16px;
+}
+
+.close-btn{
+    float:right;
+    cursor:pointer;
+    font-size:20px;
+    opacity:.6;
+}
+
+.close-btn:hover{
+    opacity:1;
+}
 </style>
 
+
 <div class="container">
-    <h1>Issued Certificates</h1>
+<h1><span class="title-logo">📜</span>Issues Certificates</h1>
+<p class="page-desc">
+    Issue, preview, and manage employee training certificates from a single dashboard.
+</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Staff</th>
-                <th>Training</th>
-                <th>Issued</th>
-                <th>Expiry</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody>
-        {% for cert in certs %}
-            <tr>
-                <td>{{ cert.user }}</td>
-                <td>{{ cert.training.title }}</td>
-                <td class="date">{{ cert.issue_date }}</td>
-                <td class="date">{{ cert.expiry_date }}</td>
-                <td>
-                    <a class="btn" href="{% url 'certificate_preview' cert.id %}">
-                        Preview
-                    </a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="5" class="empty">
-                    No certificates have been issued yet.
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="filters">
+    <input id="filter-training" placeholder="Training name">
+    <input id="filter-employee" placeholder="Employee name">
+    <select id="filter-status">
+        <option value="">All Status</option>
+        <option value="Active">Active</option>
+        <option value="Expiring Soon">Expiring Soon</option>
+        <option value="Expired">Expired</option>
+        <option value="Not Issued">Not Issued</option>
+    </select>
 </div>
+
+<table class="cert-table" id="certTable">
+<thead>
+<tr>
+    <th>Training</th>
+    <th>Employee</th>
+    <th>Status</th>
+    <th>Expiry</th>
+    <th>Action</th>
+</tr>
+</thead>
+<tbody>
+{% for row in rows %}
+<tr data-training="{{ row.training.title }}"
+    data-employee="{{ row.employee.username }}"
+    data-status="{{ row.status }}">
+
+<td>{{ row.training.title }}</td>
+<td>{{ row.employee.username }}</td>
+
+<td>
+{% if row.status == 'Expired' %}
+    <span class="status-expired">{{ row.status }}</span>
+{% elif row.status == 'Expiring Soon' %}
+    <span class="status-soon">{{ row.status }}</span>
+{% else %}
+    <span class="status-active">{{ row.status }}</span>
+{% endif %}
+</td>
+
+<td>
+    {% if row.cert %}
+        {{ row.cert.expiry_date }}
+    {% else %}
+        -
+    {% endif %}
+</td>
+
+<td>
+{% if row.cert %}
+    <a href="{% url 'certificate_preview' row.cert.id %}"
+    class="btn btn-action btn-preview">
+        Preview
+    </a>
+
+    <button class="btn btn-action btn-edit open-edit"
+            data-cert="{{ row.cert.id }}">
+       Edit
+    </button>
+
+{% else %}
+    <button class="btn btn-primary open-issue"
+            data-training="{{ row.training.id }}"
+            data-user="{{ row.employee.id }}">
+        Issue
+    </button>
+{% endif %}
+</td>
+
+
+</tr>
+{% empty %}
+<tr><td colspan="5">No data</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<!-- Issue Modal -->
+<div class="modal" id="issueModal">
+<div class="modal-content">
+<span class="close-btn" onclick="issueModal.style.display='none'">&times;</span>
+<h3>Issue Certificate</h3>
+<form method="post" id="issueForm">
+{% csrf_token %}
+<input type="date" name="expiry_date" required>
+<button class="btn">Submit</button>
+</form>
+</div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+<div class="modal-content">
+<span class="close-btn" onclick="editModal.style.display='none'">&times;</span>
+<h3>Edit Expiry</h3>
+<form method="post" id="editForm">
+{% csrf_token %}
+<input type="date" name="expiry_date" required>
+<button class="btn btn-update">Update</button>
+</form>
+</div>
+</div>
+
+<script>
+function applyFilter(){
+    const rows=document.querySelectorAll('#certTable tbody tr');
+    const t=document.getElementById('filter-training').value.toLowerCase();
+    const e=document.getElementById('filter-employee').value.toLowerCase();
+    const s=document.getElementById('filter-status').value;
+
+    rows.forEach(r=>{
+        const ok =
+            r.dataset.training.toLowerCase().includes(t) &&
+            r.dataset.employee.toLowerCase().includes(e) &&
+            (s==='' || r.dataset.status===s);
+        r.style.display = ok ? '' : 'none';
+    });
+}
+['filter-training','filter-employee'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',applyFilter);
+});
+document.getElementById('filter-status').addEventListener('change',applyFilter);
+
+const issueModal=document.getElementById('issueModal');
+const editModal=document.getElementById('editModal');
+
+document.querySelectorAll('.open-issue').forEach(b=>{
+    b.onclick=()=>{
+        issueModal.style.display='flex';
+        document.getElementById('issueForm').action =
+        `/certificate/trainer/provide/${b.dataset.training}/${b.dataset.user}/`;
+    }
+});
+document.querySelectorAll('.open-edit').forEach(b=>{
+    b.onclick=()=>{
+        editModal.style.display='flex';
+        document.getElementById('editForm').action =
+        `/certificate/trainer/certificate/${b.dataset.cert}/edit-expiry/`;
+    }
+});
+</script>
+
 {% endblock %}

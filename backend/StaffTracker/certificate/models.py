@@ -6,7 +6,7 @@ from datetime import date
 class Certificate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     training = models.ForeignKey("training.Training", on_delete=models.CASCADE)
-    issue_date = models.DateField()
+    issue_date = models.DateField(auto_now_add=True)
     expiry_date = models.DateField()
     trainer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='issued_certificates')
 

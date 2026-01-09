@@ -1,51 +1,213 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training Check-in</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            border: 1px solid #ddd;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #message {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Check-in</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+/* ===== Light Animated Background ===== */
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+        120deg,
+        #eef4ff,
+        #f6f9ff,
+        #e9f1ff
+    );
+    background-size: 300% 300%;
+    animation: softGradient 14s ease infinite;
+
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes softGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* floating light shapes */
+body::before,
+body::after {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(76,125,240,0.18), transparent 70%);
+    filter: blur(60px);
+    z-index: 0;
+}
+
+body::before {
+    top: -140px;
+    left: -140px;
+}
+
+body::after {
+    bottom: -160px;
+    right: -160px;
+}
+
+/* ===== Card ===== */
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 38px 36px 34px;
+    border-radius: 22px;
+
+    background: #ffffff;
+    box-shadow:
+        0 25px 60px rgba(76, 125, 240, 0.18),
+        0 4px 12px rgba(0,0,0,0.04);
+
+    animation: fadeUp 0.5s ease;
+    transform: translateY(28px);
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Title ===== */
+h1 {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 14px;
+}
+
+/* ===== Training Info ===== */
+.training-info {
+    text-align: center;
+    font-size: 14px;
+    color: #4b5563;
+    margin-bottom: 26px;
+}
+
+.training-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.training-info p {
+    margin: 3px 0;
+}
+
+/* ===== Inputs ===== */
+input {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #111827;
+    background: #f9fbff;
+    transition: all 0.2s ease;
+}
+
+input::placeholder {
+    color: #9ca3af;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4c7df0;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(76, 125, 240, 0.15);
+}
+
+/* ===== Button ===== */
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 6px;
+    border-radius: 14px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+
+    background: linear-gradient(
+        135deg,
+        #4c7df0,
+        #6b8cff
+    );
+
+    box-shadow:
+        0 12px 26px rgba(76, 125, 240, 0.35);
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(76, 125, 240, 0.45);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* ===== Messages ===== */
+#message {
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.success,
+.error {
+    padding: 12px 14px;
+    border-radius: 12px;
+}
+
+.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Training Check-in</h1>
-        
+
+<div class="container">
+    <h1>Training Check-in</h1>
+
+    <div class="training-info">
         {% if training_info %}
             <h3>{{ training_info.title }}</h3>
             <p>Date: {{ training_info.date }} | Time: {{ training_info.time }}</p>
@@ -54,79 +216,68 @@
         {% elif training_id %}
             <p>Training ID: {{ training_id }}</p>
         {% else %}
-            <p style="color: red;">No training ID provided</p>
+            <p style="color:#dc2626;">No training ID provided</p>
         {% endif %}
-        
-        <form id="checkinForm">
-            <input type="hidden" id="trainingId" value="{{ training_id }}">
-            
-            <div>
-                <input type="text" id="username" placeholder="Username" required>
-            </div>
-            <div>
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            
-            <button type="submit">Check In</button>
-        </form>
-        
-        <div id="message"></div>
     </div>
 
-    <script>
-    document.getElementById('checkinForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const trainingId = document.getElementById('trainingId').value;
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        const submitBtn = document.querySelector('button');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Checking in...';
-        
-        try {
-            const response = await fetch('/attendance/api/employee/qr-checkin/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken()
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                    training_id: trainingId
-                })
-            });
-            
-            const data = await response.json();
-            const messageDiv = document.getElementById('message');
-            
-            if (data.success) {
-                messageDiv.innerHTML = `<div class="success">✅ ${data.message}</div>`;
-                setTimeout(() => {
-                    try { window.close(); } catch(e) {}
-                }, 3000);
-            } else {
-                messageDiv.innerHTML = `<div class="error">❌ ${data.message}</div>`;
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Check In';
-            }
-        } catch (error) {
-            document.getElementById('message').innerHTML = 
-                `<div class="error">Network error: ${error.message}</div>`;
+    <form id="checkinForm">
+        <input type="hidden" id="trainingId" value="{{ training_id }}">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Check In</button>
+    </form>
+
+    <div id="message"></div>
+</div>
+
+<script>
+document.getElementById('checkinForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const trainingId = document.getElementById('trainingId').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const submitBtn = document.querySelector('button');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Checking in…';
+
+    try {
+        const response = await fetch('/attendance/api/employee/qr-checkin/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ username, password, training_id: trainingId })
+        });
+
+        const data = await response.json();
+        const messageDiv = document.getElementById('message');
+
+        if (data.success) {
+            messageDiv.innerHTML = `<div class="success">✅ ${data.message}</div>`;
+            setTimeout(() => { try { window.close(); } catch(e) {} }, 2500);
+        } else {
+            messageDiv.innerHTML = `<div class="error">❌ ${data.message}</div>`;
             submitBtn.disabled = false;
             submitBtn.textContent = 'Check In';
         }
-    });
-    
-    function getCSRFToken() {
-        const cookieValue = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('csrftoken='))
-            ?.split('=')[1];
-        return cookieValue || '';
+    } catch (error) {
+        document.getElementById('message').innerHTML =
+            `<div class="error">Network error</div>`;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Check In';
     }
-    </script>
+});
+
+function getCSRFToken() {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1] || '';
+}
+</script>
+
 </body>
 </html>

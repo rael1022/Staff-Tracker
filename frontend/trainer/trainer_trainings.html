@@ -668,24 +668,16 @@
                     <div class="card">
                         <div class="card-body p-3">
                             <div class="row align-items-center">
-                                <div class="col-md-4 text-center">
-                                    <img src="${data.qr_image}" class="img-fluid" style="max-width: 150px;">
-                                </div>
                                 <div class="col-md-8">
                                     <h6 class="mb-2">QR Code Generated</h6>
                                     <p class="mb-1"><small><strong>Valid Until:</strong> ${data.expires_human}</small></p>
                                     <p class="mb-1"><small><strong>URL:</strong> 
-                                        <a href="${data.qr_url}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">
+                                        <a href="${data.qr_url}" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">
                                             ${data.qr_url}
                                         </a>
                                     </small></p>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="copyQRUrl('${data.qr_url}')">
-                                            <i class="bi bi-clipboard me-1"></i>Copy URL
-                                        </button>
-                                        <a href="${data.qr_url_local}" target="_blank" class="btn btn-sm btn-outline-info ms-1">
-                                            <i class="bi bi-link me-1"></i>Local
-                                        </a>
+                                    <div class="col-md-4 text-center">
+                                        <img src="${data.qr_image}" class="img-fluid" style="max-width: 150px;">
                                     </div>
                                 </div>
                             </div>

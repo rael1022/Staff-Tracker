@@ -517,28 +517,6 @@ def qr_checkin(request):
             import traceback
             traceback.print_exc()
         
-        try:
-            if hasattr(training_obj, 'trainer') and training_obj.trainer:
-                Certificate.objects.get_or_create(
-                    user=user,
-                    training=training_obj,
-                    trainer=training_obj.trainer,
-                    defaults={
-                        'issue_date': date.today(),
-                        'expiry_date': date.today() + timedelta(days=365)
-                    }
-                )
-            else:
-                Certificate.objects.get_or_create(
-                    user=user,
-                    training=training_obj,
-                    defaults={
-                        'issue_date': date.today(),
-                        'expiry_date': date.today() + timedelta(days=365)
-                    }
-                )
-        except Exception as e:
-            print(f"Certificate error: {e}")
         
         cpd_created = False
         cpd_points = 0

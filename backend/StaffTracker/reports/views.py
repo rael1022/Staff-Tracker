@@ -414,3 +414,96 @@ def cpd_summary_download(request):
         ])
 
     return response
+
+@login_required
+def hr_certificate_download(request):
+    certificates = Certificate.objects.select_related(
+        'user',
+        'trainer',
+        'training',
+        'user__userprofile',
+        'trainer__userprofile',
+        'training__department',
+    )
+
+    department_id = request.GET.get('department')
+    trainer_id = request.GET.get('trainer')
+    status = request.GET.get('status')
+
+    if department_id:
+        certificates = certificates.filter(user__userprofile__department_id=department_id)
+    if trainer_id:
+        certificates = certificates.filter(trainer_id=trainer_id)
+
+    today = date.today()
+    if status == 'valid':
+        certificates = certificates.filter(expiry_date__gte=today)
+    elif status == 'expired':
+        certificates = certificates.filter(expiry_date__lt=today)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="certificate_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Employee', 'Department', 'Training', 'Trainer', 'Issue Date', 'Expiry Date', 'Status'])
+
+    for c in certificates:
+        writer.writerow([
+            c.user.username,
+            c.user.userprofile.department.name if c.user.userprofile.department else '-',
+            c.training.title if c.training else '-',
+            c.trainer.username if c.trainer else '-',
+            c.issue_date,
+            c.expiry_date,
+            'Expired' if c.is_expired else 'Valid'
+        ])
+
+    return response
+
+@login_required
+def attendance_summary_download(request):
+    records = Attendance.objects.select_related('user')
+
+    department_id = request.GET.get('department')
+    training_name = request.GET.get('training')
+    status = request.GET.get('status')
+
+    if department_id:
+        records = records.filter(user__userprofile__department_id=department_id)
+
+    if training_name:
+        matched_trainings = Training.objects.filter(title__icontains=training_name)
+        matched_ids = matched_trainings.values_list('id', flat=True)
+        records = records.filter(training_id__in=[str(tid) for tid in matched_ids])
+
+    if status in ['Present', 'Absent']:
+        records = records.filter(status=status)
+
+    trainings = Training.objects.all()
+    training_map = {str(t.id): t for t in trainings}
+    for r in records:
+        r.training_obj = training_map.get(r.training_id)
+        r.department_name = (
+            r.user.userprofile.department.name
+            if r.user and r.user.userprofile.department
+            else '-'
+        )
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="attendance_summary.csv"'
+
+    import csv
+    writer = csv.writer(response)
+    writer.writerow(['Employee', 'Department', 'Training', 'Status', 'Check-in Time', 'Date'])
+
+    for r in records:
+        writer.writerow([
+            r.user.username,
+            r.department_name,
+            r.training_obj.title if r.training_obj else '-',
+            r.status,
+            r.check_in_time,
+            r.date
+        ])
+
+    return response

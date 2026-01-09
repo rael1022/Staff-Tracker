@@ -32,7 +32,6 @@ def trainer_certificates_dashboard(request):
     employee_filter = request.GET.get('employee')     # username
     status_filter = request.GET.get('status')         # Active / Expired / Expiring Soon / Not Issued
 
-    # 所有培训
     trainings = Training.objects.filter(trainer=request.user).prefetch_related(
         'trainingregistration_set', 'certificate_set'
     )
@@ -148,7 +147,6 @@ def issued_certificates(request):
     certs = Certificate.objects.filter(trainer=request.user)
     today = date.today()
 
-    # 计算每个证书距离到期天数
     for cert in certs:
         cert.days_to_expiry = (cert.expiry_date - today).days
 

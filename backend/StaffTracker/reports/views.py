@@ -55,13 +55,59 @@ def hr_certificate_report(request):
 
 @login_required
 def cpd_summary_report(request):
-    records = CPDRecord.objects.all()
-    total_points = sum(r.points for r in records)
+    records = CPDRecord.objects.select_related(
+        'user',
+        'training',
+        'user__userprofile',
+        'training__department',
+    )
 
-    return render(request, 'reports/cpd_summary.html', {
+    # filters
+    department_id = request.GET.get('department')
+    employee_name = request.GET.get('employee')
+    training_name = request.GET.get('training')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if department_id:
+        records = records.filter(
+            user__userprofile__department_id=department_id
+        )
+
+    if employee_name:
+        records = records.filter(
+            user__username__icontains=employee_name
+        )
+
+    if training_name:
+        records = records.filter(
+            training__title__icontains=training_name
+        )
+
+    if start_date:
+        records = records.filter(earned_date__gte=start_date)
+
+    if end_date:
+        records = records.filter(earned_date__lte=end_date)
+
+    total_points = records.aggregate(
+        total=models.Sum('points')
+    )['total'] or 0
+
+    context = {
         'records': records,
+        'departments': Department.objects.all(),
         'total_points': total_points,
-    })
+
+        # keep filters
+        'selected_department': int(department_id) if department_id else '',
+        'selected_employee': employee_name or '',
+        'selected_training': training_name or '',
+        'start_date': start_date or '',
+        'end_date': end_date or '',
+    }
+
+    return render(request, 'reports/cpd_summary.html', context)
 
 
 from django.shortcuts import render
@@ -322,6 +368,49 @@ def hod_department_cpd_download(request):
             r.user.username,
             r.training.title if r.training else '-',
             r.points
+        ])
+
+    return response
+
+@login_required
+def cpd_summary_download(request):
+    records = CPDRecord.objects.select_related(
+        'user',
+        'training',
+        'user__userprofile',
+        'training__department',
+    )
+
+    department_id = request.GET.get('department')
+    employee_name = request.GET.get('employee')
+    training_name = request.GET.get('training')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if department_id:
+        records = records.filter(user__userprofile__department_id=department_id)
+    if employee_name:
+        records = records.filter(user__username__icontains=employee_name)
+    if training_name:
+        records = records.filter(training__title__icontains=training_name)
+    if start_date:
+        records = records.filter(earned_date__gte=start_date)
+    if end_date:
+        records = records.filter(earned_date__lte=end_date)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="cpd_summary.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Employee', 'Department', 'Training', 'CPD Points', 'Date'])
+
+    for r in records:
+        writer.writerow([
+            r.user.username,
+            r.user.userprofile.department.name if r.user.userprofile.department else '-',
+            r.training.title if r.training else '-',
+            r.points,
+            r.earned_date
         ])
 
     return response

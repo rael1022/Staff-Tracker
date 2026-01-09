@@ -1,63 +1,311 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>CPD Summary</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #eef1ff;
-            padding: 30px;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-        }
-        h1 {
-            color: #4c7df0;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background: #dde2ff;
-        }
-    </style>
-</head>
-<body>
+{% extends 'dashboard/base.html' %}
+{% block content %}
 
-<div class="container">
-    <h1>CPD Summary Report</h1>
+<style>
+/* ===== Title Bar===== */
+.title-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-bottom: 28px;
+}
 
-    {% if records %}
-    <table>
-        <tr>
-            <th>User</th>
-            <th>Training</th>
-            <th>Points</th>
-            <th>Earned Date</th>
-        </tr>
-        {% for r in records %}
-        <tr>
-            <td>{{ r.user.username }}</td>
-            <td>{{ r.training.title }}</td>
-            <td>{{ r.points }}</td>
-            <td>{{ r.earned_date }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-        <p>No CPD records found.</p>
-    {% endif %}
+.title-center {
+    text-align: center;
+}
+
+.title-right {
+    justify-self: end;
+}
+
+/* ===== Page Container ===== */
+.cpd-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+/* ===== Title ===== */
+.cpd-container h1 {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 600;
+    color: #3f51b5;
+    margin-bottom: 6px;
+}
+
+.cpd-subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 28px;
+}
+
+/* ===== Filter Bar ===== */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.filter-bar input,
+.filter-bar select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: #fff;
+    min-width: 160px;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+    outline: none;
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 3px rgba(63,81,181,0.15);
+}
+
+.filter-bar button {
+    padding: 10px 26px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.filter-bar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(63,81,181,.35);
+}
+
+/* ===== Reset Button ===== */
+.btn-reset {
+    padding: 10px 26px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: linear-gradient(180deg, #ffffff, #f9fafb);
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        border-color .18s ease,
+        color .18s ease;
+}
+
+.btn-reset:hover {
+    transform: translateY(-1px);
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12) inset;
+}
+
+/* ===== Download Button ===== */
+.btn-download {
+    padding: 10px 26px;
+    border-radius: 999px;
+    border: 1px dashed #c7d2fe;
+    background: #f8faff;
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+}
+
+.btn-download:hover {
+    transform: translateY(-1px);
+    background: #eef2ff;
+    border-color: #818cf8;
+    box-shadow: 0 6px 16px rgba(63,81,181,0.18);
+}
+
+
+/* ===== Table ===== */
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+.table-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+th {
+    background: #f1f3ff;
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 1px solid #e0e3ff;
+    white-space: nowrap;
+}
+
+td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef0f6;
+    white-space: nowrap;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: #f1f3ff;
+}
+
+/* ===== CPD Badge ===== */
+.badge-cpd {
+    background: #e8edff;
+    color: #3f51b5;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ===== Empty State ===== */
+.empty-row td {
+    text-align: center;
+    color: #888;
+    padding: 30px 0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .stats {
+        flex-direction: column;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+    <div class="cpd-container">
+
+        <div class="title-bar">
+            <div></div> <!-- left spacer -->
+
+            <div class="title-center">
+                <h1>CPD Summary Report</h1>
+                <div class="cpd-subtitle">
+                    Overview of employee CPD points earned
+                </div>
+            </div>
+
+            <div class="title-right">
+                <a href="{% url 'cpd_summary_download' %}?department={{ selected_department }}&employee={{ selected_employee }}&training={{ selected_training }}&start_date={{ start_date }}&end_date={{ end_date }}"
+                class="btn-download">
+                    Download CSV
+                </a>
+            </div>
+        </div>
+
+
+    <!-- Filter Bar -->
+    <form method="get" class="filter-bar">
+        <select name="department">
+            <option value="">All Departments</option>
+            {% for d in departments %}
+                <option value="{{ d.id }}" {% if selected_department == d.id %}selected{% endif %}>
+                    {{ d.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="text"
+               name="employee"
+               placeholder="Employee username"
+               value="{{ selected_employee }}">
+
+        <input type="text"
+               name="training"
+               placeholder="Training title"
+               value="{{ selected_training }}">
+
+        <input type="date" name="start_date" value="{{ start_date }}">
+        <input type="date" name="end_date" value="{{ end_date }}">
+
+        <button type="submit">Apply Filter</button>
+        <a href="{% url 'cpd_summary' %}" class="btn-reset">Reset</a>
+    </form>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Training</th>
+                <th>CPD</th>
+                <th>Date</th>
+            </tr>
+
+            {% for r in records %}
+            <tr>
+                <td>{{ r.user.username }}</td>
+                <td>{{ r.user.userprofile.department.name|default:"-" }}</td>
+                <td>{{ r.training.title }}</td>
+                <td>
+                    <span class="badge-cpd">{{ r.points }} pts</span>
+                </td>
+                <td>{{ r.earned_date }}</td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="5">No CPD records found</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 </div>
 
-</body>
-</html>
+{% endblock %}

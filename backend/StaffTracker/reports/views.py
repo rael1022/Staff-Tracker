@@ -426,14 +426,16 @@ def hr_certificate_download(request):
         'training__department',
     )
 
-    department_id = request.GET.get('department')
-    trainer_id = request.GET.get('trainer')
-    status = request.GET.get('status')
+
+    department_id = request.GET.get('department', '').strip()
+    trainer_id = request.GET.get('trainer', '').strip()
+    status = request.GET.get('status', '').strip().lower()
+
 
     if department_id:
-        certificates = certificates.filter(user__userprofile__department_id=department_id)
+        certificates = certificates.filter(user__userprofile__department_id=int(department_id))
     if trainer_id:
-        certificates = certificates.filter(trainer_id=trainer_id)
+        certificates = certificates.filter(trainer_id=int(trainer_id))
 
     today = date.today()
     if status == 'valid':
@@ -447,6 +449,7 @@ def hr_certificate_download(request):
     writer = csv.writer(response)
     writer.writerow(['Employee', 'Department', 'Training', 'Trainer', 'Issue Date', 'Expiry Date', 'Status'])
 
+
     for c in certificates:
         writer.writerow([
             c.user.username,
@@ -455,10 +458,11 @@ def hr_certificate_download(request):
             c.trainer.username if c.trainer else '-',
             c.issue_date,
             c.expiry_date,
-            'Expired' if c.is_expired else 'Valid'
+            'Expired' if c.is_expired() else 'Valid'
         ])
 
     return response
+
 
 @login_required
 def attendance_summary_download(request):

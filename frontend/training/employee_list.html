@@ -11,13 +11,22 @@ h2 {
     text-align: center;
 }
 
+.card {
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+    transition: all 0.2s ease;
+}
+
 .filter-card {
     background: #f9fafc;
     padding: 20px 25px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    max-width: 900px;
-    margin: 0 auto 20px auto;
+    margin-bottom: 20px;
 }
 
 .filter-card h3 {
@@ -49,6 +58,7 @@ h2 {
     color: #555;
 }
 
+.filter-group select,
 .filter-group input[type="date"] {
     padding: 7px 10px;
     font-size: 14px;
@@ -56,86 +66,15 @@ h2 {
     border-radius: 6px;
     width: 100%;
     box-sizing: border-box;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 10px;
-    flex: 1 1 100%;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 6px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-}h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.filter-card {
     background: #fff;
-    padding: 20px 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    max-width: 900px;
-    margin: 0 auto 20px auto;
-    transition: all 0.2s ease;
-}
-
-.filter-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-.filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.filter-group {
-    flex: 1 1 200px;
-    display: flex;
-    flex-direction: column;
-}
-
-.filter-group label {
-    font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #555;
-}
-
-.filter-group select,
-.filter-group input[type="date"] {
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: #f9fafb;
     transition: all 0.2s ease;
 }
 
 .filter-group select:focus,
 .filter-group input[type="date"]:focus {
     outline: none;
-    border-color: #6366f1;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
 }
 
 .filter-actions {
@@ -146,37 +85,35 @@ h2 {
     margin-top: 10px;
 }
 
-.filter-actions .btn {
-    padding: 8px 16px;
-    border-radius: 8px;
+/* 所有蓝色按钮统一样式 */
+.btn, .btn-register {
+    display: inline-block;
+    padding: 8px 25px;
+    font-size: 13px;
     font-weight: 500;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.filter-actions .btn-primary {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
+.btn:hover, .btn-register:hover {
+    background-color: #0056b3;
+    text-decoration: none;
+}
+
+/* Reset按钮保持原样 */
+.btn-secondary {
+    background-color: #6c757d;
     color: #fff;
 }
 
-.filter-actions .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(79,70,229,0.35);
-}
-
-.filter-actions .btn-secondary {
-    background: #6c757d;
-    color: #fff;
-}
-
-.filter-actions .btn-secondary:hover {
-    background: #565e64;
-}
-
-.card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+.btn-secondary:hover {
+    background-color: #565e64;
+    text-decoration: none;
 }
 
 table {
@@ -211,21 +148,6 @@ th {
 
 .status-rejected {
     color: red;
-}
-
-.btn-register {
-    display: inline-block;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #fff;
-    background-color: #007bff;
-    border-radius: 4px;
-    text-decoration: none;
-}
-
-.btn-register:hover {
-    background-color: #0056b3;
 }
 
 .assessment-status {
@@ -283,44 +205,43 @@ th {
         justify-content: center;
     }
 }
-
 </style>
 
 <h2>Available Trainings</h2>
 
-<div class="filter-card">
-    <h3>Filter Trainings</h3>
-    <form method="get" class="filter-form">
-        <div class="filter-group">
-            <label for="trainer">Trainer</label>
-            <select name="trainer" id="trainer">
-                <option value="">-- All Trainers --</option>
-                {% for t in trainers %}
-                    <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
-                        {{ t.get_full_name|default:t.username }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="start_date">Start Date</label>
-            <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
-        </div>
-
-        <div class="filter-group">
-            <label for="end_date">End Date</label>
-            <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
-        </div>
-
-        <div class="filter-actions">
-            <button type="submit" class="btn btn-primary">Filter</button>
-            <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Reset</a>
-        </div>
-    </form>
-</div>
-
 <div class="card">
+    <div class="filter-card">
+        <h3>Filter Trainings</h3>
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label for="trainer">Trainer</label>
+                <select name="trainer" id="trainer">
+                    <option value="">-- All Trainers --</option>
+                    {% for t in trainers %}
+                        <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
+                            {{ t.get_full_name|default:t.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="start_date">Start Date</label>
+                <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
+            </div>
+
+            <div class="filter-group">
+                <label for="end_date">End Date</label>
+                <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn">Filter</button>
+                <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -355,9 +276,7 @@ th {
                                 {% elif reg.status == 'Approved' %}status-approved
                                 {% elif reg.status == 'Rejected' %}status-rejected
                                 {% endif %}
-                            ">
-                                {{ reg.status }}
-                            </span>
+                            ">{{ reg.status }}</span>
                         {% else %}
                         <a href="{% url 'register_training' training.id %}" class="btn-register">
                             Register
@@ -369,33 +288,22 @@ th {
                     {% with reg=registrations|get_training_registration:training.id %}
                         {% if reg and reg.status == 'Approved' %}
                             {% load assessment_tags %}
-                            
                             {% if training.id|has_pre_assessment_questions %}
                                 {% if training.id|has_completed_pre_assessment:request.user %}
                                     <span class="assessment-status assessment-completed">Pre ✓</span>
-                                {% elif reg.complete_status != 'Completed' %}
-                                    <a href="{% url 'pre_assessment' training_id=training.id %}" 
-                                    class="assessment-available">Pre-Assessment</a>
                                 {% else %}
-                                    <span class="text-muted">Pre (Not Available)</span>
+                                    <a href="{% url 'pre_assessment' training_id=training.id %}" class="assessment-available">Pre-Assessment</a>
                                 {% endif %}
                             {% else %}
                                 <span class="assessment-status assessment-no-questions">No Pre</span>
                             {% endif %}
-                            
                             <br>
-                            
                             {% if reg.complete_status == 'Completed' %}
                                 {% if training.id|has_post_assessment_questions %}
                                     {% if training.id|has_completed_post_assessment:request.user %}
                                         <span class="assessment-status assessment-completed">Post ✓</span>
                                     {% else %}
-                                        {% if training.id|has_completed_pre_assessment:request.user %}
-                                            <a href="{% url 'post_assessment' training_id=training.id %}" 
-                                            class="assessment-available">Post-Assessment</a>
-                                        {% else %}
-                                            <span class="text-muted">Complete Pre First</span>
-                                        {% endif %}
+                                        <a href="{% url 'post_assessment' training_id=training.id %}" class="assessment-available">Post-Assessment</a>
                                     {% endif %}
                                 {% else %}
                                     <span class="assessment-status assessment-no-questions">No Post</span>
@@ -415,9 +323,7 @@ th {
                                 {% if training|has_evaluated:request.user %}
                                     <span class="text-success">✓ Evaluated</span>
                                 {% else %}
-                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn btn-primary btn-sm">
-                                        Evaluate
-                                    </a>
+                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn">Evaluate</a>
                                 {% endif %}
                             {% else %}
                                 <span class="text-muted">Training Not Completed</span>
@@ -430,7 +336,7 @@ th {
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9">No trainings available.</td>
+                <td colspan="10">No trainings available.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -13,21 +13,36 @@
   animation: fadeUp 0.6s ease-out both;
 }
 
+/* ===== 左侧（升级） ===== */
 .left {
   padding: 80px 0;
 }
 
 .left h1 {
   font-size: 36px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  background: var(--greeting-gradient, linear-gradient(90deg, #1f2937, #4f46e5));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   animation: fadeUp 0.6s ease-out both;
 }
 
-.left p {
-  color: #666;
-  max-width: 420px;
-  line-height: 1.6;
-  animation: fadeUp 0.6s ease-out both;
+.left .date-time {
+  font-size: 14px;
+  color: #9ca3af;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: softFade 0.8s ease-out both;
+}
+
+.left .date-time::before {
+  content: "●";
+  font-size: 6px;
+  color: #c7d2fe;
 }
 
 .left .motivation {
@@ -41,17 +56,6 @@
   animation-delay: 0.2s;
 }
 
-@keyframes softFade {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 0.75;
-    transform: translateY(0);
-  }
-}
-
 .left .motivation::before {
   content: "";
   display: block;
@@ -62,6 +66,21 @@
   opacity: 0.4;
 }
 
+@keyframes softFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 0.75; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: greetingFade 0.5s ease both;
+}
+
+@keyframes greetingFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 右侧（完全不动） ===== */
 .card-options {
   background: #fff;
   border-radius: 16px;
@@ -87,7 +106,8 @@
 
 .card-options:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 50px rgba(47,128,255,0.35), 0 30px 80px rgba(0,0,0,0.12);
+  box-shadow: 0 20px 50px rgba(47,128,255,0.35),
+              0 30px 80px rgba(0,0,0,0.12);
 }
 
 .card-options-header h3 {
@@ -159,8 +179,9 @@
 
 <div class="dashboard-container">
   <section class="left">
-    <h1>Trainer Dashboard</h1>
-    <p>Welcome, <strong>{{ request.user.username }}</strong></p>
+    <h1 id="greeting">Good Morning, {{ request.user.username }}</h1>
+    <div class="date-time" id="dateTime"></div>
+
     <p class="motivation">
       Skill beats talent when practiced daily.
     </p>
@@ -175,7 +196,7 @@
 
       <a href="{% url 'trainer_dashboard' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/manage-trainings.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/manage-trainings.png' %}">
         </div>
         <div class="option-text">
           <h4>Manage Trainings</h4>
@@ -185,7 +206,7 @@
 
       <a href="{% url 'trainer_trainings_page' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/qr-code.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/qr-code.png' %}">
         </div>
         <div class="option-text">
           <h4>Attendance QR</h4>
@@ -195,7 +216,7 @@
 
       <a href="{% url 'manage_assessment_questions' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/quiz.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/quiz.png' %}">
         </div>
         <div class="option-text">
           <h4>Assessment Questions</h4>
@@ -205,7 +226,7 @@
 
       <a href="{% url 'view_results' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/my_results.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/my_results.png' %}">
         </div>
         <div class="option-text">
           <h4>View Assessment Results</h4>
@@ -215,7 +236,7 @@
 
       <a href="{% url 'trainer_evaluations' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/attendance_summary.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/attendance_summary.png' %}">
         </div>
         <div class="option-text">
           <h4>View Evaluations</h4>
@@ -225,16 +246,62 @@
 
       <a href="{% url 'trainer_certificates_dashboard' %}" class="option">
         <div class="option-icon">
-          <img src="{% static 'assets/img/my_certificates.png' %}" alt="Department Report">
+          <img src="{% static 'assets/img/my_certificates.png' %}">
         </div>
         <div class="option-text">
           <h4>Issued Certificates</h4>
           <p>View all certificates issued</p>
         </div>
       </a>
-
     </div>
   </section>
 </div>
+
+<script>
+function updateDateTime() {
+  const el = document.getElementById("dateTime");
+  const now = new Date();
+
+  el.textContent = now.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 60000);
+
+function updateGreeting() {
+  const hour = new Date().getHours();
+  const el = document.getElementById("greeting");
+
+  let text = "Good Morning";
+  let gradient = "linear-gradient(90deg, #0f172a, #22d3ee)";
+
+  if (hour >= 12 && hour < 17) {
+    text = "Good Afternoon";
+    gradient = "linear-gradient(90deg, #1e293b, #6366f1)";
+  } else if (hour >= 17 && hour < 21) {
+    text = "Good Evening";
+    gradient = "linear-gradient(90deg, #7c3aed, #ec4899)";
+  } else if (hour >= 21 || hour < 5) {
+    text = "Good Night";
+    gradient = "linear-gradient(90deg, #020617, #312e81)";
+  }
+
+  document.documentElement.style.setProperty("--greeting-gradient", gradient);
+  el.textContent = `${text}, {{ request.user.username }}`;
+
+  el.classList.remove("fade-in");
+  void el.offsetWidth;
+  el.classList.add("fade-in");
+}
+
+updateGreeting();
+setInterval(updateGreeting, 300000);
+</script>
 
 {% endblock %}

@@ -21,10 +21,11 @@
 /* ===== Header ===== */
 .report-header {
     margin-bottom: 24px;
+    text-align: center;
 }
 
 .report-header h1 {
-    font-size: 22px;
+    font-size: 28px;
     font-weight: 600;
     margin: 0;
     color: #111827;
@@ -32,19 +33,28 @@
 
 .report-header span {
     font-size: 13px;
-    color: #6b7280;
+    color: #3f51b5;
 }
 
-/* ===== Filter Bar ===== */
+/* ===== Filter Layout ===== */
 .filter-bar {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     margin: 26px 0 30px;
 }
 
-.filter-bar input,
-.filter-bar select {
+/* Filters (centered) */
+.filter-fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 12px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.filter-fields input,
+.filter-fields select {
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid #d1d5db;
@@ -52,29 +62,90 @@
     background: #f9fafb;
 }
 
-.filter-bar input:focus,
-.filter-bar select:focus {
+.filter-fields input:focus,
+.filter-fields select:focus {
     outline: none;
     border-color: #6366f1;
     background: #ffffff;
 }
 
-/* Filter button */
-.filter-bar button {
-    background: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .2s ease;
+/* ===== Buttons (Enhanced Effects) ===== */
+.filter-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 4px;
 }
 
-.filter-bar button:hover {
-    background: #4338ca;
-    box-shadow: 0 6px 18px rgba(79,70,229,0.35);
+/* Apply button - primary */
+.filter-actions button {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: 
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
 }
+
+/* Hover */
+.filter-actions button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(79,70,229,0.45);
+    background: linear-gradient(135deg, #4338ca, #5b5cf6);
+}
+
+/* Active (click) */
+.filter-actions button:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+}
+
+/* Focus (keyboard access) */
+.filter-actions button:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 3px rgba(99,102,241,0.35),
+        0 10px 28px rgba(79,70,229,0.45);
+}
+
+/* Reset button - ghost style */
+.reset-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border-radius: 12px;
+    padding: 11px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+/* Hover */
+.reset-btn:hover {
+    background: #ffffff;
+    border-color: #c7d2fe;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* Active */
+.reset-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
 
 /* ===== Table ===== */
 table {
@@ -108,36 +179,14 @@ tbody tr:last-child td {
 }
 
 /* ===== Status ===== */
-.status-complete {
-    color: #16a34a;
-    font-weight: 500;
-}
-
-.status-incomplete {
-    color: #dc2626;
-    font-weight: 500;
-}
-
-.status-approved {
-    color: #2563eb;
-    font-weight: 500;
-}
-
-.status-pending {
-    color: #ca8a04;
-    font-weight: 500;
-}
+.status-complete { color: #16a34a; font-weight: 500; }
+.status-incomplete { color: #dc2626; font-weight: 500; }
+.status-approved { color: #2563eb; font-weight: 500; }
+.status-pending { color: #ca8a04; font-weight: 500; }
 
 /* ===== Certificate ===== */
-.cert-expired {
-    color: #dc2626;
-    font-weight: 500;
-}
-
-.cert-active {
-    color: #16a34a;
-    font-weight: 500;
-}
+.cert-expired { color: #dc2626; font-weight: 500; }
+.cert-active { color: #16a34a; font-weight: 500; }
 
 /* ===== Empty ===== */
 .empty-row {
@@ -150,6 +199,7 @@ tbody tr:last-child td {
 <div class="report-wrapper">
     <div class="report-card">
 
+        <!-- Header -->
         <div class="report-header">
             <h1>{{ department.name }} Department</h1>
             <span>Training Progress Overview</span>
@@ -157,35 +207,46 @@ tbody tr:last-child td {
 
         <!-- Filters -->
         <form method="get" class="filter-bar">
-            <input type="text" name="employee" placeholder="Employee"
-                   value="{{ selected_employee }}">
 
-            <input type="text" name="training" placeholder="Training"
-                   value="{{ selected_training }}">
+            <div class="filter-fields">
+                <input type="text" name="employee" placeholder="Employee"
+                       value="{{ selected_employee }}">
 
-            <select name="status">
-                <option value="">Completion</option>
-                <option value="Completed" {% if selected_status == "Completed" %}selected{% endif %}>
-                    Completed
-                </option>
-                <option value="Not Completed" {% if selected_status == "Not Completed" %}selected{% endif %}>
-                    Not Completed
-                </option>
-            </select>
+                <input type="text" name="training" placeholder="Training"
+                       value="{{ selected_training }}">
 
-            <select name="certificate">
-                <option value="">Certificate</option>
-                <option value="Active" {% if selected_certificate == "Active" %}selected{% endif %}>
-                    Active
-                </option>
-                <option value="Expired" {% if selected_certificate == "Expired" %}selected{% endif %}>
-                    Expired
-                </option>
-            </select>
+                <select name="status">
+                    <option value="">Completion</option>
+                    <option value="Completed"
+                        {% if selected_status == "Completed" %}selected{% endif %}>
+                        Completed
+                    </option>
+                    <option value="Not Completed"
+                        {% if selected_status == "Not Completed" %}selected{% endif %}>
+                        Not Completed
+                    </option>
+                </select>
 
-            <div></div>
+                <select name="certificate">
+                    <option value="">Certificate</option>
+                    <option value="Active"
+                        {% if selected_certificate == "Active" %}selected{% endif %}>
+                        Active
+                    </option>
+                    <option value="Expired"
+                        {% if selected_certificate == "Expired" %}selected{% endif %}>
+                        Expired
+                    </option>
+                </select>
+            </div>
 
-            <button type="submit">Apply Filters</button>
+            <div class="filter-actions">
+                <button type="submit">Apply Filters</button>
+                <a href="{% url 'hod_department_training_progress' %}" class="reset-btn">
+                    Reset
+                </a>
+            </div>
+
         </form>
 
         <!-- Table -->

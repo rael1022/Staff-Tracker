@@ -82,6 +82,7 @@ p {
     transition: all 0.25s ease;
     z-index: 1000;
     margin-top: 100px;
+    text-decoration: none;
 }
 
 .print-btn:hover {
@@ -106,10 +107,7 @@ p {
 }
 </style>
 
-<button class="print-btn" onclick='window.open("{% url 'print_certificate' cert.id %}", "_blank")'>
-    Print Certificate
-</button>
-
+<a href="{% url 'print_certificate' cert.id %}" target="_blank" class="print-btn"> Print Certificate </a>
 
 
 <div class="certificate-wrapper">

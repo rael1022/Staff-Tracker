@@ -249,7 +249,7 @@
                                     <th>Employee</th>
                                     <th>Status</th>
                                     <th>Check-in Time</th>
-                                    <th>Method</th>
+                                    <th>Training Name</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -494,6 +494,9 @@
             
             const isTrainingCompleted = trainingStatus === 'completed';
 
+            const training = allTrainings.find(t => t.id == currentTrainingId);
+            const trainingName = training ? escapeHtml(training.title) : 'Unknown Training';
+
             attendances.forEach(att => {
                 const row = document.createElement('tr');
                 const user = att.user || { username: 'N/A', full_name: 'Unknown', role: 'Unknown' };
@@ -518,16 +521,11 @@
                             '<span class="text-muted">Not checked in</span>'}
                     </td>
                     <td>
-                        ${att.is_qr_checkin ? 
-                            `<span class="badge bg-info">QR Code</span>` : 
-                            `<span class="badge bg-secondary">Manual</span>`}
+                        <span class="badge bg-primary">${escapeHtml(trainingName)}</span>
                     </td>
                     <td>
                         ${!isPresent && !isTrainingCompleted ? 
-                            `<button class="btn btn-sm btn-outline-success" 
-                                    onclick="manualCheckin(${currentTrainingId}, ${user.id})">
-                                <i class="bi bi-check-lg"></i> Check In
-                            </button>` : 
+                            `<span class="text-muted"><i class="bi bi-clock me-1"></i>Training in Progress</span>` : 
                             !isPresent && isTrainingCompleted ?
                             `<span class="text-muted"><i class="bi bi-clock-history me-1"></i>Training is Close</span>` :
                             `<span class="text-muted">Checked In</span>`}

@@ -238,7 +238,6 @@ def generate_qr_code(request):
 @login_required
 def get_training_attendance(request, training_id):
     try:
-        from training.models import Training
         training = get_object_or_404(Training, id=training_id)
 
         if training.trainer != request.user:
@@ -246,46 +245,79 @@ def get_training_attendance(request, training_id):
                 'success': False,
                 'message': 'You are not allowed to view this training attendance.'
             }, status=403)
-            
+        
+        approved_registrations = TrainingRegistration.objects.filter(
+            training=training,
+            status='Approved'
+        ).select_related('employee')
+        
         attendances = Attendance.objects.filter(training_id=training_id)
         
-        data = []
+        attendance_dict = {}
         for att in attendances:
-            user_info = None
             if att.user:
-                user_info = {
-                    'id': att.user.id,
-                    'username': att.user.username,
-                    'full_name': f"{att.user.first_name} {att.user.last_name}".strip() or att.user.username,
+                attendance_dict[att.user.id] = {
+                    'attendance': att,
+                    'status': att.status,
+                    'check_in_time': att.check_in_time,
+                    'is_qr_checkin': bool(att.check_in_time)
                 }
+                
+        attendance_list = []
+        for registration in approved_registrations:
+            user = registration.employee
+            user_attendance = attendance_dict.get(user.id)
             
-            data.append({
-                'id': str(att.id),
-                'user': user_info,
-                'status': att.status,
-                'check_in_time': att.check_in_time.isoformat() if att.check_in_time else None,
-                'date': att.date.isoformat(),
-                'is_qr_checkin': bool(att.check_in_time),
-            })
+            if user_attendance:
+                att = user_attendance['attendance']
+                attendance_list.append({
+                    'id': str(att.id),
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'full_name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                    },
+                    'status': user_attendance['status'],
+                    'check_in_time': att.check_in_time.isoformat() if att.check_in_time else None,
+                    'date': att.date.isoformat(),
+                    'is_qr_checkin': user_attendance['is_qr_checkin'],
+                })
+            else:
+                attendance_list.append({
+                    'id': None,
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'full_name': f"{user.first_name} {user.last_name}".strip() or user.username,
+                    },
+                    'status': 'Absent',
+                    'check_in_time': None,
+                    'date': timezone.now().date().isoformat(),
+                    'is_qr_checkin': False,
+                })
         
-        training_info = {
-            'id': training.id,
-            'title': training.title,
-            'date': training.date.isoformat() if training.date else None,
-            'location': training.location,
-        }
+        present_count = len([a for a in attendance_list if a['status'] == 'Present'])
+        absent_count = len([a for a in attendance_list if a['status'] == 'Absent'])
+        total_count = len(attendance_list)
         
         return JsonResponse({
             'success': True,
             'training_id': training_id,
-            'training_info': training_info,
-            'total': attendances.count(),
-            'present': attendances.filter(status=Attendance.Status.PRESENT).count(),
-            'absent': attendances.filter(status=Attendance.Status.ABSENT).count(),
-            'attendances': data
+            'training_info': {
+                'id': training.id,
+                'title': training.title,
+                'date': training.date.isoformat() if training.date else None,
+                'location': training.location,
+            },
+            'total': total_count,
+            'present': present_count,
+            'absent': absent_count,
+            'attendances': attendance_list
         })
         
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({
             'success': False,
             'message': str(e)

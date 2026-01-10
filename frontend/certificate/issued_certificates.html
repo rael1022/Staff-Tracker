@@ -253,6 +253,13 @@ h1{
     font-weight:700;
 }
 
+.modal h4{
+    font-weight:500;
+    color: grey;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
 .modal input[type="date"]{
     width:100%;
     padding:10px 12px;
@@ -364,6 +371,7 @@ h1{
 <div class="modal-content">
 <span class="close-btn" onclick="issueModal.style.display='none'">&times;</span>
 <h3>Issue Certificate</h3>
+<h4>Expired date</h4>
 <form method="post" id="issueForm">
 {% csrf_token %}
 <input type="date" name="expiry_date" required>

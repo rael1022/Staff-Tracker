@@ -5,6 +5,7 @@ from .views import hr_delete_certificate
 urlpatterns = [
     # Employee
     path('my-certificates/', views.certificate_list, name='my_certificates'),
+    path("print/<int:cert_id>/", views.print_certificate, name="print_certificate"),
 
     # Trainer – new certificate flow
     path('trainer/certificates/', views.trainer_certificates_dashboard, name='trainer_certificates_dashboard'),

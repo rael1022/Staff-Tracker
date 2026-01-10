@@ -144,6 +144,7 @@ tr:hover td {
       <tr>
         <th>Username</th>
         <th>Email</th>
+        <th>Department</th>
         <th>Role</th>
         <th>Action</th>
       </tr>
@@ -151,6 +152,14 @@ tr:hover td {
       <tr>
         <td>{{ profile.user.username }}</td>
         <td>{{ profile.user.email }}</td>
+        <td>
+          {% if profile.department %}
+            {{ profile.department.name }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+
         <td>{{ profile.role }}</td>
         <td>
           <form method="post" class="inline-form">{% csrf_token %}

@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Register | Staff Training Tracker</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/img/logo.png' %}" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", "Inter", Arial, sans-serif; }
         body { 
@@ -18,12 +20,20 @@
         .header-container {
             max-width: 1200px; 
             margin: 0 auto; 
-            padding: 18px 20px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
         }
         .logo {
             display: flex;
-            flex-direction: column;
-            line-height: 1;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo img {
+            height: 40px;
+            width: 40px;
+            object-fit: contain;
+            background: transparent;
         }
         .logo-main {
             font-size: 17px; 
@@ -59,7 +69,7 @@
         label { font-size: 14px; font-weight: 500; margin-bottom: 6px; display: block; color: #374151; }
         input, select { width: 100%; padding: 12px 14px; margin-bottom: 16px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; background: #f9fafb; transition: all 0.2s ease; }
         input:focus, select:focus { outline: none; border-color: #6366f1; background: #ffffff; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
-        button { width: 100%; padding: 13px; border: none; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #ffffff; font-size: 15px; font-weight: 600; letter-spacing: 0.3px; cursor: pointer; transition: all 0.2s ease; }
+        button { width: 100%; padding: 13px; border: none; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #ffffff; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.35); }
         .login-link { text-align: center; margin-top: 16px; font-size: 14px; }
         .login-link a { color: #6366f1; text-decoration: none; font-weight: 500; }
@@ -74,6 +84,7 @@
 <header class="site-header">
     <div class="header-container">
         <div class="logo">
+            <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
             <span class="logo-main">STAFF TRAINING & CERT TRACKER</span>
         </div>
     </div>
@@ -93,40 +104,34 @@
         </select>
     </form>
 
-<form method="post" id="registerForm">
-    {% csrf_token %}
-    <input type="hidden" name="role" value="{{ selected_role|default:'' }}">
+    <form method="post" id="registerForm">
+        {% csrf_token %}
+        <input type="hidden" name="role" value="{{ selected_role|default:'' }}">
 
-    <label>Department</label>
-    <select name="department"         
-        {% if selected_role|default:'' == 'HR' %}
-            disabled
-        {% else %}
-            required
-        {% endif %}>
-        <option value="">-- Select Department --</option>
-        {% for dept in departments %}
-            <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == department_value|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
-        {% endfor %}
-    </select>
+        <label>Department</label>
+        <select name="department" {% if selected_role|default:'' == 'HR' %}disabled{% else %}required{% endif %}>
+            <option value="">-- Select Department --</option>
+            {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if dept.id|stringformat:"s" == department_value|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+            {% endfor %}
+        </select>
 
-    <label>Username</label>
-    <input type="text" name="username" value="{{ request.POST.username|default:'' }}" required>
+        <label>Username</label>
+        <input type="text" name="username" value="{{ request.POST.username|default:'' }}" required>
 
-    <label>Email</label>
-    <input type="email" name="email" value="{{ request.POST.email|default:'' }}" required>
+        <label>Email</label>
+        <input type="email" name="email" value="{{ request.POST.email|default:'' }}" required>
 
-    <label>Password</label>
-    <input type="password" name="password" id="password" required>
+        <label>Password</label>
+        <input type="password" name="password" id="password" required>
 
-    <label>Confirm Password</label>
-    <input type="password" name="confirm_password" id="confirm_password" required>
+        <label>Confirm Password</label>
+        <input type="password" name="confirm_password" id="confirm_password" required>
 
-    <button type="submit">Create Account</button>
-</form>
+        <button type="submit">Create Account</button>
+    </form>
 
-<div class="message error" id="passwordError" style="display:none;">Passwords do not match.</div>
-
+    <div class="message error" id="passwordError" style="display:none;">Passwords do not match.</div>
 
     <div class="login-link">
         <a href="{% url 'login' %}">Back to Login</a>
@@ -141,25 +146,23 @@
     {% endif %}
 </div>
 
-</body>
-</html>
 <script>
 document.getElementById('registerForm').addEventListener('submit', function(event) {
     var pwd = document.getElementById('password').value;
     var confirmPwd = document.getElementById('confirm_password').value;
-
     if (pwd !== confirmPwd) {
-        event.preventDefault();  
+        event.preventDefault();
         document.getElementById('passwordError').style.display = 'block';
     } else {
         document.getElementById('passwordError').style.display = 'none';
     }
 });
-
 document.addEventListener('DOMContentLoaded', function () {
     {% if message %}
         alert("{{ message|escapejs }}");
     {% endif %}
 });
-
 </script>
+
+</body>
+</html>

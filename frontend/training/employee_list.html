@@ -1,5 +1,7 @@
 {% extends 'dashboard/base.html' %}
 {% load evaluation_tags %}
+{% load training_tags %}
+{% load assessment_tags %}
 
 {% block content %}
 
@@ -13,20 +15,19 @@ h2 {
 
 .card {
     background: #fff;
-    padding: 20px 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    max-width: 1000px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    max-width: 1200px;
     margin: 0 auto 20px auto;
-    transition: all 0.2s ease;
 }
 
 .filter-card {
     background: #f9fafc;
     padding: 20px 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
 }
 
 .filter-card h3 {
@@ -34,7 +35,6 @@ h2 {
     font-weight: 600;
     text-align: center;
     margin-bottom: 15px;
-    color: #333;
 }
 
 .filter-form {
@@ -42,7 +42,6 @@ h2 {
     flex-wrap: wrap;
     gap: 15px;
     justify-content: space-between;
-    align-items: flex-end;
 }
 
 .filter-group {
@@ -53,156 +52,162 @@ h2 {
 
 .filter-group label {
     font-size: 13px;
-    font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     color: #555;
 }
 
 .filter-group select,
 .filter-group input[type="date"] {
-    padding: 7px 10px;
+    padding: 8px 10px;
     font-size: 14px;
-    border: 1px solid #ccc;
     border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
-    background: #fff;
-    transition: all 0.2s ease;
-}
-
-.filter-group select:focus,
-.filter-group input[type="date"]:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+    border: 1px solid #ccc;
 }
 
 .filter-actions {
     display: flex;
     gap: 10px;
-    flex: 1 1 100%;
     justify-content: center;
-    margin-top: 10px;
+    width: 100%;
 }
 
-/* 所有蓝色按钮统一样式 */
-.btn, .btn-register {
-    display: inline-block;
-    padding: 8px 25px;
+.btn,
+.btn-register {
+    padding: 8px 20px;
     font-size: 13px;
     font-weight: 500;
+    border-radius: 6px;
+    background: #007bff;
     color: #fff;
-    background-color: #007bff;
-    border-radius: 4px;
-    text-decoration: none;
     border: none;
     cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s ease;
 }
 
-.btn:hover, .btn-register:hover {
-    background-color: #0056b3;
-    text-decoration: none;
+.btn:hover,
+.btn-register:hover {
+    background: #0056b3;
 }
 
-/* Reset按钮保持原样 */
 .btn-secondary {
-    background-color: #6c757d;
-    color: #fff;
+    background: #6c757d;
 }
 
 .btn-secondary:hover {
-    background-color: #565e64;
-    text-decoration: none;
+    background: #565e64;
 }
 
 table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 15px;
     font-size: 14px;
-    text-align: left;
 }
 
-th {
-    background-color: #f2f4f7;
+thead th {
+    background: #f2f4f7;
+    padding: 12px;
+    text-align: center;
     font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background: #f9fbff;
 }
 
 .status {
+    font-weight: 600;
+}
+
+.status-pending { color: #ff9800; }
+.status-approved { color: #2e7d32; }
+.status-rejected { color: #d32f2f; }
+
+.action-btn {
+    display: inline-block;
+    padding: 6px 14px;
+    font-size: 12px;
     font-weight: 500;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
 }
 
-.status-pending {
-    color: #ff9800;
+.btn-pre {
+    background: #e3f2fd;
+    color: #1976d2;
 }
 
-.status-approved {
-    color: green;
+.btn-post {
+    background: #e8f5e9;
+    color: #2e7d32;
 }
 
-.status-rejected {
-    color: red;
+.btn-eval {
+    background: #fff3e0;
+    color: #ef6c00;
 }
 
-.assessment-status {
-    font-weight: 500;
+.action-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
 }
 
-.assessment-completed {
-    color: green;
-    cursor: default;
+.completed-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #e0f2f1;
+    color: #00796b;
+    font-size: 12px;
+    font-weight: 600;
 }
 
-.assessment-no-questions {
-    color: #ff9800;
-}
-
-.assessment-available {
-    color: #007bff;
+.muted-text {
+    color: #999;
+    font-size: 12px;
 }
 
 .modal {
     display: none;
     position: fixed;
     z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    inset: 0;
+    background: rgba(0,0,0,0.5);
 }
 
 .modal-content {
-    background-color: #fff;
+    background: #fff;
     margin: 15% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
+    padding: 25px;
+    border-radius: 10px;
+    width: 320px;
     text-align: center;
 }
 
 .modal-close {
     margin-top: 15px;
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
+    padding: 8px 18px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 6px;
     border: none;
-    border-radius: 4px;
     cursor: pointer;
 }
 
-@media (max-width: 700px) {
-    .filter-form {
-        flex-direction: column;
-    }
-    .filter-actions {
-        justify-content: center;
+@media (max-width: 768px) {
+    table {
+        font-size: 13px;
     }
 }
 </style>
@@ -210,166 +215,146 @@ th {
 <h2>Available Trainings</h2>
 
 <div class="card">
-    <div class="filter-card">
-        <h3>Filter Trainings</h3>
-        <form method="get" class="filter-form">
-            <div class="filter-group">
-                <label for="trainer">Trainer</label>
-                <select name="trainer" id="trainer">
-                    <option value="">-- All Trainers --</option>
-                    {% for t in trainers %}
-                        <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:"" == t.id|add:"" %}selected{% endif %}>
-                            {{ t.get_full_name|default:t.username }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
 
-            <div class="filter-group">
-                <label for="start_date">Start Date</label>
-                <input type="date" name="start_date" id="start_date" value="{{ start_date }}">
-            </div>
-
-            <div class="filter-group">
-                <label for="end_date">End Date</label>
-                <input type="date" name="end_date" id="end_date" value="{{ end_date }}">
-            </div>
-
-            <div class="filter-actions">
-                <button type="submit" class="btn">Filter</button>
-                <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Reset</a>
-            </div>
-        </form>
+<div class="filter-card">
+<form method="get" class="filter-form">
+    <div class="filter-group">
+        <label>Trainer</label>
+        <select name="trainer">
+            <option value="">-- All Trainers --</option>
+            {% for t in trainers %}
+            <option value="{{ t.id }}" {% if selected_trainer and selected_trainer|add:'' == t.id|add:'' %}selected{% endif %}>
+                {{ t.get_full_name|default:t.username }}
+            </option>
+            {% endfor %}
+        </select>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Trainer</th>
-                <th>Duration (hours)</th>
-                <th>Location</th>
-                <th>CPD Points</th>
-                <th>Status</th>
-                <th>Assessment</th>
-                <th>Evaluation</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% load training_tags %}
-            {% for training in trainings %}
-            <tr>
-                <td>{{ training.title }}</td>
-                <td>{{ training.date }}</td>
-                <td>{{ training.time }}</td>
-                <td>{{ training.trainer }}</td>
-                <td>{{ training.duration_hours }}</td>
-                <td>{{ training.location }}</td>
-                <td>{{ training.cpd_points }}</td>
-                <td>
-                    {% with reg=registrations|get_training_registration:training.id %}
-                        {% if reg %}
-                            <span class="status
-                                {% if reg.status == 'Pending' %}status-pending
-                                {% elif reg.status == 'Approved' %}status-approved
-                                {% elif reg.status == 'Rejected' %}status-rejected
-                                {% endif %}
-                            ">{{ reg.status }}</span>
-                        {% else %}
-                        <a href="{% url 'register_training' training.id %}" class="btn-register">
-                            Register
-                        </a>
-                        {% endif %}
-                    {% endwith %}
-                </td>
-                <td>
-                    {% with reg=registrations|get_training_registration:training.id %}
-                        {% if reg and reg.status == 'Approved' %}
-                            {% load assessment_tags %}
-                            {% if training.id|has_pre_assessment_questions %}
-                                {% if training.id|has_completed_pre_assessment:request.user %}
-                                    <span class="assessment-status assessment-completed">Pre ✓</span>
-                                {% else %}
-                                    <a href="{% url 'pre_assessment' training_id=training.id %}" class="assessment-available">Pre-Assessment</a>
-                                {% endif %}
-                            {% else %}
-                                <span class="assessment-status assessment-no-questions">No Pre</span>
-                            {% endif %}
-                            <br>
-                            {% if reg.complete_status == 'Completed' %}
-                                {% if training.id|has_post_assessment_questions %}
-                                    {% if training.id|has_completed_post_assessment:request.user %}
-                                        <span class="assessment-status assessment-completed">Post ✓</span>
-                                    {% else %}
-                                        <a href="{% url 'post_assessment' training_id=training.id %}" class="assessment-available">Post-Assessment</a>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="assessment-status assessment-no-questions">No Post</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">Post (Training Not Completed)</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="text-muted">Not Eligible</span>
-                        {% endif %}
-                    {% endwith %}
-                </td>
-                <td>
-                    {% with reg=registrations|get_training_registration:training.id %}
-                        {% if reg and reg.status == 'Approved' %}
-                            {% if reg.complete_status == 'Completed' %}
-                                {% if training|has_evaluated:request.user %}
-                                    <span class="text-success">✓ Evaluated</span>
-                                {% else %}
-                                    <a href="{% url 'submit_evaluation' training.id %}" class="btn">Evaluate</a>
-                                {% endif %}
-                            {% else %}
-                                <span class="text-muted">Training Not Completed</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="text-muted">Not Eligible</span>
-                        {% endif %}
-                    {% endwith %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="10">No trainings available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="filter-group">
+        <label>Start Date</label>
+        <input type="date" name="start_date" value="{{ start_date }}">
+    </div>
+
+    <div class="filter-group">
+        <label>End Date</label>
+        <input type="date" name="end_date" value="{{ end_date }}">
+    </div>
+
+    <div class="filter-actions">
+        <button class="btn">Filter</button>
+        <a href="{% url 'employee_dashboard' %}" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+</div>
+
+<table>
+<thead>
+<tr>
+    <th>Title</th>
+    <th>Date</th>
+    <th>Time</th>
+    <th>Trainer</th>
+    <th>Duration</th>
+    <th>Location</th>
+    <th>CPD</th>
+    <th>Status</th>
+    <th>Assessment</th>
+    <th>Evaluation</th>
+</tr>
+</thead>
+
+<tbody>
+{% for training in trainings %}
+<tr>
+<td>{{ training.title }}</td>
+<td>{{ training.date }}</td>
+<td>{{ training.time }}</td>
+<td>{{ training.trainer }}</td>
+<td>{{ training.duration_hours }}</td>
+<td>{{ training.location }}</td>
+<td>{{ training.cpd_points }}</td>
+
+<td>
+{% with reg=registrations|get_training_registration:training.id %}
+{% if reg %}
+<span class="status {% if reg.status == 'Pending' %}status-pending{% elif reg.status == 'Approved' %}status-approved{% else %}status-rejected{% endif %}">
+{{ reg.status }}
+</span>
+{% else %}
+<a href="{% url 'register_training' training.id %}" class="btn-register">Register</a>
+{% endif %}
+{% endwith %}
+</td>
+
+<td>
+{% with reg=registrations|get_training_registration:training.id %}
+{% if reg and reg.status == 'Approved' %}
+{% if training.id|has_pre_assessment_questions %}
+{% if training.id|has_completed_pre_assessment:request.user %}
+<span class="completed-badge">Pre ✓</span>
+{% else %}
+<a href="{% url 'pre_assessment' training.id %}" class="action-btn btn-pre">Pre</a>
+{% endif %}
+{% else %}
+<span class="muted-text">No Pre</span>
+{% endif %}
+<br>
+{% if reg.complete_status == 'Completed' %}
+{% if training.id|has_post_assessment_questions %}
+{% if training.id|has_completed_post_assessment:request.user %}
+<span class="completed-badge">Post ✓</span>
+{% else %}
+<a href="{% url 'post_assessment' training.id %}" class="action-btn btn-post">Post</a>
+{% endif %}
+{% else %}
+<span class="muted-text">No Post</span>
+{% endif %}
+{% else %}
+<span class="muted-text">Not Completed</span>
+{% endif %}
+{% else %}
+<span class="muted-text">Not Eligible</span>
+{% endif %}
+{% endwith %}
+</td>
+
+<td>
+{% with reg=registrations|get_training_registration:training.id %}
+{% if reg and reg.status == 'Approved' and reg.complete_status == 'Completed' %}
+{% if training|has_evaluated:request.user %}
+<span class="completed-badge">✓ Evaluated</span>
+{% else %}
+<a href="{% url 'submit_evaluation' training.id %}" class="action-btn btn-eval">Evaluate</a>
+{% endif %}
+{% else %}
+<span class="muted-text">Not Eligible</span>
+{% endif %}
+{% endwith %}
+</td>
+</tr>
+{% empty %}
+<tr><td colspan="10" style="text-align:center;">No trainings available.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+
 </div>
 
 <script>
 function showCompletedMessage() {
     document.getElementById('completedModal').style.display = 'block';
 }
-
 function closeModal() {
     document.getElementById('completedModal').style.display = 'none';
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    const completedAssessments = document.querySelectorAll('.assessment-completed');
-    completedAssessments.forEach(element => {
-        element.style.cursor = 'default';
-        element.onclick = function(e) {
-            e.preventDefault();
-            showCompletedMessage();
-        };
-    });
-});
 </script>
 
 <div id="completedModal" class="modal">
-    <div class="modal-content">
-        <h3>Assessment Already Completed</h3>
-        <p>You have already completed this assessment.</p>
-        <button class="modal-close" onclick="closeModal()">OK</button>
-    </div>
+<div class="modal-content">
+<h3>Assessment Already Completed</h3>
+<p>You have already completed this assessment.</p>
+<button class="modal-close" onclick="closeModal()">OK</button>
+</div>
 </div>
 
 {% endblock %}

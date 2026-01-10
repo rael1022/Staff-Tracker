@@ -1,16 +1,12 @@
 <p align="center">
-  <img src="backend/StaffTracker/assets/static/assets/img/logo.png" alt="Project Logo" width="100">
+  <img src="backend/StaffTracker/assets/static/assets/img/logo.png" alt="Project Logo" width="150">
 </p>
-
 <h1 align="center">Staff Training and Certification Tracker</h1>
 
-<p align="center">
-A web-based application developed as a project for the <strong>Software Engineering Fundamentals</strong> course.<br>
-
-This system applies core software engineering principles to design and implement a structured solution for managing <strong>staff training</strong>, <strong>certifications</strong>, <strong>CPD (Continuing Professional Development)</strong>, <strong>attendance</strong>, and <strong>automated notifications</strong>.<br>
+A web-based application developed as a project for the **Software Engineering Fundamentals** course. 
+This system applies core software engineering principles to design and implement a structured solution for managing **staff training**, **certifications**, **CPD (Continuing Professional Development)**, **attendance**, and **automated notifications**. 
 
 The project emphasizes modular design, maintainability, and real-world applicability using modern web technologies.
-</p>
 
 ---
 

@@ -2,135 +2,26 @@
 {% block content %}
 
 <style>
-/* ===== Layout ===== */
-.edit-user-wrapper {
-    max-width: 480px;
-    margin: 0 auto;
-}
-
-/* ===== Header ===== */
-.edit-user-header {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.edit-user-header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 6px;
-}
-
-.edit-user-header p {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-/* ===== Card ===== */
-.edit-user-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 22px 26px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-}
-
-/* ===== Form ===== */
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 6px;
-    display: block;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 9px 11px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-}
-
-/* ===== Status ===== */
-.status-message {
-    font-size: 14px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-.status-message.success {
-    background: #ecfdf5;
-    color: #065f46;
-}
-
-.status-message.error {
-    background: #fef2f2;
-    color: #991b1b;
-}
-
-/* ===== Button ===== */
-.button-group {
-    margin-top: 22px;
-    text-align: center;
-}
-
-.btn-primary {
-    background: #4f46e5;
-    color: #ffffff;
-    border: none;
-    padding: 10px 34px;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 10px;
-    cursor: pointer;
-    transition:
-        transform .12s ease,
-        box-shadow .12s ease,
-        background .12s ease;
-    box-shadow: 0 6px 14px rgba(79,70,229,0.25);
-}
-
-/* hover = 抬起 */
-.btn-primary:hover {
-    background: #4338ca;
-    transform: translateY(-1px);
-    box-shadow: 0 10px 22px rgba(79,70,229,0.35);
-}
-
-/* click = 按下 */
-.btn-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 10px rgba(79,70,229,0.25);
-}
-
-/* keyboard focus */
-.btn-primary:focus-visible {
-    outline: none;
-    box-shadow:
-        0 0 0 3px rgba(99,102,241,0.4),
-        0 6px 14px rgba(79,70,229,0.25);
-}
+.edit-user-wrapper { max-width: 480px; margin: 0 auto; }
+.edit-user-header { margin-bottom: 20px; text-align: center; }
+.edit-user-header h1 { font-size: 22px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+.edit-user-header p { font-size: 14px; color: #6b7280; }
+.edit-user-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px 26px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+.form-group { margin-bottom: 18px; }
+.form-group label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; display: block; }
+.form-group input, .form-group select { width: 100%; padding: 9px 11px; font-size: 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #ffffff; transition: border-color .15s ease, box-shadow .15s ease; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+.status-message { font-size: 14px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; }
+.status-message.success { background: #ecfdf5; color: #065f46; }
+.status-message.error { background: #fef2f2; color: #991b1b; }
+.button-group { margin-top: 22px; text-align: center; }
+.btn-primary { background: #4f46e5; color: #ffffff; border: none; padding: 10px 34px; font-size: 14px; font-weight: 500; border-radius: 10px; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease, background .12s ease; box-shadow: 0 6px 14px rgba(79,70,229,0.25); }
+.btn-primary:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(79,70,229,0.35); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(79,70,229,0.25); }
+.btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.4), 0 6px 14px rgba(79,70,229,0.25); }
 </style>
 
 <div class="edit-user-wrapper">
-
     <div class="edit-user-header">
         <h1>Edit User</h1>
         <p>Update user account details and permissions</p>
@@ -160,12 +51,9 @@
 
             <div class="form-group">
                 <label>Role</label>
-                <select name="role"
-                        onchange="document.getElementById('action').value='change_role'; this.form.submit();">
+                <select name="role" onchange="document.getElementById('action').value='change_role'; this.form.submit();">
                     {% for r in roles %}
-                        <option value="{{ r }}" {% if r == selected_role %}selected{% endif %}>
-                            {{ r }}
-                        </option>
+                        <option value="{{ r }}" {% if r == selected_role %}selected{% endif %}>{{ r }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -174,27 +62,18 @@
                 <label>Department</label>
                 <select name="department">
                     {% for d in departments %}
-                        <option value="{{ d.id }}"
-                            {% if edit_user.userprofile.department and edit_user.userprofile.department.id == d.id %}
-                                selected
-                            {% endif %}>
-                            {{ d.name }}
-                        </option>
+                        <option value="{{ d.id }}" {% if edit_user.userprofile.department and edit_user.userprofile.department.id == d.id %}selected{% endif %}>{{ d.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="button-group">
-                <button type="submit"
-                        class="btn-primary"
-                        onclick="document.getElementById('action').value='submit';">
+                <button type="submit" class="btn-primary" onclick="document.getElementById('action').value='submit';">
                     Update User
                 </button>
             </div>
-
         </form>
     </div>
-
 </div>
 
 {% endblock %}

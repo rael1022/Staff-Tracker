@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Certificate</title>
+
 <style>
 @page {
     size: A4 landscape;
@@ -15,6 +16,7 @@ html, body {
     margin: 0;
     padding: 0;
     background: #1f1f1f;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
 }
 
 body {
@@ -36,9 +38,9 @@ body {
 }
 
 h1 {
-    font-size: 40px;
+    font-size: 14mm;
     font-weight: 900;
-    margin: 0 0 20px;
+    margin-bottom: 8mm;
     background: linear-gradient(90deg, #fbbf24, #f59e0b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -46,45 +48,49 @@ h1 {
 }
 
 p {
-    font-size: 18px;
-    margin: 10px 0;
+    font-size: 6mm;
+    margin: 4mm 0;
     color: #d1d5db;
 }
 
 .name {
-    font-size: 36px;
+    font-size: 12mm;
     font-weight: 800;
-    margin: 25px 0;
+    margin: 8mm 0;
+    letter-spacing: 0.5mm;
     color: #fbbf24;
 }
 
 .training {
-    font-size: 24px;
+    font-size: 8mm;
     font-weight: 600;
-    margin: 15px 0;
+    margin: 6mm 0;
     color: #fcd34d;
 }
 
 .line {
-    width: 100px;
-    height: 3px;
+    width: 40mm;
+    height: 1.2mm;
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    margin: 30px auto;
+    margin: 10mm auto;
 }
 
 .date {
-    font-size: 16px;
-    margin-top: 40px;
+    font-size: 5mm;
+    margin-top: 10mm;
     color: #d1d5db;
 }
 </style>
+
 <script>
-window.onload = function() {
+window.onload = function () {
     window.print();
 };
 </script>
+
 </head>
 <body>
+
 <div class="certificate">
     <h1>Certificate of Completion</h1>
     <p>This certifies that</p>
@@ -97,5 +103,6 @@ window.onload = function() {
         Valid until {{ cert.expiry_date }}
     </div>
 </div>
+
 </body>
 </html>

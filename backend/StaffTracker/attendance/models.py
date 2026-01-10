@@ -38,3 +38,5 @@ class Attendance(models.Model):
             ).exclude(id=self.id).exists():
                 raise ValueError("The user has checked in for this training.")
         super().save(*args, **kwargs)
+    
+    

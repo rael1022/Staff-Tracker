@@ -9,16 +9,65 @@
   background: #fff;
   border-radius: 22px;
   padding: 32px;
-  margin: 50px 40px;
+  margin: 50px auto;
+  max-width: 1100px;
   box-shadow: 0 16px 45px rgba(0,0,0,.08);
 }
 
-/* ===== HEADER ===== */
-.section-header h2 {
-  margin: 0 0 24px;
-  font-size: 22px;
+/* ===== TITLE BAR (CENTERED) ===== */
+.title-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.title-center h2 {
+  margin: 0;
+  font-size: 26px;
   font-weight: 600;
-  color: #1f2937;
+  color: #3f51b5;
+  text-align: center;
+}
+
+.section-subtitle {
+  margin-top: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.title-right {
+  justify-self: end;
+}
+
+.btn-download {
+    padding: 10px 26px;
+    border-radius: 999px;
+    border: 1px dashed #c7d2fe;
+    background: #f8faff;
+    color: #3f51b5;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+}
+
+.btn-download:hover {
+    transform: translateY(-1px);
+    background: #eef2ff;
+    border-color: #818cf8;
+    box-shadow: 0 6px 16px rgba(63,81,181,0.18);
 }
 
 /* ===== FILTER BAR ===== */
@@ -26,7 +75,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-bottom: 26px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .filter-bar select {
@@ -35,6 +86,7 @@
   border: 1px solid #e5e7eb;
   font-size: 14px;
   background: #fff;
+  min-width: 160px;
   transition: border .2s ease, box-shadow .2s ease;
 }
 
@@ -44,6 +96,17 @@
   box-shadow: 0 0 0 3px rgba(63,81,181,.15);
 }
 
+/* ===== FILTER ACTIONS ===== */
+.filter-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+
+/* ===== BUTTONS ===== */
 .btn-primary {
   padding: 10px 26px;
   border-radius: 999px;
@@ -59,6 +122,35 @@
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(63,81,181,.35);
+}
+
+.btn-outline {
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(180deg, #ffffff, #f9fafb);
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background .2s ease,
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    color .18s ease;
+}
+
+.btn-outline:hover {
+  background: #eef1ff;
+  border-color: #3f51b5;
+  color: #3f51b5;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(63,81,181,.25);
 }
 
 /* ===== TABLE ===== */
@@ -117,36 +209,6 @@ tr:hover td {
   color: #c62828;
 }
 
-/* ===== ACTION BUTTON ===== */
-.btn-outline {
-  padding: 7px 20px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: linear-gradient(180deg, #ffffff, #f9fafb);
-  font-size: 12px;
-  font-weight: 500;
-  color: #374151;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition:
-    background .2s ease,
-    transform .18s ease,
-    box-shadow .18s ease,
-    border-color .18s ease,
-    color .18s ease;
-}
-
-.btn-outline:hover {
-  background: #eef1ff;
-  border-color: #3f51b5;
-  color: #3f51b5;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(63,81,181,.25);
-}
-
 /* ===== EMPTY ===== */
 .empty-row td {
   text-align: center;
@@ -158,45 +220,81 @@ tr:hover td {
 @media (max-width: 768px) {
   .filter-bar {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .title-bar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .title-right {
+    justify-self: center;
   }
 }
 </style>
 
 <div class="section-card">
-  <div class="section-header">
-    <h2>Employee Certificates</h2>
+
+  <!-- TITLE BAR -->
+  <div class="title-bar">
+    <div></div>
+
+    <div class="title-center">
+      <div class="section-header">
+        <h2>Employee Certificates</h2>
+        <p class="section-subtitle">
+          View and filter all issued employee training certificates, including validity and expiry status.
+        </p>
+      </div>
+    </div>
+
+    <div class="title-right">
+      <a href="{% url 'hr_certificate_download' %}?department={{ request.GET.department }}&trainer={{ request.GET.trainer }}&status={{ request.GET.status }}"
+         class="btn-download">
+        Download CSV
+      </a>
+    </div>
   </div>
 
   <!-- FILTER BAR -->
-  <form method="get" class="filter-bar">
-    <select name="department">
-      <option value="">All Departments</option>
-      {% for d in departments %}
-        <option value="{{ d.id }}"
-          {% if request.GET.department == d.id|stringformat:"s" %}selected{% endif %}>
-          {{ d.name }}
-        </option>
-      {% endfor %}
-    </select>
+<form method="get" class="filter-bar">
 
-    <select name="trainer">
-      <option value="">All Trainers</option>
-      {% for t in trainers %}
-        <option value="{{ t.user.id }}"
-          {% if request.GET.trainer == t.user.id|stringformat:"s" %}selected{% endif %}>
-          {{ t.user.username }}
-        </option>
-      {% endfor %}
-    </select>
+  <!-- FILTER FIELDS -->
+  <select name="department">
+    <option value="">All Departments</option>
+    {% for d in departments %}
+      <option value="{{ d.id }}"
+        {% if request.GET.department == d.id|stringformat:"s" %}selected{% endif %}>
+        {{ d.name }}
+      </option>
+    {% endfor %}
+  </select>
 
-    <select name="status">
-      <option value="">All Status</option>
-      <option value="valid" {% if request.GET.status == 'valid' %}selected{% endif %}>Valid</option>
-      <option value="expired" {% if request.GET.status == 'expired' %}selected{% endif %}>Expired</option>
-    </select>
+  <select name="trainer">
+    <option value="">All Trainers</option>
+    {% for t in trainers %}
+      <option value="{{ t.user.id }}"
+        {% if request.GET.trainer == t.user.id|stringformat:"s" %}selected{% endif %}>
+        {{ t.user.username }}
+      </option>
+    {% endfor %}
+  </select>
 
-    <button class="btn-primary">Apply Filters</button>
-  </form>
+  <select name="status">
+    <option value="">All Status</option>
+    <option value="valid" {% if request.GET.status == 'valid' %}selected{% endif %}>Valid</option>
+    <option value="expired" {% if request.GET.status == 'expired' %}selected{% endif %}>Expired</option>
+  </select>
+
+  <!-- ACTION BUTTONS (SECOND ROW) -->
+  <div class="filter-actions">
+    <button class="btn-primary" type="submit">Apply Filters</button>
+    <a href="{% url 'hr_certificate_report' %}" class="btn-outline">Reset</a>
+  </div>
+
+</form>
+
 
   <!-- TABLE -->
   <div class="table-wrap">
@@ -215,7 +313,7 @@ tr:hover td {
       {% for cert in certificates %}
       <tr>
         <td>{{ cert.user.username }}</td>
-        <td>{{ cert.user.userprofile.department.name }}</td>
+        <td>{{ cert.user.userprofile.department.name|default:"-" }}</td>
         <td>{{ cert.training.title }}</td>
         <td>{{ cert.trainer.username }}</td>
         <td>{{ cert.issue_date }}</td>
@@ -240,6 +338,7 @@ tr:hover td {
       {% endfor %}
     </table>
   </div>
+
 </div>
 
 {% endblock %}

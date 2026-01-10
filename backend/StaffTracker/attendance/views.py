@@ -12,7 +12,7 @@ from training.models import Training, TrainingRegistration
 from cpd.models import CPDRecord
 from accounts.models import UserProfile
 from certificate.models import Certificate
-from assessment.models import PostAssessment
+from assessment.models import PreAssessment
 from datetime import date, timedelta
 import json
 import base64
@@ -516,7 +516,31 @@ def qr_checkin(request):
                 
         except Exception as e:
             print(f"Warning: TrainingRegistration check error: {str(e)}")
+        
+        try:
+            pre_assessment = PreAssessment.objects.filter(
+                training__id=training_id,
+                user=user
+            ).first()
             
+            if pre_assessment:
+                if pre_assessment.status != 'Completed':
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Please complete the pre-assessment before checking in'
+                    }, status=403)
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'You must complete the pre-assessment before checking in'
+                }, status=403)
+                
+            print(f"=== DEBUG: PreAssessment check passed. Status: {pre_assessment.status}, Score: {pre_assessment.score}")
+        except Exception as e:
+            print(f"=== DEBUG: Error checking PreAssessment: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+        
         existing = Attendance.objects.filter(
             user=user,
             training_id=training_id,

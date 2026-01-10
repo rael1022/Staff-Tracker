@@ -4,6 +4,7 @@
 <h1 align="center">Staff Training and Certification Tracker</h1>
 
 A web-based application developed as a project for the **Software Engineering Fundamentals** course. 
+
 This system applies core software engineering principles to design and implement a structured solution for managing **staff training**, **certifications**, **CPD (Continuing Professional Development)**, **attendance**, and **automated notifications**. 
 
 The project emphasizes modular design, maintainability, and real-world applicability using modern web technologies.

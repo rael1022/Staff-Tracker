@@ -483,13 +483,10 @@
                 const missing = Math.max(0, totalRegistered - data.present);
                 document.getElementById('missingCount').textContent = missing;
                 
-                populateAttendanceList(data.attendances);
-                
-                if (training && (training.status === 'ongoing' || training.status === 'upcoming')) {
-                    await populateUserSelect(trainingId);
-                    document.getElementById('manualCheckinSection').style.display = 'block';
-                }
-                
+                populateAttendanceList(data.attendances, training?.status);
+
+                document.getElementById('manualCheckinSection').style.display = 'block';
+
                 document.getElementById('modalLoading').style.display = 'none';
                 
             } catch (error) {
@@ -499,7 +496,7 @@
             }
         }
 
-        function populateAttendanceList(attendances) {
+        function populateAttendanceList(attendances, trainingStatus) {
             const tbody = document.getElementById('attendanceList');
             tbody.innerHTML = '';
             
@@ -515,6 +512,8 @@
                 return;
             }
             
+            const isTrainingCompleted = trainingStatus === 'completed';
+
             attendances.forEach(att => {
                 const row = document.createElement('tr');
                 const user = att.user || { username: 'N/A', full_name: 'Unknown', role: 'Unknown' };

@@ -131,6 +131,14 @@
     {% endfor %}
 {% endif %}
 
+{% if is_past_training and approved_registrations_count > 0 %}
+<div class="alert alert-warning" style="background: #fffbeb; color: #92400e; border-color: #fbbf24;">
+    <strong>⚠️ Warning: Past Training</strong><br>
+    This training is already in the past. Saving changes will automatically mark 
+    <strong>{{ approved_registrations_count }} registered users</strong> who haven't checked in as <strong>Absent</strong>.
+</div>
+{% endif %}
+
 <div class="card">
     <form method="POST">
         {% csrf_token %}

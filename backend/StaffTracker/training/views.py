@@ -7,6 +7,10 @@ from django.contrib.auth.models import User
 from django.utils.dateparse import parse_date
 from django.utils import timezone
 from datetime import datetime, timedelta
+from attendance.models import Attendance
+from django.contrib import messages
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 
 # ---------------- HR ----------------
 def is_hr(user):
@@ -126,16 +130,21 @@ def hr_create_training(request):
 @login_required
 @user_passes_test(is_hr)
 def hr_edit_training(request, training_id):
+    from datetime import datetime
+    from django.utils import timezone
     from django.contrib.auth.models import User
     from department.models import Department
     from django.contrib import messages
-    from datetime import datetime
 
     training = get_object_or_404(Training, id=training_id)
     trainers = User.objects.filter(groups__name='Trainer')
     departments = Department.objects.all()
 
     if request.method == 'POST':
+        old_date = training.date
+        old_time = training.time
+        old_duration = training.duration_hours
+        
         new_title = request.POST.get('title')
 
         if Training.objects.filter(title__iexact=new_title).exclude(id=training.id).exists():
@@ -183,18 +192,38 @@ def hr_edit_training(request, training_id):
         date_str = request.POST.get('date')
         time_str = request.POST.get('time')
         if date_str:
-            training.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            try:
+                training.date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                messages.error(request, "Invalid date format.")
+                return redirect('hr_edit_training', training_id=training_id)
         if time_str:
-            training.time = datetime.strptime(time_str, '%H:%M').time()
-
+            try:
+                training.time = datetime.strptime(time_str, '%H:%M').time()
+            except ValueError:
+                messages.error(request, "Invalid time format.")
+                return redirect('hr_edit_training', training_id=training_id)
+        
         training.save()
-        messages.success(request, "Training updated successfully")
+        
+        messages.success(request, "Training updated successfully.")  
         return redirect('hr_dashboard')
+
+    current_time = timezone.now()
+    current_end_time = datetime.combine(
+        training.date, 
+        training.time
+    ).replace(tzinfo=current_time.tzinfo) + timedelta(hours=training.duration_hours)
+    
+    is_past_training = current_time > current_end_time
+    approved_registrations_count = training.trainingregistration_set.filter(status='Approved').count()
 
     return render(request, 'training/hr_edit_training.html', {
         'training': training,
         'trainers': trainers,
-        'departments': departments
+        'departments': departments,
+        'is_past_training': is_past_training,
+        'approved_registrations_count': approved_registrations_count,
     })
 
 @login_required
@@ -237,7 +266,7 @@ def hr_training_registrations(request):
         'selected_trainer': trainer_id,
         'selected_department': department_id,
     })
-
+    
 # ---------------- Trainer ----------------
 @login_required
 def trainer_dashboard(request):

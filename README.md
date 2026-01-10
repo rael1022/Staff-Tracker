@@ -46,6 +46,7 @@ The system supports:
 
 ## 🗂️ Project Structure
 
+```text
 Staff-Tracker/
 ├── backend/
 │   ├── .myvenv/

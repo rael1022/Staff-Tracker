@@ -18,13 +18,28 @@
 
 .left h1 {
   font-size: 36px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  background: var(--greeting-gradient, linear-gradient(90deg, #1f2937, #4f46e5));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.left p {
-  color: #666;
-  max-width: 420px;
-  line-height: 1.6;
+.left .date-time {
+  font-size: 14px;
+  color: #9ca3af;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.left .date-time::before {
+  content: "●";
+  font-size: 6px;
+  color: #c7d2fe;
 }
 
 .left .motivation {
@@ -38,17 +53,6 @@
   animation-delay: 0.2s;
 }
 
-@keyframes softFade {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 0.75;
-    transform: translateY(0);
-  }
-}
-
 .left .motivation::before {
   content: "";
   display: block;
@@ -57,6 +61,20 @@
   background: linear-gradient(90deg, #6366f1, transparent);
   margin-bottom: 10px;
   opacity: 0.4;
+}
+
+@keyframes softFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 0.75; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: greetingFade 0.5s ease both;
+}
+
+@keyframes greetingFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .card-options {
@@ -142,21 +160,16 @@
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
 <div class="dashboard-container">
   <section class="left">
-    <h1>HR Dashboard</h1>
-    <p>Welcome, <strong>{{ user.username }}</strong></p>
+    <h1 id="greeting">Good Morning, {{ user.username }}</h1>
+    <div class="date-time" id="dateTime"></div>
+
     <p class="motivation">
       Managing people is hard. That's why it matters.
     </p>
@@ -228,9 +241,55 @@
           <p>View and download employees cpd report</p>
         </div>
       </a>
-
     </div>
   </section>
 </div>
+
+<script>
+function updateDateTime() {
+  const el = document.getElementById("dateTime");
+  const now = new Date();
+
+  el.textContent = now.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 60000);
+
+function updateGreeting() {
+  const hour = new Date().getHours();
+  const el = document.getElementById("greeting");
+
+  let text = "Good Morning";
+  let gradient = "linear-gradient(90deg, #374151, #22d3ee)";
+
+  if (hour >= 12 && hour < 17) {
+    text = "Good Afternoon";
+    gradient = "linear-gradient(90deg, #1e293b, #6366f1)";
+  } else if (hour >= 17 && hour < 21) {
+    text = "Good Evening";
+    gradient = "linear-gradient(90deg, #7c3aed, #ec4899)";
+  } else if (hour >= 21 || hour < 5) {
+    text = "Good Night";
+    gradient = "linear-gradient(90deg, #020617, #312e81)";
+  }
+
+  document.documentElement.style.setProperty("--greeting-gradient", gradient);
+  el.textContent = `${text}, {{ user.username }}`;
+
+  el.classList.remove("fade-in");
+  void el.offsetWidth;
+  el.classList.add("fade-in");
+}
+
+updateGreeting();
+setInterval(updateGreeting, 300000);
+</script>
 
 {% endblock %}

@@ -1,101 +1,130 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Certificate Preview</title>
-    <style>
-        body {
-            background: linear-gradient(120deg, #f5f5f5, #e0e0e0); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Georgia', serif;
-        }
+{% extends 'dashboard/base.html' %}
+{% block content %}
 
-        .certificate {
-            width: 750px;
-            background: #1f1f1f; 
-            padding: 60px 50px;
-            border-radius: 20px;
-            text-align: center;
-            border: 6px solid transparent;
-            border-image: linear-gradient(135deg, #fbbf24, #f59e0b) 1; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            color: #fff;
-        }
+<style>
+.certificate-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 60px;
+}
 
-        h1 {
-            font-size: 40px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+.certificate {
+    width: 750px;
+    background: #1f1f1f; 
+    padding: 60px 50px;
+    border-radius: 20px;
+    text-align: center;
+    border: 6px solid transparent;
+    border-image: linear-gradient(135deg, #fbbf24, #f59e0b) 1; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    color: #fff;
+    position: relative;
+}
 
-        p {
-            font-size: 18px;
-            margin: 10px 0;
-            color: #d1d5db;
-        }
+h1 {
+    font-size: 40px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-        .name {
-            font-size: 36px;
-            font-weight: 800;
-            margin: 25px 0;
-            letter-spacing: 0.5px;
-            color: #fbbf24;
-        }
+p {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #d1d5db;
+}
 
-        .training {
-            font-size: 24px;
-            font-weight: 600;
-            margin: 15px 0;
-            color: #fcd34d;
-        }
+.name {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 25px 0;
+    letter-spacing: 0.5px;
+    color: #fbbf24;
+}
 
-        .line {
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            margin: 30px auto;
-            border-radius: 2px;
-        }
+.training {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 15px 0;
+    color: #fcd34d;
+}
 
-        .date {
-            font-size: 16px;
-            color: #d1d5db;
-            margin-top: 35px;
-        }
+.line {
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    margin: 30px auto;
+    border-radius: 2px;
+}
 
-        @media (max-width: 800px) {
-            .certificate {
-                width: 90%;
-                padding: 40px 30px;
-            }
+.date {
+    font-size: 16px;
+    color: #d1d5db;
+    margin-top: 35px;
+}
 
-            h1 { font-size: 32px; }
-            .name { font-size: 28px; }
-            .training { font-size: 20px; }
-        }
-    </style>
-</head>
-<body>
+.print-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 5px 15px rgba(79,70,229,0.4);
+    transition: all 0.25s ease;
+    z-index: 1000;
+    margin-top: 100px;
+}
+
+.print-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(79,70,229,0.6);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+
+.print-btn:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+@media (max-width: 800px) {
+    .certificate {
+        width: 90%;
+        padding: 40px 30px;
+    }
+    h1 { font-size: 32px; }
+    .name { font-size: 28px; }
+    .training { font-size: 20px; }
+}
+</style>
+
+<button class="print-btn" onclick='window.open("{% url 'print_certificate' cert.id %}", "_blank")'>
+    Print Certificate
+</button>
+
+
+
+<div class="certificate-wrapper">
     <div class="certificate">
         <h1>Certificate of Completion</h1>
         <p>This certifies that</p>
         <div class="name">{{ cert.user }}</div>
         <p>has successfully completed</p>
         <div class="training">{{ cert.training }}</div>
-
         <div class="line"></div>
-
         <div class="date">
             Issued on {{ cert.issue_date }} <br>
             Valid until {{ cert.expiry_date }}
         </div>
     </div>
-</body>
-</html>
+</div>
+
+{% endblock %}

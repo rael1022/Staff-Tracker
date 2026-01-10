@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from training.models import Training, TrainingRegistration
 
+
+
 # ====== Employee Views ======
 @login_required
 def certificate_list(request):
@@ -187,3 +189,9 @@ def hr_delete_certificate(request, cert_id):
         cert.delete()
         messages.success(request, "Certificate deleted successfully.")
     return redirect('hr_dashboard')
+
+@login_required
+def print_certificate(request, cert_id):
+    cert = get_object_or_404(Certificate, id=cert_id)
+    context = {'cert': cert}
+    return render(request, 'certificate/print_certificate.html', context)

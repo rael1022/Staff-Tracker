@@ -50,6 +50,8 @@ def hr_dashboard(request):
 def hr_create_training(request):
     from django.contrib.auth.models import User
     from department.models import Department
+    from datetime import datetime
+    from django.contrib import messages
 
     trainers = User.objects.filter(groups__name='Trainer')
     departments = Department.objects.all()
@@ -60,6 +62,14 @@ def hr_create_training(request):
         date_str = request.POST.get('date')
         time_str = request.POST.get('time')
         location = request.POST.get('location')
+
+        if Training.objects.filter(title__iexact=title).exists():
+            messages.error(request, "Training with this title already exists.")
+            return render(
+                request,
+                'training/hr_create_training.html',
+                {'trainers': trainers, 'departments': departments}
+            )
 
         cpd_points = request.POST.get('cpd_points', 0)
         try:
@@ -81,15 +91,14 @@ def hr_create_training(request):
             except User.DoesNotExist:
                 trainer_user = None
 
-        dept_id = request.POST.get('department_id')
         department = None
+        dept_id = request.POST.get('department_id')
         if dept_id:
             try:
                 department = Department.objects.get(id=dept_id)
             except Department.DoesNotExist:
                 department = None
 
-        from datetime import datetime
         date_val = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
         time_val = datetime.strptime(time_str, '%H:%M').time() if time_str else None
 
@@ -108,20 +117,36 @@ def hr_create_training(request):
         messages.success(request, "Training created successfully")
         return redirect('hr_dashboard')
 
-    return render(request, 'training/hr_create_training.html', {'trainers': trainers, 'departments': departments})
+    return render(
+        request,
+        'training/hr_create_training.html',
+        {'trainers': trainers, 'departments': departments}
+    )
 
 @login_required
 @user_passes_test(is_hr)
 def hr_edit_training(request, training_id):
     from django.contrib.auth.models import User
     from department.models import Department
+    from django.contrib import messages
+    from datetime import datetime
 
     training = get_object_or_404(Training, id=training_id)
     trainers = User.objects.filter(groups__name='Trainer')
     departments = Department.objects.all()
 
     if request.method == 'POST':
-        training.title = request.POST.get('title')
+        new_title = request.POST.get('title')
+
+        if Training.objects.filter(title__iexact=new_title).exclude(id=training.id).exists():
+            messages.error(request, "Another training with this title already exists.")
+            return render(request, 'training/hr_edit_training.html', {
+                'training': training,
+                'trainers': trainers,
+                'departments': departments
+            })
+
+        training.title = new_title
         training.description = request.POST.get('description')
         training.location = request.POST.get('location')
 
@@ -143,6 +168,8 @@ def hr_edit_training(request, training_id):
                 training.trainer = User.objects.get(id=trainer_id)
             except User.DoesNotExist:
                 training.trainer = None
+        else:
+            training.trainer = None
 
         dept_id = request.POST.get('department_id')
         if dept_id:
@@ -150,8 +177,9 @@ def hr_edit_training(request, training_id):
                 training.department = Department.objects.get(id=dept_id)
             except Department.DoesNotExist:
                 training.department = None
+        else:
+            training.department = None
 
-        from datetime import datetime
         date_str = request.POST.get('date')
         time_str = request.POST.get('time')
         if date_str:
@@ -178,8 +206,6 @@ def hr_delete_training(request, training_id):
         messages.success(request, "Training deleted successfully")
         return redirect('hr_dashboard')
     return render(request, 'training/hr_delete_training.html', {'training': training})
-
-
 
 @login_required
 @user_passes_test(is_hr)
@@ -247,9 +273,9 @@ def trainer_dashboard(request):
 @login_required
 def create_training(request):
     from datetime import datetime
-    from django.contrib.auth.models import User
-    from .models import Training
+    from django.contrib import messages
     from department.models import Department
+    from .models import Training
 
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -260,6 +286,15 @@ def create_training(request):
         cpd_points = request.POST.get('cpd_points', 0)
         duration_hours = request.POST.get('duration_hours', 1)
         department_id = request.POST.get('department_id')
+
+        if Training.objects.filter(title__iexact=title).exists():
+            messages.error(request, "Training with this title already exists.")
+            departments = Department.objects.all()
+            return render(
+                request,
+                'training/create_training.html',
+                {'departments': departments}
+            )
 
         try:
             cpd_points = max(int(cpd_points), 0)
@@ -286,6 +321,8 @@ def create_training(request):
             duration_hours=duration_hours,
             department=department
         )
+
+        messages.success(request, "Training created successfully.")
         return redirect('trainer_dashboard')
 
     departments = Department.objects.all()
@@ -295,29 +332,39 @@ def create_training(request):
 def edit_training(request, training_id):
     from datetime import datetime
     from department.models import Department
+    from django.contrib import messages
 
     training = get_object_or_404(Training, id=training_id)
 
     if request.method == 'POST':
-        training.title = request.POST.get('title')
+        new_title = request.POST.get('title')
+
+        if Training.objects.filter(title__iexact=new_title).exclude(id=training.id).exists():
+            messages.error(request, "Another training with this title already exists.")
+            departments = Department.objects.all()
+            return render(request, 'training/edit_training.html', {
+                'training': training,
+                'departments': departments
+            })
+
+        training.title = new_title
         training.description = request.POST.get('description')
+
         date_str = request.POST.get('date')
         time_str = request.POST.get('time')
         training.location = request.POST.get('location')
 
         cpd_points = request.POST.get('cpd_points')
-        if cpd_points is not None:
-            try:
-                training.cpd_points = max(int(cpd_points), 0)
-            except ValueError:
-                training.cpd_points = 0
+        try:
+            training.cpd_points = max(int(cpd_points), 0)
+        except (TypeError, ValueError):
+            training.cpd_points = 0
 
         duration_hours = request.POST.get('duration_hours')
-        if duration_hours is not None:
-            try:
-                training.duration_hours = max(int(duration_hours), 1)
-            except ValueError:
-                training.duration_hours = 1
+        try:
+            training.duration_hours = max(int(duration_hours), 1)
+        except (TypeError, ValueError):
+            training.duration_hours = 1
 
         department_id = request.POST.get('department_id')
         if department_id:
@@ -338,7 +385,10 @@ def edit_training(request, training_id):
         return redirect('trainer_dashboard')
 
     departments = Department.objects.all()
-    return render(request, 'training/edit_training.html', {'training': training, 'departments': departments})
+    return render(request, 'training/edit_training.html', {
+        'training': training,
+        'departments': departments
+    })
 
 @login_required
 def delete_training(request, training_id):

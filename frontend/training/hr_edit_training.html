@@ -3,7 +3,6 @@
 {% block content %}
 
 <style>
-    /* ===== Page Header ===== */
     .page-header {
         text-align: center;
         margin-bottom: 30px;
@@ -20,7 +19,27 @@
         color: #6b7280;
     }
 
-    /* ===== Card ===== */
+    .alert {
+        max-width: 760px;
+        margin: 0 auto 20px auto;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
     .card {
         max-width: 760px;
         margin: 0 auto 40px auto;
@@ -30,7 +49,6 @@
         box-shadow: 0 10px 24px rgba(0,0,0,0.08);
     }
 
-    /* ===== Form ===== */
     .form-group {
         margin-bottom: 18px;
     }
@@ -52,15 +70,6 @@
         border-radius: 10px;
         border: 1px solid #d1d5db;
         background: #fff;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
     }
 
     textarea {
@@ -68,7 +77,6 @@
         min-height: 90px;
     }
 
-    /* ===== Two Column ===== */
     .form-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -79,7 +87,6 @@
         max-width: 120px;
     }
 
-    /* ===== Buttons ===== */
     .form-actions {
         margin-top: 30px;
         display: flex;
@@ -96,20 +103,12 @@
         border: none;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
         text-decoration: none;
-        transition: all 0.25s ease;
     }
 
     .btn-success {
         background: linear-gradient(135deg, #22c55e, #16a34a);
         color: white;
-        box-shadow: 0 6px 14px rgba(34,197,94,0.4);
-    }
-
-    .btn-success:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(34,197,94,0.6);
     }
 
     .btn-secondary {
@@ -117,22 +116,20 @@
         color: #374151;
         border: 1px solid #d1d5db;
     }
-
-    .btn-secondary:hover {
-        background: #e5e7eb;
-    }
-
-    @media (max-width: 600px) {
-        .card {
-            padding: 22px;
-        }
-    }
 </style>
 
 <div class="page-header">
     <h1>Edit Training</h1>
     <p>Update the details of this training session</p>
 </div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
 
 <div class="card">
     <form method="POST">
@@ -168,14 +165,12 @@
         <div class="form-row">
             <div class="form-group">
                 <label>CPD Points</label>
-                <input type="number" name="cpd_points" min="1"
-                       value="{{ training.cpd_points }}" class="number-small">
+                <input type="number" name="cpd_points" min="1" value="{{ training.cpd_points }}" class="number-small">
             </div>
 
             <div class="form-group">
                 <label>Duration (hours)</label>
-                <input type="number" name="duration_hours" min="1"
-                       value="{{ training.duration_hours }}" class="number-small">
+                <input type="number" name="duration_hours" min="1" value="{{ training.duration_hours }}" class="number-small">
             </div>
         </div>
 
@@ -184,8 +179,7 @@
             <select name="department_id">
                 <option value="">Select Department</option>
                 {% for dept in departments %}
-                <option value="{{ dept.id }}"
-                    {% if training.department and training.department.id == dept.id %}selected{% endif %}>
+                <option value="{{ dept.id }}" {% if training.department and training.department.id == dept.id %}selected{% endif %}>
                     {{ dept.name }}
                 </option>
                 {% endfor %}
@@ -197,8 +191,7 @@
             <select name="trainer_id">
                 <option value="">Select Trainer</option>
                 {% for trainer in trainers %}
-                <option value="{{ trainer.id }}"
-                    {% if training.trainer and training.trainer.id == trainer.id %}selected{% endif %}>
+                <option value="{{ trainer.id }}" {% if training.trainer and training.trainer.id == trainer.id %}selected{% endif %}>
                     {{ trainer.username }}
                 </option>
                 {% endfor %}

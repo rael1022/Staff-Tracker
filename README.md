@@ -123,7 +123,7 @@ EMAIL_HOST_PASSWORD = 'your_app_password'         # line 147: replace with your 
 EMAIL_PORT = 587                                  # line 148: SMTP port
 EMAIL_USE_TLS = True                              # enable TLS
 
-
+```
 ---
 
 ## 📄 PDF & Certificate Generation

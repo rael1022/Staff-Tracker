@@ -213,14 +213,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" onclick="exportAttendance()">
-                                <i class="bi bi-download me-1"></i>Export CSV
-                            </button>
-                            <button class="btn btn-success" onclick="refreshAttendance()">
-                                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
-                            </button>
-                        </div>
                     </div>
 
                     <div class="row mb-4">
@@ -245,14 +237,6 @@
                                 <div class="card-body text-center py-3">
                                     <h6 class="mb-1">Absent</h6>
                                     <h3 id="absentCount" class="mb-0">0</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-warning text-dark">
-                                <div class="card-body text-center py-3">
-                                    <h6 class="mb-1">Not Checked In</h6>
-                                    <h3 id="missingCount" class="mb-0">0</h3>
                                 </div>
                             </div>
                         </div>
@@ -479,10 +463,6 @@
                 document.getElementById('presentCount').textContent = data.present;
                 document.getElementById('absentCount').textContent = data.absent;
                 
-                const totalRegistered = await getTotalRegistered(trainingId);
-                const missing = Math.max(0, totalRegistered - data.present);
-                document.getElementById('missingCount').textContent = missing;
-                
                 populateAttendanceList(data.attendances, training?.status);
 
                 document.getElementById('manualCheckinSection').style.display = 'block';
@@ -543,11 +523,13 @@
                             `<span class="badge bg-secondary">Manual</span>`}
                     </td>
                     <td>
-                        ${!isPresent ? 
+                        ${!isPresent && !isTrainingCompleted ? 
                             `<button class="btn btn-sm btn-outline-success" 
                                     onclick="manualCheckin(${currentTrainingId}, ${user.id})">
                                 <i class="bi bi-check-lg"></i> Check In
                             </button>` : 
+                            !isPresent && isTrainingCompleted ?
+                            `<span class="text-muted"><i class="bi bi-clock-history me-1"></i>Training is Close</span>` :
                             `<span class="text-muted">Checked In</span>`}
                     </td>
                 `;

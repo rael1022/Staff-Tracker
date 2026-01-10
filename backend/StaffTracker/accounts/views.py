@@ -81,6 +81,22 @@ def register_view(request):
                 "department_value": department_value
             })
 
+        if User.objects.filter(email=email).exists():
+            if selected_role == "HR":
+                departments = Department.objects.none()
+            elif selected_role:
+                allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
+                departments = Department.objects.filter(name__in=allowed_dept_names)
+            else:
+                departments = Department.objects.all()
+
+            return render(request, "register/register.html", {
+                "error": "Email already exists",
+                "selected_role": selected_role,
+                "departments": departments,
+                "department_value": department_value
+            })
+
         department = None
         if selected_role != "HR" and department_value:
             department = get_object_or_404(Department, id=department_value)
@@ -104,20 +120,12 @@ def register_view(request):
             group, _ = Group.objects.get_or_create(name=selected_role)
             user.groups.add(group)
 
-        if selected_role == "HR":
-            departments = Department.objects.none()
-        elif selected_role:
-            allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
-            departments = Department.objects.filter(name__in=allowed_dept_names)
-        else:
-            departments = Department.objects.all()
-
         return render(request, "register/register.html", {
             "message": "Register Successful. Awaiting HR approval.",
-            "selected_role": '',   
-            "departments": Department.objects.none(),  
-            "department_value": ''  ,
-            "request": {"POST": {"username": "", "email": ""}} 
+            "selected_role": '',
+            "departments": Department.objects.none(),
+            "department_value": '',
+            "request": {"POST": {"username": "", "email": ""}}
         })
 
     return render(request, "register/register.html", {
@@ -125,7 +133,6 @@ def register_view(request):
         "departments": departments,
         "department_value": department_value
     })
-
 @login_required
 def hr_create_user(request):
     if not request.user.groups.filter(name='HR').exists():
@@ -139,6 +146,9 @@ def hr_create_user(request):
         'roles': roles,
         'departments': departments,
         'selected_role': selected_role,
+        'username': '',
+        'email': '',
+        'password': '',
         'message': '',
         'error': '',
     }
@@ -152,12 +162,22 @@ def hr_create_user(request):
         role = request.POST.get('role')
         department_id = request.POST.get('department')
 
+        context['username'] = username
+        context['email'] = email
+        context['password'] = password
+        context['selected_role'] = role
+        context['departments'] = Department.objects.filter(name__in=ROLE_DEPARTMENTS.get(role, [])) if role else Department.objects.none()
+
         if not username or not email or not password or not role:
             context['error'] = "Username, email, password, and role are required."
             return render(request, 'manage_account/create_user.html', context)
 
         if User.objects.filter(username=username).exists():
             context['error'] = "Username already exists."
+            return render(request, 'manage_account/create_user.html', context)
+
+        if User.objects.filter(email=email).exists():
+            context['error'] = "Email already exists."
             return render(request, 'manage_account/create_user.html', context)
 
         user = User.objects.create_user(username=username, email=email, password=password)
@@ -177,22 +197,22 @@ def hr_create_user(request):
         user.groups.add(group)
 
         context['message'] = "User created successfully."
-        context['departments'] = Department.objects.filter(name__in=ROLE_DEPARTMENTS.get(role, []))
-        context['selected_role'] = role
+        context['username'] = ''
+        context['email'] = ''
+        context['password'] = ''
 
     return render(request, 'manage_account/create_user.html', context)
 
 @login_required
 def hr_update_user(request, user_id):
     if not request.user.groups.filter(name='HR').exists():
-        return redirect('/dashboard/')
+        return redirect('hr_manage_users')
 
     user = get_object_or_404(User, id=user_id)
     profile = user.userprofile
 
     roles = list(ROLE_DEPARTMENTS.keys())
     selected_role = request.POST.get('role', profile.role)
-
     allowed_dept_names = ROLE_DEPARTMENTS.get(selected_role, [])
     departments = Department.objects.filter(name__in=allowed_dept_names)
 
@@ -222,6 +242,10 @@ def hr_update_user(request, user_id):
             context['error'] = "Username already exists."
             return render(request, 'manage_account/update_user.html', context)
 
+        if User.objects.filter(email=new_email).exclude(id=user.id).exists():
+            context['error'] = "Email already exists."
+            return render(request, 'manage_account/update_user.html', context)
+
         user.username = new_username
         user.email = new_email
         user.groups.clear()
@@ -238,30 +262,30 @@ def hr_update_user(request, user_id):
         profile.save()
 
         messages.success(request, "User updated successfully.")
-        return redirect('/dashboard/')
+        return redirect('hr_manage_users')
 
     return render(request, 'manage_account/update_user.html', context)
 
 @login_required
 def hr_delete_user(request, user_id):
     if not request.user.groups.filter(name='HR').exists():
-        return redirect('/dashboard/')
+        return redirect('hr_manage_users')
 
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         user.delete()
-        return redirect('/dashboard/')
+        return redirect('hr_manage_users')
 
 @login_required
 def hr_toggle_user(request, user_id):
     if not request.user.groups.filter(name='HR').exists():
-        return redirect('/dashboard/')
+        return redirect('hr_manage_users')
 
     user = User.objects.get(id=user_id)
     user.is_active = not user.is_active
     user.save()
 
-    return redirect('/dashboard/')
+    return redirect('hr_manage_users')
 
 @login_required
 def hr_manage_users(request):

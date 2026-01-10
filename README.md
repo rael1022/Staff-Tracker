@@ -46,17 +46,41 @@ The system supports:
 
 ## 🗂️ Project Structure
 
-backend/
-├── requirements.txt
-├── myvenv/
-└── StaffTracker/
-    ├── manage.py
-    ├── StaffTracker/
-    ├── accounts/
-    ├── training/
-    ├── attendance/
-    └── templates/
+Staff-Tracker/
+├── backend/
+│   ├── .myvenv/
+│   ├── StaffTracker/
+│   │   ├── accounts/
+│   │   ├── assessment/
+│   │   ├── assets/
+│   │   ├── attendance/
+│   │   ├── certificate/
+│   │   ├── cpd/
+│   │   ├── department/
+│   │   ├── evaluation/
+│   │   ├── registration/
+│   │   ├── reports/
+│   │   ├── StaffTracker/
+│   │   ├── training/
+│   │   └── manage.py
+│   └── requirements.txt
+├── frontend/
+│   ├── assessment/
+│   ├── attendance/
+│   ├── certificate/
+│   ├── cpd/
+│   ├── dashboard/
+│   ├── evaluation/
+│   ├── login/
+│   ├── manage_account/
+│   ├── register/
+│   ├── reports/
+│   ├── trainer/
+│   └── training/
+├── .gitignore
+└── README.md
 
+```    
 ---
 
 ## ⚙️ Installation & Setup

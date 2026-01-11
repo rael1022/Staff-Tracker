@@ -10,4 +10,4 @@ staticfiles/
 
 # Environment
 .env
-venv/
+backend/.myvenv/

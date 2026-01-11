@@ -1,0 +1,17 @@
+# Django Python 代码统计
+*.py linguist-language=Python
+
+# 忽略虚拟环境统计
+backend/.myvenv/* linguist-vendored
+
+# 忽略前端文件统计
+frontend/* linguist-vendored
+
+# 忽略 Django 静态资源统计
+backend/StaffTracker/assets/* linguist-vendored
+backend/staticfiles/* linguist-vendored
+backend/media/* linguist-vendored
+
+# 可选：忽略其他生成文件
+*.pyc linguist-generated
+__pycache__/* linguist-generated

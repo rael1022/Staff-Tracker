@@ -133,7 +133,7 @@ http://127.0.0.1:8000/
 
 ---
 
-## Gmail Email Configuration
+## ✉️ Gmail Email Configuration
 
 To enable the system to send email reminders, you need to configure Gmail SMTP in `settings.py`. It is recommended to use a **Gmail App Password** instead of your regular Gmail password.
 

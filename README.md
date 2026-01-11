@@ -81,6 +81,7 @@ Staff-Tracker/
 │   ├── reports/
 │   ├── trainer/
 │   └── training/
+├── .gitattributes
 ├── .gitignore
 └── README.md
 

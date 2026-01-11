@@ -53,7 +53,6 @@ The system supports:
 ```text
 Staff-Tracker/
 ├── backend/
-│   ├── .myvenv/
 │   ├── StaffTracker/
 │   │   ├── accounts/
 │   │   ├── assessment/

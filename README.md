@@ -146,11 +146,8 @@ To enable the system to send email reminders, you need to configure Gmail SMTP i
 Open `settings.py` and modify the following lines:
 
 ```python
-EMAIL_HOST = 'smtp.gmail.com'                     # line 145: SMTP host
 EMAIL_HOST_USER = 'your_email@gmail.com'          # line 146: replace with your Gmail address
 EMAIL_HOST_PASSWORD = 'your_app_password'         # line 147: replace with your 16-character App Password
-EMAIL_PORT = 587                                  # line 148: SMTP port
-EMAIL_USE_TLS = True                              # enable TLS
 
 ```
 ---

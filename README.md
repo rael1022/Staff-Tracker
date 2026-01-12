@@ -138,7 +138,9 @@ python manage.py createsuperuser
 
 ### 6️⃣ Run Development Server
 
+```bash
 python manage.py runserver
+```
 
 📍 Access the system at:  
 http://127.0.0.1:8000/

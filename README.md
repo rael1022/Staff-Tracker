@@ -119,16 +119,22 @@ source myvenv/bin/activate
 
 ### 3️⃣ Install Dependencies
 
+```bash
 pip install -r requirements.txt
+```
 
 ### 4️⃣ Apply Database Migrations
 
+```bash
 cd StaffTracker
 python manage.py migrate
+```
 
 ### 5️⃣ Create Superuser (Optional)
 
+```bash
 python manage.py createsuperuser
+```
 
 ### 6️⃣ Run Development Server
 

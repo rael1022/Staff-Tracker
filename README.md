@@ -94,22 +94,28 @@ Follow the steps below to run the project locally.
 
 ### 1️⃣ Clone the Repository
 
-git clone <your-repository-url>
+```bash
+git clone https://github.com/rael1022/Staff-Tracker.git
 cd Staff-Tracker/backend
+```
 
 ### 2️⃣ Create & Activate Virtual Environment
 
+```bash
 python -m venv myvenv
+```
 
 **Windows**
 
+```bash
 myvenv\Scripts\activate
-
+```
 
 **macOS / Linux**
 
+```bash
 source myvenv/bin/activate
-
+```
 
 ### 3️⃣ Install Dependencies
 

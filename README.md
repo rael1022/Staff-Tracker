@@ -162,7 +162,6 @@ Open `settings.py` and modify the following lines:
 ```python
 EMAIL_HOST_USER = 'your_email@gmail.com'          # line 146: replace with your Gmail address
 EMAIL_HOST_PASSWORD = 'your_app_password'         # line 147: replace with your 16-character App Password
-
 ```
 ---
 

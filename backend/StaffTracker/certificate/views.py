@@ -5,8 +5,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.models import User
 from training.models import Training, TrainingRegistration
-
-
+from attendance.models import Attendance
 
 # ====== Employee Views ======
 @login_required
@@ -22,7 +21,7 @@ def certificate_list(request):
 # ====== Trainer Views ======
 @login_required
 def trainer_certificates_dashboard(request):
-    """Trainer dashboard: all trainings merged in one table with filters"""
+    """Trainer dashboard: show only employees with attendance, merged trainings with filters"""
     if request.user.userprofile.role != 'Trainer':
         return redirect('dashboard')
 
@@ -34,6 +33,7 @@ def trainer_certificates_dashboard(request):
     employee_filter = request.GET.get('employee')     # username
     status_filter = request.GET.get('status')         # Active / Expired / Expiring Soon / Not Issued
 
+    # ====== Trainer trainings ======
     trainings = Training.objects.filter(trainer=request.user).prefetch_related(
         'trainingregistration_set', 'certificate_set'
     )
@@ -44,27 +44,40 @@ def trainer_certificates_dashboard(request):
         if training_filter and str(training.id) != training_filter:
             continue
 
+        # ====== Completed registrations ======
         completed_regs = training.trainingregistration_set.filter(
             complete_status='Completed'
         ).select_related('employee')
 
+        # ====== Certificate map ======
         cert_map = {cert.user_id: cert for cert in training.certificate_set.all()}
 
         for reg in completed_regs:
             employee = reg.employee
 
+            # ====== Attendance check ======
+            attended = Attendance.objects.filter(
+                user=employee,
+                training_id=str(training.id),
+                status=Attendance.Status.PRESENT
+            ).exists()
+
+            if not attended:
+                continue  # 没出勤的员工不显示
+
             # ====== Employee name filter ======
             if employee_filter and employee_filter.lower() not in employee.username.lower():
                 continue
 
+            # ====== Get certificate ======
             cert = cert_map.get(employee.id)
 
             # ====== Certificate status calculation ======
             if cert:
-                days = (cert.expiry_date - today).days
-                if days < 0:
+                days_to_expiry = (cert.expiry_date - today).days
+                if days_to_expiry < 0:
                     status = 'Expired'
-                elif days <= 7:
+                elif days_to_expiry <= 7:
                     status = 'Expiring Soon'
                 else:
                     status = 'Active'
@@ -75,6 +88,7 @@ def trainer_certificates_dashboard(request):
             if status_filter and status != status_filter:
                 continue
 
+            # ====== Append row ======
             rows.append({
                 'training': training,
                 'employee': employee,

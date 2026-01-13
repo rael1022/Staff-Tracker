@@ -53,12 +53,12 @@ class EvaluationAdmin(admin.ModelAdmin):
     )
     
     def training_title_truncated(self, obj):
-        title = obj.training.training_title
+        title = obj.training.title
         return title[:50] + '...' if len(title) > 50 else title
     training_title_truncated.short_description = 'Training'
     
     def user_info(self, obj):
-        return f"{obj.user.username} ({obj.user.get_full_name() or 'No name'})"
+        return f"{obj.user.username}"
     user_info.short_description = 'User'
     
     def rating_display(self, obj):

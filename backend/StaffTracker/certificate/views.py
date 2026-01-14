@@ -63,7 +63,7 @@ def trainer_certificates_dashboard(request):
             ).exists()
 
             if not attended:
-                continue  # 没出勤的员工不显示
+                continue 
 
             # ====== Employee name filter ======
             if employee_filter and employee_filter.lower() not in employee.username.lower():

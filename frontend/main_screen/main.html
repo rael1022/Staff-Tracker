@@ -1,5 +1,8 @@
 {% load static %}
 {% block content %}
+<head>
+    <title>Staff Training & Certification Tracker</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/img/logo.png' %}" />
 <style>
 html, body {
     margin: 0;
@@ -230,7 +233,9 @@ h1 span { color: #2563eb; }
     .visual { max-height: 300px; overflow-y: auto; }
 }
 </style>
+</head>
 
+<body>
 <div class="bg-glow"></div>
 
 <header class="brand-header">
@@ -273,4 +278,5 @@ h1 span { color: #2563eb; }
         </div>
     </div>
 </section>
+</body>
 {% endblock %}

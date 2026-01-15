@@ -17,6 +17,9 @@ ROLE_DEPARTMENTS = {
     'HR': [],  
 }
 
+def main_screen(request):
+    return render(request, 'main_screen/main.html')
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')

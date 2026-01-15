@@ -1,0 +1,276 @@
+{% load static %}
+{% block content %}
+<style>
+html, body {
+    margin: 0;
+    height: 100%;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color: #0f172a;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 70%);
+    overflow: hidden;
+}
+
+/* ===== Background Glow ===== */
+.bg-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-glow::before,
+.bg-glow::after {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.45;
+}
+
+.bg-glow::before { background: #93c5fd; top: -120px; left: -120px; }
+.bg-glow::after { background: #c7d2fe; bottom: -140px; right: -140px; }
+
+/* ===== Header Brand ===== */
+header.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 32px 24px 100px;
+    position: fixed;
+    width: 100%;
+    background: transparent;
+    z-index: 10;
+}
+
+.brand-header img {
+    width: 100px;
+    height: auto;
+    opacity: 0.9;
+}
+
+.brand-header span {
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #2563eb, #4f46e5, #10b981, #f472b6, #2563eb);
+    background-size: 400% 400%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientFlow 6s ease infinite;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+
+/* ===== Hero Section ===== */
+.hero {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 72px;
+    align-items: center;
+    height: calc(100vh - 80px);
+}
+
+/* ===== Float Animation for Right Card ===== */
+@keyframes float {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== Left Hero Content ===== */
+h1 {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 24px;
+}
+
+h1 span { color: #2563eb; }
+
+.subtitle {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #475569;
+    max-width: 520px;
+    margin-bottom: 44px;
+}
+
+/* ===== Actions ===== */
+.actions {
+    display: flex;
+    gap: 16px;
+}
+
+.btn {
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    box-shadow: 0 14px 32px rgba(37,99,235,0.35);
+    letter-spacing: 0.3px;
+}
+
+.btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 42px rgba(37,99,235,0.45);
+}
+
+.btn.secondary {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    color: #0f172a;
+    background: white;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.btn.secondary::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300%;
+    height: 300%;
+    background: linear-gradient(45deg, #2563eb, #4f46e5, #2563eb, #4f46e5);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s ease;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.btn.secondary:hover::before { transform: translate(-50%, -50%) scale(1); }
+.btn.secondary:hover { color: white; transform: translateY(-3px); }
+.btn.secondary span { position: relative; z-index: 1; }
+
+/* ===== Right Card ===== */
+.visual {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(16px);
+    border-radius: 26px;
+    padding: 48px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: float 5s ease-in-out infinite;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.visual:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.16);
+}
+
+.visual h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: #1e293b;
+}
+
+.visual ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.visual li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 22px;
+    font-size: 15px;
+    color: #334155;
+}
+
+.visual li::before {
+    content: "✓";
+    color: #2563eb;
+    font-weight: 700;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        height: auto;
+        justify-items: center;
+    }
+    h1 { font-size: 42px; }
+    .hero { align-items: flex-start; padding-top: 160px; }
+    .visual { max-height: 300px; overflow-y: auto; }
+}
+</style>
+
+<div class="bg-glow"></div>
+
+<header class="brand-header">
+    <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+    <span>Staff Training & Cert Tracker</span>
+</header>
+
+<section class="hero">
+    <div class="container">
+        <!-- Left Content -->
+        <div>
+            <h1>
+                Staff Training & Certification,<br>
+                <span>Handled Properly</span>
+            </h1>
+
+            <p class="subtitle">
+                A centralized system for organizations to manage staff training,
+                attendance tracking, and certification compliance
+                with clarity and control.
+            </p>
+
+            <div class="actions">
+                <a href="{% url 'login' %}" class="btn primary">Login</a>
+                <a href="{% url 'register' %}" class="btn secondary"><span>Create Account</span></a>
+            </div>
+        </div>
+
+        <!-- Right Card -->
+        <div class="visual">
+            <h3>Key Features</h3>
+            <ul>
+                <li>Centralized training and certification records</li>
+                <li>Attendance tracking with historical records</li>
+                <li>Role-based access control (HR, HOD, Trainer, Employee)</li>
+                <li>PDF certificate generation</li>
+                <li>QR code-based training attendance recording</li>
+                <li>Certificate expiry tracking and automated reminders</li>
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

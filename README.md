@@ -76,6 +76,7 @@ Staff-Tracker/
 │   ├── dashboard/
 │   ├── evaluation/
 │   ├── login/
+│   ├── main_screen/
 │   ├── manage_account/
 │   ├── register/
 │   ├── reports/

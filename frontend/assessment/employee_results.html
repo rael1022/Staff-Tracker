@@ -156,70 +156,8 @@
         </div>
     </div>
 
-    <!-- Training Assessments -->
-    <div class="section">
-        <div class="section-title">Training Assessments</div>
-
-        {% if registration_status %}
-            {% for item in registration_status %}
-                {% with registration=item.registration %}
-                <div class="assess-card">
-
-                    <h3>{{ registration.training.title }}</h3>
-
-                    <div class="row-line">
-                        Training Status:
-                        {% if registration.complete_status == "Completed" %}
-                            <span class="status status-ok">Completed</span>
-                        {% else %}
-                            <span class="status status-wait">Not Completed</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="row-line">
-                        <strong>Pre-Assessment:</strong>
-                        {% if item.assessment_available == 'pre' %}
-                            {% if item.pre_done %}
-                                <span class="status status-ok">Completed</span>
-                            {% else %}
-                                <a class="action"
-                                   href="{% url 'pre_assessment' training_id=registration.training.id %}">
-                                    Take Pre-Assessment
-                                </a>
-                            {% endif %}
-                        {% else %}
-                            <span class="status status-wait">Not available</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="row-line">
-                        <strong>Post-Assessment:</strong>
-                        {% if item.assessment_available == 'post' %}
-                            {% if item.post_done %}
-                                <span class="status status-ok">Completed</span>
-                            {% else %}
-                                <a class="action"
-                                   href="{% url 'post_assessment' training_id=registration.training.id %}">
-                                    Take Post-Assessment
-                                </a>
-                            {% endif %}
-                        {% else %}
-                            <span class="status status-wait">Available after completion</span>
-                        {% endif %}
-                    </div>
-
-                </div>
-                {% endwith %}
-            {% endfor %}
-        {% else %}
-            <div class="empty">No approved trainings found</div>
-        {% endif %}
-    </div>
-
     <!-- History -->
     <div class="section">
-        <div class="section-title">Assessment History</div>
-
         <div class="section-title" style="margin-top:16px;">Pre-Assessments</div>
         {% if pre_assessments %}
             <div class="history">

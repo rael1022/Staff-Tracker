@@ -131,7 +131,7 @@ cd StaffTracker
 python manage.py migrate
 ```
 
-### 5️⃣ Create Superuser (Optional)
+### 5️⃣ Create Superuser
 
 ```bash
 python manage.py createsuperuser
@@ -145,6 +145,8 @@ python manage.py runserver
 
 📍 Access the system at:  
 http://127.0.0.1:8000/
+
+Log in using the superuser account created in Step 5.
 
 ---
 

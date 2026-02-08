@@ -30,7 +30,7 @@ The system supports:
 - 🕒 Attendance management  
 - 📧 Automated certificate expiry reminder emails  
 - 📄 PDF certificate generation  
-- 🔳 QR code generation for certificates  
+- 🔳 QR code generation for attendance 
 - 🔐 Secure authentication and authorization  
 - 🌐 RESTful API support  
 

@@ -166,10 +166,9 @@ EMAIL_HOST_PASSWORD = 'your_app_password'         # line 147: replace with your 
 ```
 ---
 
-## 📄 PDF & Certificate Generation
+## 📄 Certificate PDF Generation
 
 The system generates certificates in PDF format using **ReportLab**, **PyHanko**, and **PyPDF**.  
-QR codes embedded in certificates are generated using the **qrcode** library.
 
 All required libraries are included in the `requirements.txt` file.
 
